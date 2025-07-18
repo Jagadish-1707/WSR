@@ -57,7 +57,7 @@ export interface WSRProjectDetailsDto {
 }
 export class WSRTaskDto {
   task!: string;
-  status!: boolean;
+  taskStatus!: string;
   remarks!: string;
   createdBy!: string;
   createdOn!: string;
@@ -67,10 +67,10 @@ export interface WSRIssueDto {
   type: string;
   functionalArea: string;
   description: string;
-  actionRequired: string;    
+  ActionRequired: string;    
   dateReported: string;        
   resolveByDate: string;       
-  issueOwner: string;          
+  IssueOwner: string;          
   createdBy: string;
   createdOn: string;
 }

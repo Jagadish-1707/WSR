@@ -94,14 +94,14 @@ export class WsrPayloadService {
     const wsrTaskDto: WSRTaskDto[] = [
       ...(formModel.progressData || []).map((item: any) => ({
         task: item.task || '',
-        status: item.status === 'Completed' || item.status === true,
+        taskStatus: item.status || '',
         remarks: item.remarks || '',
         createdBy,
         createdOn: now
       })),
       ...(formModel.plannedActivities || []).map((item: any) => ({
         task: item.task || '',
-        status: item.status === 'Completed' || item.status === true,
+        taskStatus: item.status || '',
         remarks: item.remarks || '',
         createdBy,
         createdOn: now
@@ -112,10 +112,10 @@ export class WsrPayloadService {
     type: item.type || '',
     functionalArea: item.functionalArea || '',
     description: item.description || '',
-    actionRequired: item.actions || '',
+    ActionRequired: item.ActionRequired || '',
     dateReported: item.dateRaised ? new Date(item.dateRaised).toISOString() : now,
     resolveByDate: item.resolveBy ? new Date(item.resolveBy).toISOString() : now,
-    issueOwner: item.owner || '',
+    IssueOwner: item.IssueOwner || '',
     createdBy,
     createdOn: now
   }));

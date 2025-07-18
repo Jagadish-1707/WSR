@@ -328,6 +328,7 @@ namespace backend.ReposirotyService
                         Id = projectStatus.Id,
                         ProjectId = projectStatus.ProjectId,
                         ProjectName= projectNameForStatus.ProjectName,
+                        ClientName = projectNameForStatus.ClientName,
                         WSRId = projectStatus.WSRId,
                         OverallStatus = projectStatus.OverallStatus,
                         Schedule = projectStatus.Schedule,

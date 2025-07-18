@@ -37,7 +37,8 @@ declare var pdfMake: any;
 interface ProgressItem {
   sno?: number;
   task: string;
-  active: string;
+  active: boolean;
+  taskStatus: string;
   remarks: string;
 }
 
@@ -92,10 +93,10 @@ interface ProjectData {
     type?: string;
     functionalArea?: string;
     description?: string;
-    ActionRequired?: string;
+    actionRequired?: string;
     dateRaised?: string;
     resolveBy?: string;
-    IssueOwner?: string;
+    issueOwner?: string;
   }[];
 
   keyRisks?: {
@@ -1214,7 +1215,7 @@ export class WSRComponent implements OnInit {
           ...project.progressData.map((item, index) => [
             (item.sno || index + 1).toString(),
             item.task || '',
-            item.active || '',
+            item.taskStatus || '',
             item.remarks || ''
           ])
         ];
@@ -1235,7 +1236,7 @@ export class WSRComponent implements OnInit {
           ...project.plannedActivities.map((item, index) => [
             (item.sno || index + 1).toString(),
             item.task || '',
-            item.active || '',
+            item.taskStatus || '',
             item.remarks || ''
           ])
         ];
@@ -1282,10 +1283,10 @@ export class WSRComponent implements OnInit {
             item.type || '',
             item.functionalArea || '',
             item.description || '',
-            item.ActionRequired || '',
+            item.actionRequired || '',
             item.dateRaised || '',
             item.resolveBy || '',
-            item.IssueOwner || ''
+            item.issueOwner || ''
           ])
         ];
         issueSlide.addText('Key Issues:', { x: 0.5, y: 1, fontSize: 14, bold: true });
@@ -1697,7 +1698,7 @@ export class WSRComponent implements OnInit {
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.active || '',
+                          text: item.taskStatus || '',
                           alignment: 'center',
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
@@ -1753,7 +1754,7 @@ export class WSRComponent implements OnInit {
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.active || '',
+                          text: item.taskStatus || '',
                           alignment: 'center',
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
@@ -1868,7 +1869,7 @@ export class WSRComponent implements OnInit {
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.ActionRequired || '',
+                          text: item.actionRequired || '',
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
@@ -1880,7 +1881,7 @@ export class WSRComponent implements OnInit {
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.IssueOwner || '',
+                          text: item.issueOwner || '',
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                       ]),

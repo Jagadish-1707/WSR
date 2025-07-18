@@ -296,7 +296,7 @@
           <tr *ngFor="let item of formModel.progressData; let i = index" [class.even-row]="i % 2 !== 0">
             <td class="text-center">{{ i + 1 }}</td>
             <td>{{ item.task }}</td>
-            <td class="text-center">{{ item.status }}</td>
+            <td class="text-center">{{ item.TaskStatus }}</td>
             <td>{{ item.remarks }}</td>
           </tr>
         </tbody>
@@ -341,7 +341,7 @@
           <tr *ngFor="let item of formModel.plannedActivities; let i = index" [class.even-row]="i % 2 !== 0">
             <td class="text-center">{{ i + 1 }}</td>
             <td>{{ item.task }}</td>
-            <td class="text-center">{{ item.status }}</td>
+            <td class="text-center">{{ item.TaskStatus }}</td>
             <td>{{ item.remarks }}</td>
           </tr>
         </tbody>
@@ -399,10 +399,10 @@
             <td>{{ issue.type }}</td>
             <td>{{ issue.functionalArea }}</td>
             <td>{{ issue.description }}</td>
-            <td>{{ issue.actions }}</td>
+            <td>{{ issue.ActionRequired }}</td>
             <td>{{ issue.dateRaised }}</td>
             <td>{{ issue.resolveBy }}</td>
-            <td>{{ issue.owner }}</td>
+            <td>{{ issue.IssueOwner }}</td>
           </tr>
         </tbody>
       </table>

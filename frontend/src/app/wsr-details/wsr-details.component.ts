@@ -58,9 +58,9 @@ interface ProjectData {
   projectDescription?: string;
   
 
-  progressData?: { task: string; status: string; remarks: string }[];
+  progressData?: { task: string; TaskStatus: string; remarks: string }[];
   keyAchievements?: ProgressItem[];
-  plannedActivities?: { task: string; status: string; remarks: string }[];
+  plannedActivities?: { task: string; TaskStatus: string; remarks: string }[];
   nextPeriodActivities?: ProgressItem[];
 
   resourceData?: ResourceItem[];

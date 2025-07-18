@@ -229,7 +229,7 @@
                                         <tr *ngIf="!item.active" [class.even-row]="i % 2 !== 0">
                                             <td class="text-center">{{ i + 1 }}</td>
                                             <td>{{ item.task }}</td>
-                                            <td class="text-center">{{ item.active }}</td>
+                                            <td class="text-center">{{ item.taskStatus }}</td>
                                             <td>{{ item.remarks }}</td>
                                         </tr>
                                     </ng-container>
@@ -267,7 +267,7 @@
                                         <tr *ngIf="item.active" [class.even-row]="i % 2 !== 0">
                                             <td class="text-center">{{ i + 1 }}</td>
                                             <td>{{ item.task }}</td>
-                                            <td class="text-center">{{ item.active }}</td>
+                                            <td class="text-center">{{ item.taskStatus }}</td>
                                             <td>{{ item.remarks }}</td>
                                         </tr>
                                     </ng-container>
@@ -329,10 +329,10 @@
                                         <td>{{ issue.type }}</td>
                                         <td>{{ issue.functionalArea }}</td>
                                         <td>{{ issue.description }}</td>
-                                        <td>{{ issue.ActionRequired }}</td>
+                                        <td>{{ issue.actionRequired }}</td>
                                         <td>{{ issue.dateRaised | date: 'dd/MM/yyyy' }}</td>
                                         <td>{{ issue.resolveBy | date: 'dd/MM/yyyy' }}</td>
-                                        <td>{{ issue.IssueOwner }}</td>
+                                        <td>{{ issue.issueOwner }}</td>
                                     </tr>
                                 </tbody>
                             </table>
