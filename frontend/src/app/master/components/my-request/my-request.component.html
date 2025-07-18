@@ -1,0 +1,256 @@
+<div class="page-bg">
+  <div class="card">
+        <div class="p-input-icon-left">
+          <span class="flex">
+            <span role="button" tabindex="0" class="p-button-custom"
+                  (keydown.enter)="WeeklyTimeLog()"
+                  (keydown.space)="WeeklyTimeLog()" (click)="WeeklyTimeLog()"
+                  aria-label="Go Back">
+              <span class="material-symbols-outlined back-button-icon" style="font-weight: 900">
+                arrow_back_ios
+              </span>
+            </span>
+            <div class="header-text mb-3" style="font-size: 18px; font-weight: 600">
+              My Timesheet Requests
+            </div>
+          </span>
+          <div class="flex flex-row flex-nowrap gap-3 align-content-center">
+            <!-- Project Filter -->
+            <div class="p-input-icon-left">
+              <p-dropdown
+                [options]="projectOptions"
+                [(ngModel)]="filterProject"
+                *ngIf="!filtersVisible"
+                placeholder="Select Project"
+                (onChange)="applyFilters()">
+              </p-dropdown>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="p-input-icon-left">
+              <p-dropdown
+                [options]="statusOptions"
+                [(ngModel)]="filterStatus"
+                *ngIf="!filtersVisible"
+                placeholder="Select Status"
+                (onChange)="applyFilters()">
+              </p-dropdown>
+            </div>
+
+            <!-- Billing Type Filter -->
+            <div class="p-input-icon-left flex">
+              <p-dropdown
+                [options]="billingTypes"
+                [(ngModel)]="filterBillingType"
+                *ngIf="!filtersVisible"
+                placeholder="Select Billing Type"
+                (onChange)="applyFilters()">
+              </p-dropdown>
+            </div>
+
+            <div class="p-input-icon-left">
+              <p-calendar
+                placeholder="Select Date Range"
+                selectionMode="range"
+                appendTo="body"
+                *ngIf="!filtersVisible"
+                dateFormat="dd/mm/yy"
+                [(ngModel)]="filterLogDate"
+                (onSelect)="applyFilters()">
+              </p-calendar>
+            </div>
+          </div>
+          <p-button
+            class="clear-filter"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            *ngIf="filtersVisible"
+            label="Show Filters"
+            icon="pi pi-filter"
+            (click)="showFilters()"
+          ></p-button>
+
+          <p-button
+            class="clear-filter"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            label="Clear"
+            icon="pi pi-filter-slash"
+            (click)="onClearFilters()"
+          ></p-button>
+        </div>
+  <span role="button" tabindex="0" class="p-view-custom"
+        (keydown.enter)="setViewMode('list')"
+        (keydown.space)="setViewMode('list')" (click)="setViewMode('list')"
+        pTooltip="List View"
+        tooltipPosition="bottom">
+    <span class="material-symbols-outlined list-button-icon" style="font-weight: 900">
+      list
+    </span>
+  </span>
+  <span role="button" tabindex="0" class="p-view-custom"
+        (keydown.enter)="setViewMode('week')"
+        (keydown.space)="setViewMode('week')" (click)="setViewMode('week')"
+        pTooltip="Week View"
+        tooltipPosition="bottom">
+    <span class="material-symbols-outlined list-button-icon" style="font-weight: 900">
+      calendar_view_week
+    </span>
+  </span>
+  <span role="button" tabindex="0" class="p-view-custom"
+        (keydown.enter)="setViewMode('month')"
+        (keydown.space)="setViewMode('month')" (click)="setViewMode('month')"
+        pTooltip="Month View"
+        tooltipPosition="bottom">
+    <span class="material-symbols-outlined list-button-icon" style="font-weight: 900">
+      calendar_view_month
+    </span>
+  </span>
+
+  </div>
+
+  <div class="table-container" *ngIf="!loading && !errorMessage && viewMode === 'list'">
+    <p-table
+      [value]="filteredTimesheets"
+      [(selection)]="selectedTimesheet"
+      selectionMode="single"
+      dataKey="timesheetId"
+      #dt
+      [rowHover]="true"
+      (onRowSelect)="onRowSelect($event)"
+      [globalFilterFields]="[
+        'employeeId',
+        'employeeName',
+        'projectName',
+        'billingType',
+        'timesheetStatus',
+        'activity'
+      ]"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>SL No.</th>
+          <th pSortableColumn="logDate">
+            Timesheet Date <p-sortIcon field="logDate"></p-sortIcon>
+          </th>
+          <th style="text-align: center;" pSortableColumn="logHours">
+            Submitted Hours <p-sortIcon field="logHours"></p-sortIcon>
+          </th>
+          <th style="text-align: center;">
+            Approved Hours
+          </th>
+          <th pSortableColumn="timesheetStatus">
+            Status <p-sortIcon field="timesheetStatus"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-timesheet let-i="rowIndex">
+        <tr [pSelectableRow]="timesheet" >
+          <td style="text-align: center;">{{ i + 1 }}</td>
+          <td style="text-align: center;">{{ timesheet.logDate | date: 'dd MMM yyyy' }}</td>
+          <td style="text-align: center;">{{ formatHours(timesheet.logHours) }}</td>
+          <td style="text-align: center;">
+            {{ timesheet.timesheetStatus === 'Approved' ? formatHours(timesheet.logHours) : '0:00' }}
+          </td>
+          <td>
+            <p-tag
+              [value]="timesheet.timesheetStatus"
+              [severity]="getSeverity(timesheet.timesheetStatus)"
+            ></p-tag>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between">
+          Total: {{ filteredTimesheets?.length ?? 0 }} entries.
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center">No timesheets found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div *ngIf="loading" class="card flex justify-content-center" style="padding: 20px;">
+    <!-- <p-progress-spinner strokeWidth="8" fill="transparent" animationDuration=".5s" [style]="{ width: '50px', height: '50px' }" /> -->
+  </div>
+  <div *ngIf="!loading && !errorMessage && (viewMode === 'week' || viewMode === 'month')" class="calendar-container" style="margin-top: 1rem;">
+    <div class="week-navigation flex align-items-center gap-3" style="margin-bottom: 1rem;">
+      <span role="button" tabindex="0" class="p-button-custom"
+                  (keydown.enter)="navigatePeriod(-1)"
+                  [attr.aria-label]="viewMode === 'week' ? 'Previous Week' : 'Previous Month'"
+                  (keydown.space)="navigatePeriod(-1)" (click)="navigatePeriod(-1)"
+                  aria-label="Previous Month">
+              <span class="material-symbols-outlined back-button-icon" style="font-weight: 900">
+                keyboard_double_arrow_left
+              </span>
+            </span>
+      <div style="flex-grow: 1; text-align: center; font-weight: 600; font-size: 16px;">
+        <ng-container *ngIf="viewMode === 'week'">
+          {{ currentPeriodStart.format('DD-MMM-YYYY') }} - {{ currentPeriodEnd.format('DD-MMM-YYYY') }}
+        </ng-container>
+        <ng-container *ngIf="viewMode === 'month'">
+          {{ currentPeriodStart.format('MMMM YYYY') }}
+        </ng-container>
+      </div>
+      <span role="button" tabindex="0" class="p-button-custom"
+                  (keydown.enter)="navigatePeriod(1)"
+                  [attr.aria-label]="viewMode === 'week' ? 'Previous Week' : 'Previous Month'"
+                  (keydown.space)="navigatePeriod(1)" (click)="navigatePeriod(1)"
+                  aria-label="Previous Month">
+              <span class="material-symbols-outlined back-button-icon" style="font-weight: 900">
+                keyboard_double_arrow_right
+              </span>
+            </span>
+    </div>
+
+    <!-- FullCalendar -->
+    <full-calendar
+      *ngIf="viewMode === 'week' || viewMode === 'month'"
+      #fullcalendar
+      [options]="calendarOptions"
+      style="max-width: 900px; margin: auto;"
+    ></full-calendar>
+  </div>
+  <div *ngIf="!loading && !errorMessage && viewMode !== 'list' && filteredTimesheets?.length === 0" class="text-center">
+    No timesheets available for the selected period.
+  </div>
+  <div *ngIf="errorMessage" class="text-center text-danger">{{ errorMessage }}</div>
+</div>
+
+<p-confirmDialog></p-confirmDialog>
+
+<p-dialog header="Timesheet Details"
+    [(visible)]="timesheetDialogVisible"
+    [modal]="true"
+    [style]="{ width: '400px' }"
+    [closable]="true">
+  <div *ngIf="selectedTimesheet">
+    <h4>
+      {{ selectedTimesheet.employeeName }} -
+      {{ selectedTimesheet.logDate | date: 'dd-MMM-yyyy' }}
+      <span class="status-icon material-symbols-outlined" style="vertical-align: middle; font-size: 20px; margin-left: 10px;">
+        {{
+          selectedTimesheet.timesheetStatus === 'Approved' ? 'check_circle' :
+          selectedTimesheet.timesheetStatus === 'Rejected' ? 'cancel' :
+          'schedule'
+        }}
+      </span>
+    </h4>
+    <p><strong>Project Name:</strong> {{ selectedTimesheet.projectName }}</p>
+    <p><strong>Customer Name:</strong> {{ selectedTimesheet.customerName || '-'}}</p>
+    <p><strong>Billing Type:</strong> {{ toInitCase(selectedTimesheet.billingType) }}</p>
+    <p><strong>Activity:</strong> {{ selectedTimesheet.activity }}</p>
+    <p><strong>Site:</strong> {{ selectedTimesheet.site }}</p>
+    <p><strong>Submitted Hours:</strong> {{ formatHours(selectedTimesheet.logHours) }}</p>
+    <p><strong>Approved Hours:</strong> {{ selectedTimesheet.timesheetStatus === 'Approved' ? formatHours(selectedTimesheet.logHours) : '00:00' }}</p>
+    <p><strong>Status:</strong> {{ selectedTimesheet.timesheetStatus }}</p>
+  </div>
+</p-dialog>

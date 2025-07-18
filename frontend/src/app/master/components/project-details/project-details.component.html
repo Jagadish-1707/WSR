@@ -1,0 +1,506 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div
+  class="title-header flex justify-content-between flex-wrap gap-4 pt-0 pl-0"
+>
+  <div class="align-items-center justify-content-start gap-2">
+    <div class="flex">
+      <p-dropdown
+        class="dropdown-asset-list mr-2"
+        pTooltip="{{ selectedProject?.projectName }}"
+        pTooltipPosition="bottom"
+        [filter]="true"
+        [options]="projectData | sort : 'projectName'"
+        [(ngModel)]="selectedProject"
+        optionLabel="projectName"
+        placeholder="Select Project"
+        (onChange)="filterProjects()"
+      ></p-dropdown>
+      <p-button
+        class="flex align-items-center flex-direction row"
+        severity="secondary"
+        [text]="true"
+        (click)="onClear()"
+      >
+        <span class="clear-btn material-symbols-outlined">backspace</span>
+        <span>Clear</span>
+      </p-button>
+    </div>
+  </div>
+  <div
+    class="flex flex-grow-1 justify-content-between flex-nowrap gap-4 w-full md:w-auto"
+  >
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button
+          pRipple
+          icon="pi pi-plus"
+          (click)="addProject()"
+          label="PROJECT"
+          class="btn-primary btn-mobile"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overflow-visible">
+  <p-table
+    [value]="filteredProjectNames"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    #dt
+    [paginator]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 30, 40]"
+    [scrollable]="true"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn>
+          <div class="flex justify-content-center align-items-center">
+            <div class="min-w-max">Action</div>
+          </div>
+        </th>
+        <th pSortableColumn="customerName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              Customer
+              <p-sortIcon field="customerName"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+
+        <th pSortableColumn="projectName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              Project
+              <p-sortIcon field="projectName"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+        <th pSortableColumn="modeName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              Engagement Mode
+              <p-sortIcon field="modeName"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+        <th pSortableColumn="contractValue">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              Contract Value
+              <p-sortIcon field="contractValue"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+        <th pSortableColumn="estimatedHours">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              Estimated Hours
+              <p-sortIcon field="estimatedHours"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+        <th pSortableColumn="startDate">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              Start Date
+              <p-sortIcon field="startDate"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+        <th pSortableColumn="endDate">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">
+              End Date
+              <p-sortIcon field="endDate"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-selectedProject>
+      <tr>
+        <td class="text-center" pFrozenColumn>
+          <div class="flex justify-content-center align-items-center">
+            <p-button
+              class="edit-btn"
+              pTooltip="Edit"
+              tooltipPosition="top"
+              [rounded]="true"
+              [text]="true"
+              (click)="editProject(selectedProject.id)"
+            >
+              <i class="material-symbols-outlined">edit</i>
+            </p-button>
+            <div>
+              <p-button
+                class="edit-btn"
+                pTooltip="Delete"
+                tooltipPosition="top"
+                [rounded]="true"
+                [text]="true"
+                (click)="confirmDelete(selectedProject)"
+              >
+                <i class="material-symbols-outlined">delete</i>
+              </p-button>
+            </div>
+          </div>
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">Customer</span>
+          {{ selectedProject.customerName }}
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">Project</span>
+          <span>
+            {{ selectedProject.projectName }}
+          </span>
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">Engagement Mode</span>
+          {{ selectedProject.modeName }}
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">Contract Value</span>
+          {{ selectedProject.contractValue | number }}
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">Estimated Hours</span>
+          {{ selectedProject.estimatedHours | number }}
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">Start Date</span>
+          {{ selectedProject.startDate | date : "dd-MM-YYYY" }}
+        </td>
+        <td class="white-space-nowrap">
+          <span class="p-column-title">End Date</span>
+          {{ selectedProject.endDate | date : "dd-MM-YYYY" }}
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No records found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<!-- Updated HTML for Combined Add/Edit Dialog -->
+<p-dialog
+  [header]="isEditMode ? 'Edit Project' : 'Add Project'"
+  [closable]="false"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [baseZIndex]="10000"
+  [style]="{ width: '70rem ' }"
+>
+  <div class="content">
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="client"
+            >Customer<span class="required-asterisk">*</span></label
+          >
+          <div>
+            <p-dropdown
+              [options]="zohoClients | sort : 'clientName'"
+              formControlName="client"
+              optionLabel="clientName"
+              appendTo="body"
+              [filter]="true"
+              placeholder="Select Customer"
+              (onChange)="onClientSelected($event.value)"
+              [ngClass]="{
+                'ng-dirty': projectForm.get('client')?.touched,
+                'ng-invalid': projectForm.get('client')?.invalid
+              }"
+            ></p-dropdown>
+
+            <small
+              class="p-error block"
+              *ngIf="
+                projectForm.get('client')?.touched &&
+                projectForm.get('client')?.invalid
+              "
+            >
+              &nbsp; &#9888; Customer name is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="project"
+            >Project<span class="required-asterisk">*</span></label
+          >
+          <p-dropdown
+            [options]="filteredZohoProjects | sort : 'projectName'"
+            formControlName="project"
+            [filter]="true"
+            optionLabel="projectName"
+            placeholder="Select Project"
+            appendTo="body"
+            (onChange)="onProjectSelected($event.value)"
+            [ngClass]="{
+              'ng-dirty': projectForm.get('project')?.touched,
+              'ng-invalid': projectForm.get('project')?.invalid
+            }"
+          ></p-dropdown>
+
+          <small
+            class="p-error"
+            *ngIf="projectForm.get('project')?.touched && projectForm.get('project')?.invalid && !projectForm.get('project')?.errors?.['alreadyExists']"
+          >
+            &nbsp; &#9888; Project name is required.
+          </small>
+          <small
+            class="p-error"
+            *ngIf="projectForm.get('project')?.touched && projectForm.get('project')?.errors?.['alreadyExists']"
+          >
+            &nbsp; &#9888; Project already exists for this Customer.
+          </small>
+        </div>
+      </div>
+
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="engagementMode"
+            >Engagement Mode<span class="required-asterisk">*</span></label
+          >
+          <p-dropdown
+            [filter]="true"
+            [options]="engagementMode"
+            optionLabel="projectEngagementMode"
+            optionValue="id"
+            formControlName="engagementMode"
+            placeholder="Select Engagement Mode"
+            [ngClass]="{
+              'ng-dirty': projectForm.get('engagementMode')?.touched,
+              'ng-invalid': projectForm.get('engagementMode')?.invalid
+            }"
+          >
+          </p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              projectForm.get('engagementMode')?.touched &&
+              projectForm.get('engagementMode')?.invalid
+            "
+          >
+            &nbsp; &#9888; Engagement Mode is required.
+          </small>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="currency"
+            >Currency<span class="required-asterisk">*</span></label
+          >
+          <input
+            type="text"
+            pInputText
+            formControlName="currencyType"
+            readonly
+            placeholder="Currency"
+          />
+        </div>
+      </div>
+
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="contractValue"
+            >Contract Value<span class="required-asterisk">*</span></label
+          >
+          <input
+            type="number"
+            pInputText
+            formControlName="contractValue"
+            placeholder="Enter contract value"
+            [ngClass]="{
+              'ng-dirty': projectForm.get('contractValue')?.touched,
+              'ng-invalid': projectForm.get('contractValue')?.invalid
+            }"
+          />
+          <small
+            class="p-error"
+            *ngIf="
+              projectForm.get('contractValue')?.touched &&
+              projectForm.get('contractValue')?.invalid
+            "
+          >
+            &nbsp; &#9888; Enter a contract value between 1 and 1,000,000.
+          </small>
+        </div>
+        <div class="field col-12 md:col-6">
+          <label for="estimatedHours"
+            >Estimated Hours<span class="required-asterisk">*</span></label
+          >
+          <input
+            type="number"
+            pInputText
+            formControlName="estimatedHours"
+            placeholder="Enter Estimated Hours"
+            [ngClass]="{
+              'ng-dirty': projectForm.get('estimatedHours')?.touched,
+              'ng-invalid': projectForm.get('estimatedHours')?.invalid
+            }"
+          />
+          <small
+            class="p-error"
+            *ngIf="
+              projectForm.get('estimatedHours')?.touched &&
+              projectForm.get('estimatedHours')?.invalid
+            "
+          >
+            &nbsp; &#9888; Estimated Hours is required.
+          </small>
+        </div>
+      </div>
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="startDate"
+            >Project Start Date<span class="required-asterisk">*</span></label
+          >
+          <p-calendar
+            class="calendar-btn"
+            formControlName="startDate"
+            dateFormat="dd/mm/yy"
+            [ngClass]="{
+              'ng-dirty': projectForm.get('startDate')?.touched,
+              'ng-invalid': projectForm.get('startDate')?.invalid
+            }"
+            [showIcon]="true"
+            [iconDisplay]="'input'"
+            [readonlyInput]="true"
+            placeholder="DD-MM-YYYY"
+            appendTo="body"
+          ></p-calendar>
+          <small
+            class="p-error"
+            *ngIf="
+              projectForm.get('startDate')?.touched &&
+              projectForm.get('startDate')?.invalid
+            "
+          >
+            &nbsp; &#9888; Please select start date.
+          </small>
+        </div>
+        <div class="field col-12 md:col-6">
+          <label for="endDate"
+            >Project End Date<span class="required-asterisk">*</span></label
+          >
+          <p-calendar
+            class="calendar-btn"
+            formControlName="endDate"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            [iconDisplay]="'input'"
+            [readonlyInput]="true"
+            [minDate]="this.projectForm.get('startDate')?.value"
+            placeholder="DD-MM-YYYY"
+            appendTo="body"
+          ></p-calendar>
+          <small
+            class="p-error"
+            *ngIf="
+              projectForm.get('endDate')?.touched &&
+              projectForm.get('endDate')?.invalid
+            "
+          >
+            &nbsp; &#9888; Please select end date.
+          </small>
+        </div>
+      </div>
+      <div class="text-area">
+        <div class="form-group field">
+          <label for="remarks">Remarks</label>
+          <textarea
+            class="mms-textarea"
+            rows="4"
+            pInputTextarea
+            formControlName="remarks"
+            placeholder="Enter Remarks"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="{{ isEditMode ? 'UPDATE' : 'SAVE' }}"
+      class="save-btn"
+      [disabled]="!projectForm.dirty || projectForm.invalid"
+      (click)="onSubmit()"
+    ></p-button>
+    <p-button
+      label="CANCEL"
+      class="btn-secondary"
+      (click)="onCancel()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Confirm Delete"
+  [(visible)]="displayDeleteDialog"
+  [modal]="true"
+  [closable]="true"
+>
+  <p>Are you sure you want to Delete?</p>
+  <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px">
+    <p-button
+      label="DELETE"
+      class="save-btn mr-2"
+      (click)="deleteTask()"
+    ></p-button>
+    <p-button
+      label="CANCEL"
+      class="btn-secondary"
+      id="p-dialog_cancel_btn"
+      (click)="displayDeleteDialog = false"
+    ></p-button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  header="Delete Failed"
+  [(visible)]="showWarningDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+>
+  <p>This project is in use.</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem">
+    <p-button
+      label="OK"
+      class="btn-secondary"
+      (click)="showWarningDialog = false"
+    ></p-button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  header="Edit Not Allowed"
+  [(visible)]="showEditWarningDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+>
+  <p>This project is in use, you can't edit it</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem">
+    <p-button
+      label="OK"
+      class="btn-secondary"
+      (click)="showEditWarningDialog = false"
+    >
+    </p-button>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

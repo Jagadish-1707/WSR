@@ -1,0 +1,370 @@
+/* Adjust styles for scrollbar (optional) */
+.p-datatable-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.p-datatable-gridlines {
+  overflow-x: auto;
+  /* Enable horizontal scroll */
+}
+
+.grid-td {
+  text-align: center;
+}
+
+.p-datatable-wrapper {
+  width: 100%;
+  /* Optional: Set a fixed width for the table container */
+}
+
+// .p-inputtext {
+//   font-weight: bold;
+// }
+.p-datatable-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.fixed-dropdown {
+  width: 150px;
+  /* Adjust width as needed */
+
+  white-space: nowrap;
+  /* Prevent text wrapping */
+  text-overflow: ellipsis;
+  /* Truncate long text with ellipsis */
+}
+
+.fixed-dropdown:hover {
+  overflow: visible;
+  /* Show full content on hover */
+}
+
+.flex {
+  // align-items: baseline;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+:host ::ng-deep {
+
+  .p-datatable-tbody > tr > td {
+    padding: 8px 16px !important;
+}
+    td .p-dropdown {
+        // max-width: 150px;
+        width: 150px;
+    }
+
+    .test .p-dropdown {
+        // max-width: 150px;
+        width: 300px;
+    }
+
+    .back-button button {
+        background-color: transparent;
+        padding: 0;
+        margin-right: 2px;
+        border: none;
+        color: var(--primary-blue);
+        cursor: pointer;
+    }
+
+    .p-datatable .p-datatable-thead > tr > th {
+        text-align: center;
+    }
+    // .ng-invalid.ng-dirty {
+    //   border: 1px solid red;
+    // }
+
+
+    .timesheet-entry {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 23.44px;
+        text-align: center;
+        padding-top: 10px;
+        color: var(--Text-color, #5a5d61);
+    }
+
+    .Withdraw-btn button {
+        background-color: var(--blue-50);
+        color: var(--primary-blue);
+        border: none;
+    }
+
+    .Withdraw-btn button:hover {
+        background-color: var(--blue-100);
+        color: var(--primary-dark-blue);
+    }
+
+    .status {
+        font-size: medium;
+    }
+
+    .employee-status {
+        gap: 10px;
+        opacity: 0px;
+        // margin-left: 20% !important;
+    }
+
+    td {
+        padding: 8px;
+    }
+
+    td,
+    th {
+        border:0.5px solid #f7f7f7;
+        border-radius: 1px;
+        border-collapse: separate;
+        border-spacing: 10px;
+    }
+
+    .grid-table {
+    }
+    // input {
+    //   width: 150px;
+    // }
+    .back-button button {
+        background-color: transparent;
+        padding: 0;
+        margin-right: 2px;
+        border: none;
+        color: var(--primary-blue);
+        cursor: pointer;
+    }
+
+    .minus-button button {
+        font-weight: 600;
+        background-color: var(--red-100);
+    }
+
+    .approve-btn button {
+        font-weight: 600;
+        background-color: var(--green-100);
+    }
+
+    .reject-btn button {
+        font-weight: 600;
+        background-color: var(--red-100);
+    }
+
+    .button-add button {
+        background-color: var(--primary-blue);
+        cursor: pointer;
+        border: none;
+        font-size: 14px;
+        text-align: center;
+        line-height: 16.41px;
+        font-weight: 600;
+        padding: 7px 19px 7px 19px;
+        gap: 0px;
+        border-radius: 6px 6px 6px 6px;
+        justify: space-between;
+        opacity: 0px;
+    }
+
+    .weekRange button {
+        font-size: 12px;
+        background-color: transparent;
+        font-weight: bolder;
+        border: none;
+        color: var(--primary-blue);
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 10px;
+    }
+
+    .button-container p-button:first-child {
+        margin-right: 9px;
+        /* Adjust the margin as needed */
+    }
+
+    .clr {
+        background-color: lightgrey !important;
+        color: black !important;
+    }
+
+    .required-asterisk {
+        font-weight: 400;
+        color: red;
+    }
+
+    .edit-button {
+        background-color: transparent;
+        border: none;
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+
+    #p-dialog_cancel_btn {
+        margin-right: 40px;
+    }
+
+    ::ng-deep .p-dialog-mask {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+    }
+
+    .daily-btn {
+        display: flex;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 10px 16px;
+        background-color: var(--primary-blue);
+        color: rgb(255, 255, 255);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .my-approvals-btn {
+        align-items: center;
+        font-size: 12px;
+        padding: 10px 12px;
+        background-color: var(--primary-blue) ;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: var(--font-family, 'Inter', sans-serif);
+    }
+
+    .header-btn {
+        align-items: center;
+        font-size: 14px;
+        padding: 10px 12px;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: var(--font-family, 'Inter', sans-serif);
+
+    }
+
+    .header-btn:hover {
+        background: var(--blue-800);
+        ;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .clone-btn {
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 0.75rem 1.25rem;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .my-approvals-btn:active {
+        background: var(--primary-blue);
+    }
+}
+
+
+::ng-deep {
+
+  .p-splitbutton .p-component{
+    background-color: white;
+    color: black;
+    border: none;
+    font-size: 18px;
+  }
+  .p-toolbar {
+    flex-wrap: nowrap;
+    div:first-child {
+      width: 100%;
+
+      div:first-child {
+        width: 100%;
+      }
+    }
+  }
+
+
+
+  .left-arrow,
+  .right-arrow {
+    z-index: 100;
+  }
+
+  .right-arrow {}
+
+  .left-arrow {}
+
+  .log-date {
+    width: 150px !important;
+  }
+
+  // Calendar code 
+  .custom-calendar {
+    span {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    input {
+      z-index: 99;
+      cursor: default;
+      background: none;
+      border: none;
+      color: transparent;
+
+      &:focus {
+        box-shadow: none;
+        outline: 0 none;
+        outline-offset: 0;
+        border-color: transparent;
+      }
+    }
+  }
+
+  .month-label {
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .calendar-icon,
+  .left-arrow,
+  .right-arrow {
+    cursor: pointer;
+  }
+
+  .cal-action-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .calender-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    left: 85px;
+  }
+}

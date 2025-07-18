@@ -1,0 +1,312 @@
+<div class="page-bg">
+  <div class="card">
+    <div class="header-text mb-3" style="font-size: 18px; font-weight: 600">
+       Manage User
+    </div>
+    <div class="flex justify-content-between align-items-center mb-5  ">
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div>
+     <p-button pRipple (click)="showDialog()" label="Assign Role" icon="pi pi-plus" class="button-add">
+      </p-button>
+    </div>
+    
+  </div>
+
+  <!-- Table code -->
+  <div class="table-container">
+    <p-table [value]="mappedRole" #dt [paginator]="true" [tableStyle]="{ 'min-width': '50rem' }"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+      [rows]="5" [rowsPerPageOptions]="[5, 10, 15, 20]" [scrollable]="true"
+       [globalFilterFields]="['role', 'startDate', 'endDate', 'status','employee']">
+      <!-- table header -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Action</th>
+          <th pSortableColumn="role">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Role</div>
+              <p-sortIcon field="role"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="employee">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Employee</div>
+              <p-sortIcon field="employee"></p-sortIcon>
+            </div>
+          </th>
+           <th pSortableColumn="startDate">
+              <div class="flex justify-content-start align-items-center gap-1">
+                <div class="min-w-max">Start Date</div>
+                <p-sortIcon field="startDate"></p-sortIcon>
+              </div>
+            </th>
+            <th pSortableColumn="endDate">
+              <div class="flex justify-content-start align-items-center gap-1">
+                <div class="min-w-max">End Date</div>
+                <p-sortIcon field="endDate"></p-sortIcon>
+              </div>
+            </th>
+          <th pFrozenColumn pSortableColumn="status">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Status</div>
+              <p-sortIcon field="status"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-assignDetail>
+        <tr class="p-selectable-row">
+          <td>
+            <p-button size="small" class="table-action-btn" icon="pi pi-pencil"
+              (click)="onEditAssignedRole(assignDetail.id)"></p-button>
+          </td>
+          <td>
+            {{ assignDetail.role }}
+          </td>
+          <td>
+            <p-button size="small" class="action-button" (click)="showDialogs(assignDetail.role)" icon="pi pi-eye"
+              [label]="assignDetail.employeeCount.toString()">
+            </p-button>
+          </td>
+          <td>
+              {{ assignDetail.startDate | date : "dd-MM-YYYY" }}
+            </td>
+            <td>
+              {{ assignDetail.endDate | date : "dd-MM-YYYY" }}
+            </td>
+          <td>
+            <p-tag [value]="assignDetail.status === 1 ? 'Active' : 'Inactive'"
+              [severity]="getSeverity(assignDetail.status)"></p-tag>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <!-- assign roles pop up form  -->
+
+  <div>
+    <p-dialog [draggable]="false" header="Header" [(visible)]="visible" [modal]="true" [style]="{ width: '900px' }">
+      <ng-template pTemplate="header">
+        <div class="header-text inline-flex align-items-center justify-content-center gap-2">
+          {{ isEditMode ? "Edit Role" : "Assign Role" }}
+        </div>
+      </ng-template>
+
+      <div class="container">
+        <form [formGroup]="frm" (ngSubmit)="onSave()" class="mms-form flex flex-column">
+          <div class="grid">
+
+            <div class="form-group field col">
+              <label for="department">Department<span class="required-asterisk">*</span></label>
+              <div class="mb-2">
+                <p-multiSelect class="mms-dropdown" id="department" [options]="departments" optionLabel="label"
+                  optionValue="value" formControlName="Department" (onChange)="onDepartmentChange($event.value)"
+                  [style]="{ width: '100%' }" placeholder="Select Department(s)" [ngClass]="{
+                  invalid:
+                    frm.get('Department')?.invalid &&
+                    frm.get('Department')?.touched
+                }" display="chip" appendTo="body"></p-multiSelect>
+
+                <div>
+                  <small id="assigned-to-help" class="p-error" *ngIf="
+                    frm.get('Department')?.touched &&
+                    frm.get('Department')?.invalid
+                  ">
+                    &nbsp; &#9888; Department is required.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <div class="form-group field col">
+              <label for="employee">Employee<span class="required-asterisk">*</span></label>
+              <div class="mb-2">
+                <p-multiSelect formControlName="Employee" [options]="filteredUsersList" optionLabel="userName"
+                  placeholder="Select Employees" [style]="{ width: '100%' }" [display]="'comma'"
+                  selectedItemsLabel="{0} users selected" [ngClass]="{
+                invalid: frm.get('Employee')?.invalid && frm.get('Employee')?.touched
+              }" appendTo="body">
+                  <!-- Template for dropdown items -->
+                  <ng-template let-user pTemplate="item">
+                    {{ user.userName }} ({{ user.department }})
+                  </ng-template>
+
+                  <!-- Template for selected chips/text -->
+                  <ng-template let-user pTemplate="selectedItem">
+                    {{ user.userName }} ({{ user.department }})
+                  </ng-template>
+                </p-multiSelect>
+
+                <div>
+                  <small id="assigned-to-help" class="p-error" *ngIf="
+                    frm.get('Employee')?.touched && frm.get('Employee')?.invalid">
+                    &nbsp; &#9888; Employee Name is required.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+
+          <div class="grid">
+            <div class="form-group field col mb-2">
+              <div class="flex flex-column">
+                <label for="role">Role<span class="required-asterisk">*</span></label>
+                <div class="mb-2">
+                  <p-dropdown class="mms-dropdown" id="role" [options]="roleOptions" optionValue="value"
+                    optionLabel="label" formControlName="Role" autoWidth="false" [style]="{ width: '100%' }"
+                    placeholder="Select Role" [ngClass]="{
+                  invalid: frm.get('Role')?.invalid && frm.get('Role')?.touched
+                }"></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error"
+                      *ngIf="frm.get('Role')?.touched && frm.get('Role')?.invalid">
+                      &nbsp; &#9888; Role is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group field col-6 mb-2">
+              <div class="flex flex-column">
+                <label for="status" style="display: block;">Status</label>
+                <p-dropdown id="status" [options]="[
+                  { label: 'Active', value: 1 },
+                  { label: 'Inactive', value: 0 }
+                ]" formControlName="status" placeholder="Select Status" class="form-control"></p-dropdown>
+                <div *ngIf="frm.get('status')?.invalid && frm.get('status')?.touched" class="alert alert-danger">
+                  Status is required
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="grid">
+            <div class="form-group field col mb-2">
+              <div class="flex flex-column">
+                <label for="startDate">Start Date<span class="required-asterisk">*</span></label>
+                <div class="p-input-icon-right">
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" formControlName="StartDate"
+                    #weekStartDateCalendar [readonlyInput]="true" dateFormat="dd/mm/yy" [showIcon]="true"
+                    placeholder="DD-MM-YYYY" [style]="{ width: '100%' }" autowidth="false" [ngClass]="{
+                    'ng-dirty': frm.get('StartDate')?.touched,
+                    'ng-invalid': frm.get('StartDate')?.invalid
+                  }"></p-calendar>
+                  <small id="contractValue-error" class="p-error" *ngIf="
+                    frm.get('StartDate')?.touched &&
+                    frm.get('StartDate')?.invalid
+                  ">
+                    &nbsp; &#9888; Please select start date.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group field col mb-2">
+              <div class="flex flex-column">
+                <label for="endDate">End Date</label>
+                <div class="p-input-icon-right">
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" formControlName="EndDate"
+                    #weekStartDateCalendar [readonlyInput]="true" dateFormat="dd/mm/yy" [showIcon]="true"
+                    placeholder="DD-MM-YYYY" [style]="{ width: '100%' }" autowidth="false"></p-calendar>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group field">
+            <label for="remarks">Remarks</label>
+            <textarea [rows]="5" class="mms-textarea" pInputTextarea formControlName="Remarks"
+              placeholder="Enter Remarks"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <p-button class="cancel-button" (click)="cancelAdd()" label="Cancel" pAutoFocus [autofocus]="true"></p-button>
+
+        <p-button class="save-button" type="submit" label="Save" (click)="onSave()"></p-button>
+      </ng-template>
+    </p-dialog>
+
+
+  </div>
+  <p-dialog [header]="selectedRoleName + '  Employees'" [(visible)]="displayDialog" [modal]="true"
+    [style]="{ width: '600px' }" [closable]="true" [draggable]="false">
+    <p-table #table [value]="selectedEmployees" [style]="{ 'min-width': '100%' }" [paginator]="true" [rows]="10"
+      [globalFilterFields]="['employeeId', 'employee', 'department']">
+      <ng-template pTemplate="caption">
+        <div class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input #globalFilterInput pInputText type="text"
+            (input)="table.filterGlobal(globalFilterInput.value, 'contains')" placeholder="Search" />
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pFrozenColumn pSortableColumn="employeeId">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Employee ID</div>
+              <p-sortIcon field="employeeId"></p-sortIcon>
+            </div>
+          </th>
+          <th pFrozenColumn pSortableColumn="department">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Department</div>
+              <p-sortIcon field="department"></p-sortIcon>
+            </div>
+          </th>
+          <th pFrozenColumn pSortableColumn="employee">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Employee Name</div>
+              <p-sortIcon field="employee"></p-sortIcon>
+            </div>
+          </th>
+          <!--<th pSortableColumn="period">
+      <div class="flex justify-content-start align-items-center gap-1">
+        <div class="header-content"></div>
+        <div class="min-w-max">Period</div>
+        <p-sortIcon field="period"></p-sortIcon>
+      </div>
+    </th>     
+    <th pFrozenColumn pSortableColumn="status">
+      <div class="flex justify-content-start align-items-center gap-1">
+        <div class="min-w-max">Status</div>
+        <p-sortIcon field="status"></p-sortIcon>
+      </div>
+    </th>-->
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-emp>
+        <tr>
+          <td>{{ emp.employeeId }}</td>
+          <td>{{ emp.department }}</td>
+          <td>{{ emp.employee }}</td>
+          <!--<td>
+      <span>
+        {{ emp.startDate | date : 'dd/MM/yyyy' }} - {{ emp.endDate | date : 'dd/MM/yyyy' }}
+      </span>
+    </td>      
+    <td>
+      <span>
+        <p-tag
+        [value]="getStatusBasedOnEndDate(emp).status"
+        [severity]="getStatusBasedOnEndDate(emp).severity"
+      ></p-tag>
+      </span>
+    </td>-->
+        </tr>
+      </ng-template>
+    </p-table>
+
+
+  </p-dialog>
+</div>
+<p-toast></p-toast>

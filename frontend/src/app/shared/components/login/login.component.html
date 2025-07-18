@@ -1,0 +1,137 @@
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="default" color="#fff" type="ball-fussion" [fullScreen]="true">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>
+<div  class="center-container">
+  <p-card styleClass="ngx-color" class="login-card">
+    <div class="card-content">
+      <div class="first-half">
+       
+        <div class="logo">
+          <span>
+            <img
+              src="../../assets/excelencia-e-symbol.svg"
+              alt=""
+              class="logo-default mr-1"
+            />
+          </span>
+          <span class="icon-header">MMS</span>
+        </div>
+        <div>
+          <p class="title-text">Tasks, Time, Insights</p>
+        </div>
+        <div class="app-illustration text-center">
+          <img src="../../../assets/MMS.png" alt="" class="metrics-image"/>
+        </div>
+      </div>
+      <div class="form-half">
+        <div  class="login-container p-3">
+          <h3 *ngIf="!mailVerified" class="header-text">Login to access your account</h3>
+          <h3 *ngIf="mailVerified" class="header-text">Access code sent to email</h3>
+
+          <form class="md:mx-5" *ngIf="!mailVerified" (ngSubmit)="emailForm.form.valid && submitForm()" #emailForm="ngForm">
+            <label for="email" class="m-0">Enter your work email to receive access code. </label>
+            <input type="text" id="email" name="email" class="loginInp" placeholder="Enter Work Email" required 
+            pattern="[a-z0-9._%+-]+@excelenciaconsulting.com$" 
+            [(ngModel)]="userEmail" #emailInput="ngModel" email
+            (input)="onEmailInput($event)" 
+            [ngClass]="{ 'border-red': emailInput.invalid && (emailInput.dirty || emailInput.touched) }">
+              <div *ngIf="emailInput.invalid && emailInput.dirty" class="text-danger">
+              <div class="p-message p-error"
+              *ngIf="emailInput.errors?.['required']">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" fill="currentColor"
+                  class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16"><path
+                      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                </svg>
+                <span >Email is required!</span>
+            </div>
+
+            <div class="p-message p-error"
+            *ngIf="emailInput.errors?.['pattern']">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" fill="currentColor"
+                  class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                </svg>
+                <span >Please enter valid email.</span>
+            </div>
+
+            <!-- <div class="p-message p-error"
+            *ngIf="validateEmail(emailInput.value) && (emailInput.dirty || emailInput.touched)" class="text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" fill="currentColor"
+                  class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                </svg>
+                <span >Invalid format</span>
+            </div>
+             -->
+            
+            </div>
+            <p-button  (click)="showSpinner()" *ngIf="!mailVerified" type="submit" class=" flex justify-content-center btn-primary"  [disabled]="!emailForm.form.valid">
+              <!-- <ng-container *ngIf="!mailVerified">Continue</ng-container> -->
+              Continue
+            </p-button>
+            
+            <!-- <ng-template class="loader" #spinnerContent>
+              <div class="loader">
+                <div>
+                  Loading
+                </div>
+               <span class="loaders"></span>
+              </div>
+            </ng-template> -->
+            
+          </form>
+          
+          <form class="md:mx-6" *ngIf="mailVerified" (ngSubmit)="otpForm.form.valid &&validateOtp()" #otpForm="ngForm">
+            <span class="welcome-text mb-1">Welcome Back, 
+              <span class="userName">{{userName}}</span></span>
+            <label for="otp" class="mb-1">Please enter the 6 digit access code sent to your work mail. </label>
+            <input (keypress)="charSet($event)" type="text" id="otp" name="otp" class="mb-3" pAutoFocus placeholder="Enter OTP" required [disabled]="resendOTP"
+            [(ngModel)]="otp" #otpInput="ngModel"  pattern="^[1-9][0-9]{5}$"
+            [ngClass]="{ 'border-red': otpInput.invalid && (otpInput.touched) }">
+            <div *ngIf="otpInput.invalid && (otpInput.touched)" class="text-danger">
+              <div class="p-message p-error"
+              *ngIf="otpInput.errors?.['required']">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" fill="currentColor"
+                  class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                </svg>
+                <span >OTP is required.</span>
+            </div>
+
+            <div class="p-message p-error"
+            *ngIf="otpInput.errors?.['pattern']">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" fill="currentColor"
+                class="bi bi-exclamation-circle-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+              </svg>
+              <span >OTP must be 6 digits long</span>
+          </div>
+         </div>
+         <div class="flex flex-column align-items-center">
+         <p *ngIf="!resendOTP"> Time Remaining: {{ minutes }}:{{ seconds < 10 ? '0' + seconds : seconds }}</p>
+         <p-button label="Resend OTP" (click)="reSendOTP()" [disabled]="!resendOTP" [link]="true" class="p-0 link-btn"></p-button>
+        </div>
+            <p-button type="submit" class="flex justify-content-center btn-primary min-w-full" [disabled]="!otpForm.form.valid">Login</p-button>
+   
+          </form>
+        
+          <p-dialog header="Verification Failed" [(visible)]="showOtpFailedDialog" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="10000">
+            <div class="dialog-content">
+                <p>OTP verification failed. Please try again.</p>
+            </div>
+           
+            <p-footer>
+                <p-button type="submit" pButton (click)="showOtpFailedDialog=false"  class="min-w-full" >Login</p-button>
+                
+            </p-footer>
+        </p-dialog>
+      </div>
+      </div>
+    </div>
+  </p-card>
+</div>
+<p-toast></p-toast>

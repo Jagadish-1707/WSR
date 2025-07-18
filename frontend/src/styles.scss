@@ -1,0 +1,444 @@
+/* You can add global styles to this file, and also import other style files */
+ 
+// @import './normalize.css';
+@import 'variables';
+@import '../node_modules/primeng/resources/primeng.min.css';
+@import 'primeflex-custom';
+@import 'primeng-custom';
+@import 'primeng-custom-old';
+@import "primeicons/primeicons.css";
+ 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  font-size: var(--font-size-base);
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #EDEDEF;
+}
+ 
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+ 
+button,
+input,
+optgroup,
+select,
+textarea {
+  line-height: 1;
+}
+ 
+a {
+  color: var(--primary-blue);
+}
+ 
+button:focus, input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.bg-blue-tint {
+  background: var(--primary-blue-tint);
+}
+ 
+.bg-orange-tint {
+  background: var(--primary-orange-tint);
+}
+ 
+.form-feedback {
+  padding-top: 8px;
+}
+ 
+.form-feedback.invalid {
+  color: var(--red);
+}
+ 
+// Dashboard Widgets
+ 
+.widget-header h2 {
+  font-size: calc(var(--font-size-base) + 4px);
+}
+ 
+.widget-body {
+  // min-height: 328px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 0;
+  padding-bottom: 121.5%;
+}
+ 
+.fc {
+  font-size: calc(var(--font-size-base) - 2px);
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  padding: 0.5rem;
+}
+ 
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: none;
+  border-radius: 8px;
+}
+.fc .fc-button-primary {
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: transparent;
+  color: #fff;
+}
+.fc .fc-button-primary:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-color: transparent;
+  color: #fff;
+}
+.fc .fc-button {
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: 1.5rem;
+}
+.fc .fc-button .fc-icon {
+  font-size: 1em;
+}
+.fc .fc-toolbar-title {
+  font-size: var(--font-size-base);
+}
+.fc a {
+  color: var(--text-color);
+}
+.fc .fc-daygrid-day-top {
+  justify-content: center;
+}
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+}
+.fc .fc-toolbar.fc-header-toolbar {
+  padding: 0.5rem;
+}
+.no-widget-data {
+  color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.mandatory-indicator {
+  color: var(--red);
+  font-weight: bold;
+}
+ 
+.account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.app-actions {
+  display: flex;
+}
+// p-button + p-button {
+//   margin-left: 0.5rem;
+// }
+ 
+.preview-mode .p-dialog {
+  width: 80vw !important;
+  transition:
+    width 0.25s ease-in-out,
+    height 0.25s ease-in-out;
+}
+ 
+@media screen and (max-width: 1440px) {
+  :root {
+    --font-size-base: 14px;
+  }
+}
+ 
+ 
+/*Card*/
+ 
+.p-card{
+ // background: var(--primary-blue-tint);
+}
+ 
+.p-card .p-card-body{
+  padding: 0%;
+  margin-bottom: 7px;
+}
+ 
+.widget-body-card {
+  // min-height: 328px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 281px;
+  //overflow-x: scroll;
+}
+ 
+.card-align{
+  text-align: center;
+}
+ 
+.card-container-empty{
+  text-align: center;
+  padding-top: 48%;
+}
+.p-datatable-table, .p-datatable-table a, .p-button, .p-paginator-page, .p-paginator-current, th {
+ font-size: 12px;
+}
+ 
+.p-paginator .p-paginator-pages .p-paginator-page {
+ min-width: 2rem;
+  height: 2rem;
+}
+.p-paginator .p-dropdown .p-dropdown-label {
+ display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+.p-dropdown .p-dropdown-trigger{
+  width: 2rem;
+}
+.p-paginator .p-dropdown {
+height: 2.5rem;
+}
+ 
+.p-button {
+ border-radius: 5px;
+  border: none;
+}
+.btn-tab .p-button {
+  background: #fff;
+  color: #a6a2a2;
+  border: 1px solid gainsboro;
+ 
+}
+ 
+.btn-tab .p-button .p-button-label{
+  font-weight: 400 ;
+}
+.p-button-primary .p-button{
+  background: #19357e !important ;
+  border: 0px solid gainsboro !important;
+  color: #fff !important;
+ 
+}
+ 
+.p-button-primary .p-button .p-button-label{
+  font-weight: 600 ;
+}
+ 
+.page-header {
+  padding: 5px 30px;
+  background: #ededef;
+ 
+}
+.nav-icon, .nav-text, .nav-toggle-icon{
+  color: #232429;
+  font-size: 14px;
+}
+.page-header h2 {
+  color: #2d2d2d;
+  font-size: 18px;
+  font-weight: 600;
+}
+.account-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444444;
+}
+btn > .p-button {
+  padding: 5px 3px;
+  color: #30498b;
+}
+.material-symbols-outlined {
+  font-size: 18px;
+}
+ 
+app-header{
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+}
+.sidebar{
+  margin-top: 60px;
+}
+ 
+.main-content{
+  padding-top: 60px !important;
+}
+.dashcard .p-card{
+box-shadow: none !important;
+border: 2px solid rgb(235, 232, 232);
+padding: 15px;
+margin-top: 20px;
+border-radius: 10px;
+}
+.p-dialog-mask{
+  // z-index: 9999 !important;
+}
+ 
+:host ::ng-deep {
+  .p-dialog {
+    max-width: 80% !important;
+  }
+}
+ 
+.p-overlaypanel button {
+    font-size: 12px !important;
+    white-space: nowrap;
+    padding: 0px;
+    margin-bottom: 10px;
+}
+.p-overlaypanel .p-button-label{
+font-weight: normal;
+}
+.p-overlaypanel-content{
+padding:15px;
+padding-bottom:5px;
+}
+
+.p-inputtext {
+  font-size: 12px !important;
+}
+::ng-deep .ng-star-inserted{
+  font-size: 12px !important;
+}
+.header-text{
+  font-size: 18px; 
+  font-weight: 600;
+  color: #2d2d2d;
+}
+.action-button button{
+   background-color: transparent ;
+   color:var(--primary-blue);
+   border: none; 
+ }
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.search-input {
+  margin-left: auto;
+  width: 200px;
+}
+
+.table-row{
+  td{
+    line-height: 1.5;
+  }
+    height: 35px;
+}
+
+  .save-btn button{
+    background-color: var(--primary-blue);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+
+  }
+.p-inputswitch {
+ height: 21px;
+}
+
+.p-button .p-button-label{
+  font-weight: 600;
+}
+.p-tag-success, .p-tag-danger{
+  padding:0px 5px !important;
+}
+sortalticon svg {
+    width: 11px;
+}
+ .p-tag-success{
+  background-color: #d2fce6;
+  border: 0.75px solid #03a56a;
+  width: 45px;
+  height: 18px;
+  line-height: 1.5;
+  color: #03a56a;
+  font-weight: 600;
+  // padding: 10px 10px;
+  border-radius: 10px;
+  font-size:10px;
+  text-decoration: none;
+  line-height: 0%;
+}
+
+ .p-tag-danger {
+  background-color: #ffe1e1 !important;
+  border: 1px solid #d43f3f  !important;  
+  color: #d43f3f !important;  
+  width: 52px;
+  height: 18px;
+  font-weight: 500;
+  //padding: 10px 10px;
+  border-radius: 10px;
+  font-size:10px;
+  line-height: 0%;
+}
+
+ .p-datatable .p-datatable-tbody>tr>td {
+       padding: 6px 12px !important;
+    }
+
+  .clear-btn{
+    width: 10px;
+    height: auto  ;
+    margin-right: 12px;
+    color:#757575;
+    padding-bottom: 0px !important ;
+    line-height: 1.5;
+  }
+  .clear-btn:hover{ 
+    
+   
+  }
+  .btn-secondary > .p-button {
+        background-color: #fff !important;
+        padding: 8px 16px;
+        color: #30498b !important;
+       border: 1px solid #19357e !important ;
+      }
+
+    .btn-primary>.p-button {
+        background-color: #30498b;
+        padding: 8px 16px;
+    }
+     .edit-btn>.p-button {
+        padding: 2px;
+        color: #30498b;
+    }
+.title-header {
+        padding: 0px 0px 20px 0px;
+        background: #fff;
+        border-radius: 10px 10px 0px 0px;
+    }
+
+.mms-textarea {
+    resize: none;
+    padding: 8px 12px;
+    height: 150%;
+}

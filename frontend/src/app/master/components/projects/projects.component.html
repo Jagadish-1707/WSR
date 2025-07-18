@@ -1,0 +1,143 @@
+<!-- Header Buttons -->
+<div class="card">
+  <p-toolbar>
+    <ng-template pTemplate="left">
+      <span class="p-input-icon-left flex">
+        <p-dropdown
+        class="mr-2"
+        [options]="projects"
+        [(ngModel)]="selectedProject"
+        optionLabel="projectName"
+        placeholder="All Clients"
+      ></p-dropdown>   
+      <p-sidebar [(visible)]="addSidebarVisible" [position]="'right'" [showCloseIcon]="true" class="custom-sidebar">
+        <ng-template pTemplate="header">Add Project</ng-template>
+        <p>Soon the form will be added!</p>
+        <!-- <app-add-project></app-add-project> -->
+        </p-sidebar>   
+        <p-dropdown
+          [options]="status"
+          [(ngModel)]="selectedStatus"
+          optionLabel="statusName"
+          placeholder="Status"
+        ></p-dropdown>
+      </span>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <p-button
+        pRipple
+        label="Add Project"
+        icon="pi pi-plus"
+        class="custom-button mr-2"
+        (onClick)="addproject()"
+      ></p-button>
+      <p-button
+        pRipple
+        icon="pi pi-upload"
+        label="Export"
+        (onClick)="exportProject()"
+        class="custom-button-export"
+      ></p-button>
+    </ng-template>
+  </p-toolbar>
+
+
+<!-- Table Code  -->
+    <div class="table-container">
+    <p-table [value]="projectData"
+        
+    [scrollHeight]="'550px'"
+    #dt
+    [rowHover]="true"
+    [rows]="5"
+    [globalFilterFields]="['name', 'project', 'status']">
+
+    <ng-template pTemplate="header">
+        <tr>
+          <th pFrozenColumn>
+            Action
+        </th>
+        <th headerIcon pSortableColumn="project_id">
+          <div class="flex justify-content-start align-items-center gap-1">
+           <div class="header-content"></div>
+            <div class="min-w-max">Project ID</div>
+            <p-sortIcon field="project_id"></p-sortIcon>
+          </div>
+        </th>
+        <th headerIcon pSortableColumn="project_name">
+          <div class="flex justify-content-start align-items-center gap-1">
+           <div class="header-content"></div>
+            <div class="min-w-max">Project Name</div>
+            <p-sortIcon field="project_name"></p-sortIcon>
+          </div>
+        </th>
+         <th headerIcon pSortableColumn="ProjectType">
+           <div class="flex justify-content-start align-items-center gap-1">
+            <div class="header-content"></div>
+             <div class="min-w-max">Project Type</div>
+             <p-sortIcon field="ProjectType"></p-sortIcon>
+           </div>
+         </th>
+         <th pSortableColumn="ClientName">
+           <div class="flex justify-content-start align-items-center gap-1">
+            <i class="fas fa-user icon-align"></i>
+             <div class="min-w-max">Client Name</div>
+             <p-sortIcon field="ClientName"></p-sortIcon>
+           </div>
+         </th>
+         <th pSortableColumn="startDate">
+           <div class="flex justify-content-start align-items-center gap-1">
+            <i class="fa fa-calendar icon-align"></i>
+             <div class="min-w-max">Start Date</div>
+             <p-sortIcon field="startDate"></p-sortIcon>
+           </div>
+         </th>
+         <th pSortableColumn="endDate">
+           <div class="flex justify-content-start align-items-center gap-1">
+            <i class="fa fa-calendar icon-align"></i>
+             <div class="min-w-max">End Date</div>
+             <p-sortIcon field="endDate"></p-sortIcon>
+           </div>
+         </th>
+         <th pSortableColumn="status">
+           <div class="flex justify-content-start align-items-center gap-1">
+            <i class="fa fa-ticket-simple icon-align"></i>
+             <div class="min-w-max">Status</div>
+             <p-sortIcon field="status"></p-sortIcon>
+           </div>
+         </th>
+         <th pSortableColumn="ContractValue">
+           <div class="flex justify-content-start align-items-center gap-1">
+            <i class="fa fa-ticket-simple icon-align"></i>
+             <div class="min-w-max">Contract Value</div>
+             <p-sortIcon field="ContractValue"></p-sortIcon>
+           </div>
+         </th>  
+        </tr> 
+    </ng-template>
+    <ng-template pTemplate="body" let-projectData>
+      <tr class="p-selectable-row">
+          <td (click)="editProject()">
+              <span
+              class="material-symbols-outlined"
+              style="font-weight: 300; font-size: large;text-align: center;">
+              edit
+              </span></td>
+      
+            <td>{{ projectData.project_id }}</td>
+            <td>{{ projectData.project_name }}</td>
+            <td>{{ projectData.projecttype }}</td>
+            <td>{{ projectData.client_name }}</td>
+            <td>{{ projectData.start_date | date :'dd-MM-YYYY'}}</td>
+            <td>{{ projectData.end_date | date :'dd-MM-YYYY'}}</td>
+            <td>{{ projectData.status }}</td>
+            <td>{{ projectData.contract_value }}</td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Total: {{ projectData ? projectData.length : 0 }} Projects.
+      </div>
+    </ng-template>
+</p-table>
+

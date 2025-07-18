@@ -1,0 +1,114 @@
+:host ::ng-deep {
+       button-add
+  .save-button button {
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+    .save-button button{
+      background-color: var(--primary-blue);
+      cursor: pointer;
+      border: none;
+    }
+    .cancel-button button{
+      background-color: var(--blue-100);
+      color: var(--primary-blue);
+      cursor: pointer;
+      border: none;
+    }
+    
+    .p-dropdown  {
+        min-width: 100%;
+    }
+    .currency>div{
+      border-radius: 6px 0px 0px 6px;
+    }
+    .currencyInput{
+      border-radius: 0px 6px 6px 0px;
+    }
+    .header-text{
+        font-size: 18px;
+      }
+      
+    .mms-dropdown>div{
+        padding: 2px 0px;
+    }
+    .mms-input{
+        padding: 8px 12px;
+    }
+    .mms-textarea{
+        resize: none;
+        padding: 8px 12px;
+    }
+
+    .p-multiselect{
+      display: flex;
+      position: relative;
+      user-select: none;
+    }
+  }
+  
+  .test {
+    height: min-content;
+  }
+  
+  .mms-form{
+    gap: 10px;
+  }
+  .required-asterisk {
+    font-weight: 400;
+    color: red;
+  }
+  /* Adjust the width and height of the input field */
+.priority-input, .p-dropdown {
+  width: 100%;
+  height: 38px; /* Adjust the height as needed */
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card column {
+  // border: 1px solid #dcdcdc; 
+  border-radius: 6px;
+}
+
+
+::ng-deep .p-checkbox-box.p-highlight .p-checkbox-icon {
+  color: white !important;
+}
+
+
+.select-checkbox{
+  display: flex !important;
+  flex-direction: row-reverse;
+ justify-content: flex-end;
+ align-items: center;
+ gap: 5px ;
+}
+::ng-deep .p-multiselect{
+  width: 100%;
+  height: 31px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+
+}
+::ng-deep .p-checkbox-box{
+  height: 20px !important;
+  width: 20px !important;
+}
+::ng-deep .mandatory-switch {
+  width: 30px !important;
+  height: 20px !important;
+
+}
+
+  .dropdown-asset-list {
+    width: 200px !important;
+  }
+

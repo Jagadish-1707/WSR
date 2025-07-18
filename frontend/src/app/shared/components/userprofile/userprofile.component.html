@@ -1,0 +1,68 @@
+<div class="account-info flex justify-content-start align-content-center gap-3">
+  <div class="flex align-items-center justify-content-center">
+    <!-- <button class="notification-btn" (click)="toggleSidebar()">
+      <div class="card flex justify-content-center">
+        <i class="pi pi-bell text-2xl mr-1" style="  cursor: pointer;"   pBadge value="{{badgeValue}}"></i>
+    </div>
+  </button> -->
+  </div>
+  <div class="flex align-items-center justify-content-center mr-2" >
+    <p-button
+    class="user-name"
+    [rounded]="true"
+     (click)="accountMenu.toggle($event)">
+    <div class="nav-icon">{{ getFirstLetters() }}</div>    
+  </p-button>
+  </div>
+</div>
+
+
+<p-sidebar [(visible)]="sidebarVisible" [position]="'right'" [showCloseIcon]="true">
+  <ng-template pTemplate="header">Notifications</ng-template>
+  <br>
+  <p>1. New Timesheets approval. </p>
+  <br>
+  <p>2. Timesheets have been updated.</p>
+  <br>
+  <p>3. All pending tasks finished!!!</p>
+</p-sidebar>
+
+
+<p-overlayPanel class="overflow-scroll" #accountMenu (onHide)="onHideOverlay()">
+  <ng-template pTemplate="content">
+    <div class="py-1 flex flex-row flex-nowrap gap-2">
+      <div>
+        <h4
+          class="profileName my-0 pb-1 white-space-nowrap overflow-hidden text-overflow-ellipsis"
+        >
+          {{ name }}
+        </h4>
+      </div>
+      <div>-</div>
+      <div class="profileId pb-1">{{ role }}</div>
+    </div>
+    <div
+      class="py-1 text-sm white-space-nowrap overflow-hidden text-overflow-ellipsis"
+    >
+      {{ email }}
+    </div>
+    <!-- <div>
+        <p-button class="btn-logout" (click)="logout()" label="Logout" [link]="true">
+          <span class="material-symbols-outlined" style="padding-bottom: 3px;"> logout </span>
+        </p-button>
+      </div> -->
+    <div>
+      <button
+        class="btn-logout flex flex-row flex-nowrap justify-content-start align-items-center gap-1"
+        (click)="logout()"
+      >
+        <div>Logout</div>
+        <div>
+          <span class="material-symbols-outlined" style="font-size: 1.5rem;">
+            logout
+          </span>
+        </div>
+      </button>
+    </div>
+  </ng-template>
+</p-overlayPanel>

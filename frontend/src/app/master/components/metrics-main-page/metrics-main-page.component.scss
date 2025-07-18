@@ -1,0 +1,285 @@
+.text-date mt-2 {
+  gap: 5px;
+}
+
+.cust-text {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--Text-Color, #323d4a);
+}
+
+::ng-deep .p-toolbar .toolbar {
+  padding-bottom: 20px;
+}
+
+.disabled-input {
+  pointer-events: none;
+  /* Prevents interaction */
+  opacity: 0.6;
+  /* Makes the input look disabled */
+  background-color: #f5f5f5;
+  /* Optional: Give it a grayish background */
+}
+
+:host ::ng-deep {
+  p-multiselect.ng-invalid.ng-touched > .p-multiselect {
+    border-color: #e24c4c;
+    border: 1px solid #e24c4c;
+  }
+
+  p-dropdown.ng-touched.ng-invalid > .p-dropdown {
+    border-color: #e24c4c;
+    border: 1px solid #e24c4c;
+  }
+  /* 
+    .p-multiselect,
+    .p-calendar,
+    .p-dropdown {
+
+        width: 168px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+    } */
+
+  .action-button button {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: none;
+
+    &:hover {
+      background-color: var(--primary-blue);
+      color: #ccc;
+    }
+  }
+
+  .project-dropdown .p-inputtext {
+    font-size: 12px;
+    /* padding: 7px 6px 7px 12px; */
+    gap: 6px;
+    border-radius: 6px 0px 0px 0px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+  }
+
+  .add-button button {
+    color: white;
+    background-color: var(--primary-blue);
+  }
+
+  .minus-button button {
+    font-weight: 600;
+    color: white;
+    background-color: var(--red-100);
+  }
+
+  .button-add button {
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+    font-weight: 400;
+  }
+
+  .month-calendar .p-calendar .p-inputtext {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+  }
+
+  .month-label {
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    position: absolute;
+    padding: 2px;
+    top: 5px;
+    left: 76px;
+  }
+
+  .calendar-box {
+    position: absolute;
+    top: 2px;
+    left: 46%;
+    z-index: 99;
+  }
+  .left-arrow,
+    .right-arrow {
+      z-index: 100;
+      cursor: pointer;
+    }
+
+    .right-arrow{
+      position: absolute;
+      left: 166px;
+      top: 7px;
+    }
+    .left-arrow{
+      position: absolute;
+      top: 7px;
+      left: 25px;
+    }
+
+  .calendar-container {
+    position: relative;
+    .calendar-icon {
+      position: absolute;
+      top: 4px;
+      left: 52px;
+      font-size: 24px !important;
+    }
+    
+    .metrics-calendar {
+      span {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      input {
+        width: 125px;
+        cursor: default;
+        background: none;
+        border: none;
+        color: transparent;
+        position: absolute;
+        left: 45px;
+
+        &:focus {
+          box-shadow: none;
+          outline: 0 none;
+          outline-offset: 0;
+          border-color: transparent;
+        }
+      }
+
+      .p-input-icon-right > .p-icon-wrapper,
+      .p-input-icon-right > i:last-of-type {
+        display: none;
+      }
+    }
+  }
+
+  .ticket-status {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 23.44px;
+    text-align: center;
+    color: var(--Text-color, #323d4a);
+  }
+  .p-ripple p-element p-button p-component {
+    background: none;
+  }
+
+  .required-asterisk {
+    font-weight: 400;
+    color: red;
+  }
+
+  .weekly-date {
+    gap: 8px;
+    opacity: 0px;
+  }
+
+  .text-date {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16.41px;
+    text-align: left;
+  }
+
+  td {
+    padding: 6px;
+  }
+
+  .material-symbols-outlined {
+    background-color: none;
+    font-size: 18px !important;
+    display: flex;
+    align-items: center;
+  }
+
+  .head-text {
+    display: flex;
+    align-items: center;
+  }
+}
+
+::ng-deep .project-dropdown .p-dropdown {
+  width: 100%;
+}
+
+.form-field {
+  width: 100%; /* Set a fixed width that fits your layout */
+  max-width: 100%;
+}
+
+.week-range-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+:host ::ng-deep {
+  .weekRange .p-button {
+    background-color: transparent;
+    font-weight: bolder;
+    border: none;
+    color: var(--primary-blue);
+  }
+  .dynamic-header {
+    background-color: var(--gray-200);
+  }
+
+  .active-week {
+    color: #19357e;
+    background: white;
+    border-bottom: 2px solid #19357e;
+    border-radius: 0;
+  }
+
+  .active-week span {
+    color: #19357e;
+    font-weight: 700 !important;
+  }
+
+  .inactive-week {
+    color: var(--primary-blue);
+    background-color: transparent;
+  }
+  .inactive-week span {
+    font-weight: 400 !important;
+    white-space: nowrap;
+    color: var(--gray-900);
+  }
+
+  .timesheet-entry {
+    font-size: 12px;
+    font-weight: 700;
+    top: 10px;
+  }
+  .right-btn {
+    z-index: 999;
+  }
+  
+  .dropdown-asset-list {
+    width: 200px !important;
+  }
+
+  .grid-table .p-datatable-tbody > tr > td {
+    padding: 8px 16px !important;
+}
+
+.back-btn .p-button{
+  top:-6px !important;
+}
+}
+
+.content {
+  display: flex;
+  width: fit-content;
+}
+

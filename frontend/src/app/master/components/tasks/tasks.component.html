@@ -1,0 +1,650 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="title-header flex justify-content-between flex-wrap gap-4">
+  <div class="align-items-center justify-content-start gap-2">
+    <div class="flex justify-content-between align-items-center">
+      <p-dropdown [filter]="true"
+        class="dropdown-asset-list mr-2"
+        [options]="projectData | sort : 'projectName'"
+        [(ngModel)]="selectedProjectName"
+        pTooltip="{{
+          selectedProjectName ? selectedProjectName.projectName : ''
+        }}"
+        (onChange)="filterTaskData()"
+        optionLabel="projectName"
+        placeholder="Project"
+      ></p-dropdown>
+      <p-dropdown [filter]="true"
+        class="dropdown-asset-list mr-2"
+        [options]="projectTypeDropdownList | sort : 'label'"
+        [(ngModel)]="selectedProjectType"
+        pTooltip="{{ selectedProjectType ? selectedProjectType.value : '' }}"
+        (onChange)="filterTaskData()"
+        optionLabel="label"
+        placeholder="Project Type"
+      ></p-dropdown>
+      <p-button
+        class="flex align-items-center flex-direction row"
+        severity="secondary"
+        [text]="true"
+        (click)="onClear()"
+      >
+      <span class=" clear-btn material-symbols-outlined">backspace</span>
+        <span>Clear</span>
+      </p-button>
+    </div>
+  </div>
+  <div
+    class="flex flex-grow-1 justify-content-between flex-nowrap gap-4 w-full md:w-auto"
+  >
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button
+          icon="pi pi-plus"
+          (click)="addtask()"
+          label="CONFIG PROJECT"
+          class="btn-primary"
+        >
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-container">
+  <p-table
+    [value]="filterProjectNames"
+    #dt
+    [paginator]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+    [rows]="10" [rowsPerPageOptions]="[10, 20, 30, 40]"
+    [scrollable]="true"
+    [globalFilterFields]="['name', 'project', 'status']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn [width]="'50px'">
+          <div class="flex justify-content-center align-items-center">
+            <div class="min-w-max">Action</div>
+          </div>
+        </th>
+        <th pSortableColumn="customer">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Customer</div>
+            <p-sortIcon field="customer"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="projectName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Project</div>
+            <p-sortIcon field="projectName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="projectTypeName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Project Type</div>
+            <p-sortIcon field="projectTypeName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="billingType">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Billing Type</div>
+            <p-sortIcon field="billingType"></p-sortIcon>
+          </div>
+        </th>
+        <th class="white-space-nowrap">Assigned To</th>
+        <th class="white-space-nowrap">Metrics</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-taskData>
+      <tr>
+        <td pFrozenColumn>
+          <div class="flex">
+            <p-button
+              class="edit-btn"
+              [rounded]="true"
+              pTooltip="Edit"
+              tooltipPosition="top"
+              [text]="true"
+              (click)="editTask(taskData.id)"
+            >
+              <i class="material-symbols-outlined">edit</i>
+            </p-button>
+            <p-button
+              [rounded]="true"
+              pTooltip="Delete"
+              tooltipPosition="top"
+              class="edit-btn"
+              [text]="true"
+              (click)="confirmDelete(taskData)"
+            >
+              <i class="material-symbols-outlined">delete</i>
+            </p-button>
+            <p-button
+              [rounded]="true"
+              pTooltip="Add Metrics"
+              tooltipPosition="top"
+              class="edit-btn"
+              [text]="true"
+              (click)="addMetrics(taskData.id)"
+            >
+              <i class="material-symbols-outlined">add</i>
+            </p-button>
+          </div>
+        </td>
+        <td class="white-space-nowrap">
+          {{ taskData.customerName }}
+        </td>
+        <td class="white-space-nowrap">
+          {{ taskData.projectName }}
+        </td>
+        <td class="white-space-nowrap">
+          {{ projectTypeMap[taskData.projectType] || "Unknown" }}
+        </td>
+        <td class="white-space-nowrap">
+          {{ taskData.billingType }}
+        </td>
+        <td>
+          <p-button
+            size="small"
+            class="action-button"
+            (click)="showEmployeeDialogs(taskData.id)"
+            icon="pi pi-eye"
+            [label]="taskData.assignedEmployeeCount.toString()"
+          >
+          </p-button>
+        </td>
+        <td>
+          <p-button
+            size="small"
+            class="action-button"
+            (click)="showMetricsDialogs(taskData.id)"
+            icon="pi pi-eye"
+            [label]="taskData.metricsCount.toString()"
+          >
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No records found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [draggable]="false"
+  [(visible)]="editModalVisible"
+  [modal]="true"
+  [style]="{ width: '80rem' }"
+>
+  <ng-template pTemplate="header">
+    <div
+      class="header-text inline-flex align-items-center justify-content-center gap-2"
+    >
+      {{
+        editFrm.get("id")?.value === 0
+          ? "Add Project Configuration"
+          : "Edit Project Configuration"
+      }}
+    </div>
+  </ng-template>
+
+  <div class="container">
+    <form [formGroup]="editFrm">
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="client"
+            >Customer<span class="required-asterisk">*</span></label
+          >
+          <p-dropdown [filter]="true"
+            [options]="projectData | sort : 'customerName'"
+            formControlName="client"
+            optionLabel="customerName"
+            placeholder="Select Customer"
+            (onChange)="onClientSelected($event.value)"
+            [ngClass]="{
+              'ng-dirty': editFrm.get('client')?.touched,
+              'ng-invalid': editFrm.get('client')?.invalid
+            }"
+          ></p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              editFrm.get('client')?.touched && editFrm.get('client')?.invalid
+            "
+          >
+            &nbsp; &#9888; Customer name is required.
+          </small>
+        </div>
+        <div class="field col-12 md:col-6">
+          <label for="project"
+            >Project<span class="required-asterisk">*</span></label
+          >
+          <p-dropdown [filter]="true"
+            [options]="filteredProjects | sort : 'projectName'"
+            formControlName="project"
+            (onChange)="onProjectSelected($event.value)"
+            optionLabel="projectName"
+            placeholder="Select Project"
+            [ngClass]="{
+              'ng-dirty': editFrm.get('project')?.touched,
+              'ng-invalid': editFrm.get('project')?.invalid
+            }"
+          ></p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="editFrm.get('project')?.touched && editFrm.get('project')?.invalid && !editFrm.get('project')?.errors?.['alreadyExists']"
+          >
+            &nbsp; &#9888; Project name is required.
+          </small>
+          <small
+            class="p-error"
+            *ngIf="editFrm.get('project')?.touched && editFrm.get('project')?.errors?.['alreadyExists']"
+          >
+            &nbsp; &#9888; Project already exists for this Customer.
+          </small>
+        </div>
+      </div>
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="projectType"
+            >Project Type<span class="required-asterisk">*</span></label
+          >
+          <div>
+            <p-dropdown [filter]="true"
+              [options]="projectTypeDropdownList | sort : 'label'"
+              optionLabel="label"
+              optionValue="value"
+              formControlName="projectType"
+              (onChange)="onProjectTypeChange($event.value)"
+              placeholder="Select Project Type"
+              [ngClass]="{
+                'ng-dirty': editFrm.get('projectType')?.touched,
+                'ng-invalid': editFrm.get('projectType')?.invalid
+              }"
+            ></p-dropdown>
+            <small
+              class="p-error"
+              *ngIf="
+                editFrm.get('projectType')?.touched &&
+                editFrm.get('projectType')?.invalid
+              "
+            >
+              &nbsp; &#9888; Project Type is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="assignedTo"
+            >Assign To <span class="required-asterisk">*</span></label
+          >
+          <p-multiSelect
+            formControlName="assignedTo"
+            [options]="zohoEmployees | sort : 'label'"
+            placeholder="Select Assignee"
+            [showClear]="true"
+            [display]="'comma'"
+            appendTo="body"
+            optionLabel="label"
+            selectedItemsLabel="{0} employee(s) selected"
+            [ngClass]="{
+              'ng-dirty': editFrm.get('assignedTo')?.touched,
+              'ng-invalid': editFrm.get('assignedTo')?.invalid
+            }"
+          ></p-multiSelect>
+          <small
+            id="assigned-to-help"
+            class="p-error"
+            *ngIf="
+              editFrm.get('assignedTo')?.touched &&
+              editFrm.get('assignedTo')?.invalid
+            "
+          >
+            &nbsp; &#9888; Please select at least one Assignee.
+          </small>
+        </div>
+      </div>
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="assignmentStartDate"
+            >Assignment Start Date
+            <span class="required-asterisk">*</span></label
+          >
+          <p-calendar
+            class="date"
+            placeholder="DD-MM-YYYY"
+            appendTo="body"
+            formControlName="assignmentStartDate"
+            [ngClass]="{
+              'ng-dirty': editFrm.get('assignmentStartDate')?.touched,
+              'ng-invalid': editFrm.get('assignmentStartDate')?.invalid
+            }"
+            [readonlyInput]="true"
+            [showIcon]="true"
+            [iconDisplay]="'input'"
+            [minDate]="minStartDate!"
+            [maxDate]="maxEndDate"
+            (ngModelChange)="onStartDateChange()"
+            dateFormat="dd/mm/yy"
+          ></p-calendar>
+          <small
+            id="assignment-start-date-help"
+            class="p-error"
+            *ngIf="
+              editFrm.get('assignmentStartDate')?.touched &&
+              editFrm.get('assignmentStartDate')?.invalid
+            "
+          >
+            &nbsp; &#9888; Please select a Start Date for the Assignment.
+          </small>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="assignmentEndDate"
+            >Assignment End Date <span class="required-asterisk">*</span></label
+          >
+          <p-calendar
+            class="date"
+            formControlName="assignmentEndDate"
+            placeholder="DD-MM-YYYY"
+            appendTo="body"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            [minDate]="minStartDate!"
+            [maxDate]="maxEndDate!"
+            [ngClass]="{
+              'ng-dirty': editFrm.get('assignmentEndDate')?.touched,
+              'ng-invalid': editFrm.get('assignmentEndDate')?.invalid
+            }"
+            dateFormat="dd/mm/yy"
+          ></p-calendar>
+          <!-- [minDate]="editFrm.get('assignmentStartDate')?.value ? editFrm.get('assignmentStartDate')?.value : null" -->
+
+          <small
+            id="assignment-end-date-help"
+            class="p-error"
+            *ngIf="
+              editFrm.get('assignmentEndDate')?.touched &&
+              editFrm.get('assignmentEndDate')?.invalid
+            "
+          >
+            &nbsp; &#9888; Please select a End Date for the Assignment.
+          </small>
+        </div>
+      </div>
+
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="assignment"
+            >Assignment % <span class="required-asterisk">*</span></label
+          >
+          <input
+            type="number"
+            pInputText
+            id="assignment"
+            name="assignment"
+            min="0"
+            max="100"
+            formControlName="assignmentPercent"
+            [ngClass]="{
+              'ng-dirty': editFrm.get('assignmentPercent')?.touched,
+              'ng-invalid': editFrm.get('assignmentPercent')?.invalid
+            }"
+            placeholder="Enter Assignment Percentage"
+          />
+          <small
+            id="assignment-error"
+            class="p-error"
+            *ngIf="
+              editFrm.get('assignmentPercent')?.touched &&
+              editFrm.get('assignmentPercent')?.invalid
+            "
+          >
+            &nbsp; &#9888; Please enter an Assignment percentage between 1 and
+            100.
+          </small>
+        </div>
+        <div class="field col-12 md:col-6">
+          <label for="billingtype"
+            >Billing Type<span class="required-asterisk">*</span></label
+          >
+          <p-dropdown [filter]="true"
+            [options]="billingType"
+            optionLabel="label"
+            optionValue="value"
+            formControlName="billingType"
+            placeholder="Select Billing Type"
+          ></p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              editFrm.get('billingType')?.touched &&
+              editFrm.get('billingType')?.invalid
+            "
+          >
+            &nbsp; &#9888; Billing Type is required.
+          </small>
+        </div>
+      </div>
+
+      <div class="text-area">
+        <div class="form-group field">
+          <label for="remarks">Remarks</label>
+          <textarea class="mms-textarea"
+            [rows]="4"
+            pInputTextarea
+            placeholder="Enter Remarks"
+            formControlName="remarks"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button
+      class="save-btn"
+      type="submit"
+      [label]="editFrm.get('id')?.value === 0 ? 'SAVE' : 'UPDATE'"
+      [disabled]="!editFrm.dirty || editFrm.invalid"
+      (onClick)="submitTask()"
+    ></p-button>
+    <p-button
+      class="btn-secondary"
+      (click)="editModalVisible = false"
+      label="CANCEL"
+      pAutoFocus
+      [autofocus]="true"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Confirm Delete"
+  [(visible)]="displayDeleteDialog"
+  [modal]="true"
+  [closable]="true"
+>
+  <p>Are you sure you want to Delete?</p>
+  <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px">
+    <p-button label="DELETE" class="save-btn mr-2" (click)="deleteTask()">
+    </p-button>
+    <p-button
+      class="btn-secondary"
+      (click)="editModalVisible = false"
+      label="CANCEL"
+      pAutoFocus
+      [autofocus]="true"
+    ></p-button>
+  </div>
+</p-dialog>
+<p-dialog
+  [(visible)]="displayEmpDialog"
+  [modal]="true"
+  [style]="{ width: '50%' }"
+  [closable]="true"
+  [draggable]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <span>Employees Assigned for {{ selectedprojectdialog }}</span>
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          (input)="table.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search"
+        />
+      </div>
+    </div>
+  </ng-template>
+  <p-table
+    #table
+    [value]="selectedEmployees"
+    [paginator]="true"
+    [rows]="10"
+    appendTo="body"
+    [globalFilterFields]="['employeeId', 'employeeName', 'department']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn pSortableColumn="employeeId">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Employee ID</div>
+            <p-sortIcon field="employeeId"></p-sortIcon>
+          </div>
+        </th>
+        <th pFrozenColumn pSortableColumn="department">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Department</div>
+            <p-sortIcon field="department"></p-sortIcon>
+          </div>
+        </th>
+        <th pFrozenColumn pSortableColumn="employeeName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Employee Name</div>
+            <p-sortIcon field="employeeName"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-emp>
+      <tr class="table-row">
+        <td>{{ emp.employeeId }}</td>
+        <td>{{ emp.department }}</td>
+        <td>{{ emp.employeeName }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="3" class="text-center">No Employees found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="displayMetricsDialog"
+  [modal]="true"
+  [style]="{ width: '50%' }"
+  [closable]="true"
+  [draggable]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <span>Metrics for {{ selectedprojectdialog }}</span>
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          (input)="table.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search"
+        />
+      </div>
+    </div>
+  </ng-template>
+
+  <p-table
+    #table
+    [value]="selectedMetrics"
+    [paginator]="true"
+    [rows]="10"
+    appendTo="body"
+    [globalFilterFields]="['metricsName']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn pSortableColumn="metricName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Metric Name</div>
+            <p-sortIcon field="metricName"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-emp>
+      <tr class="table-row">
+        <td>{{ emp.metricsName }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="3" class="text-center">No Metrics found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-dialog>
+
+<p-dialog
+  header="Delete Failed"
+  [(visible)]="showWarningDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable] ="false"
+>
+  <p>This project configuration is in use.</p>
+
+  <div style="display: flex; justify-content: center">
+    <p-button
+      label="OK"
+      class="btn-secondary"
+      (click)="showWarningDialog = false"
+      [draggable] ="false"
+
+    ></p-button>
+  </div>
+</p-dialog>
+
+<app-task-metrics
+  *ngIf="dialogVisible"
+  [dialogVisible]="dialogVisible"
+  [taskId]="selectedTaskId"
+  (dialogVisibleChange)="onDialogVisibleChange($event)"
+>
+</app-task-metrics>
+
+  <p-dialog
+  header="Edit Not Allowed"
+  [(visible)]="showEditWarningDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+>
+  <p>This project configuration is in use, you can't edit it</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem">
+    <p-button
+      label="OK"
+      class="btn-secondary"
+      (click)="showEditWarningDialog = false"
+    >
+    </p-button>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

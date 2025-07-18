@@ -1,0 +1,256 @@
+<div class="page-bg">
+  <div class="card">
+
+    <div class="header-text mb-3" style="font-size: 18px; font-weight: 600">
+       Application Roles
+    </div>
+    <div class="flex justify-content-between align-items-center mb-5  ">
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div>
+     <p-button pRipple (click)="showDialog()" label="Role" icon="pi pi-plus" class="button-add">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Table Code -->
+  <div class="table-container">
+    <p-table [value]="rolesList" #dt [paginator]="true" [tableStyle]="{ 'min-width': '50rem' }"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+      [rows]="5" [rowsPerPageOptions]="[5, 10, 15, 20]" [scrollable]="true"
+      [globalFilterFields]="['roleName', 'startDate', 'endDate', 'status']">
+      <!-- Table header -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Action</th>
+          <th pSortableColumn="roleName">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Role</div>
+              <p-sortIcon field="roleName"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="startDate">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="header-content"></div>
+              <div class="min-w-max">Effective Start Date</div>
+              <p-sortIcon field="startDate"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="endDate">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="header-content"></div>
+              <div class="min-w-max">Effective End Date</div>
+              <p-sortIcon field="endDate"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="status">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="header-content"></div>
+              <div class="min-w-max">Status</div>
+              <p-sortIcon field="status"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-roleDetail>
+        <tr class="p-selectable-row">
+          <td>
+            <p-button size="small" class="table-action-btn" icon="pi pi-pencil"
+              (click)="onEditRole(roleDetail.id)"></p-button>
+            <!-- Lock Button to trigger the Permissions dialog -->
+            <p-button size="small" class="table-action-btn" icon="pi pi-lock"
+              (click)="showPermissionsDialog(roleDetail.id)"></p-button>
+            <!-- Trash Icon Button that triggers the Delete Confirmation Dialog -->
+            <p-button class="table-action-btn" icon="pi pi-trash" (click)="confirmDelete(roleDetail.id)"
+              title="Delete Role">
+            </p-button>
+
+            <!-- Delete Confirmation Dialog -->
+            <p-dialog header="Confirm Delete" [(visible)]="displayDeleteDialog" [modal]="true" [closable]="false">
+              <p>Are you sure you want to delete this role?</p>
+              <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px;">
+                <p-button pButton label="Cancel" class="p-button-secondary p-mr-2" id="p-dialog_cancel_btn"
+                  (click)="displayDeleteDialog = false">
+
+                </p-button>
+                <p-button pButton label="Delete" class="save-btn" (click)="deleteRole()">
+
+                </p-button>
+              </div>
+            </p-dialog>
+          </td>
+          <td>
+            <span>
+              {{ roleDetail.roleName }}
+            </span>
+          </td>
+          <td>
+            <span>
+              {{ roleDetail.startDate | date : "dd-MM-YYYY" }}
+            </span>
+          </td>
+          <td>
+            <span>
+              {{ roleDetail.endDate | date : "dd-MM-YYYY" }}
+            </span>
+          </td>
+          <td>
+            <span>
+
+              <p-tag [value]="roleDetail.status === 1 ? 'Active' : 'Inactive'"
+                [severity]="getSeverity(roleDetail.status)"></p-tag>
+            </span>
+
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- add roles pop up form  -->
+  <div>
+    <div>
+      <p-dialog [draggable]="false" header="Header" [(visible)]="visible" [modal]="true" [style]="{ width: '600px' }">
+        <ng-template pTemplate="header">
+          <div class="header-text inline-flex align-items-center justify-content-center gap-2">
+            {{ isEditMode ? "Edit Role" : "Add Role" }}
+            <!-- Add Role -->
+          </div>
+        </ng-template>
+
+        <div class="container">
+          <form [formGroup]="frm" (ngSubmit)="onSave()" class="mms-form flex flex-column">
+
+            <div class="grid">
+              <div class="form-group field col-6 mb-2 ">
+                <div class="flex flex-column">
+                  <label for="RoleName" style="display: block; margin-bottom:6px;">Role</label>
+                  <input id="RoleName" type="text" pInputText formControlName="roleName" placeholder="Enter Role Name"
+                    class="form-control" />
+                  <div *ngIf="
+                    frm.get('roleName')?.invalid && frm.get('roleName')?.touched
+                  " class="alert alert-danger">
+                    Role Name is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group field col-6 mb-2">
+                <div class="flex flex-column">
+                  <label for="status" style="display: block; margin-bottom:6px; width:100%">Status</label>
+                  <p-dropdown id="status" [options]="[
+                    { label: 'Active', value: 1 },
+                    { label: 'Inactive', value: 0 }
+                  ]" formControlName="status" placeholder="Select Status" class="form-control"></p-dropdown>
+                  <div *ngIf="frm.get('status')?.invalid && frm.get('status')?.touched" class="alert alert-danger">
+                    Status is required
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="form-group field col-6 mb-2">
+                <div class="flex flex-column">
+                  <label class="mb-2" for="StartDate">Effective Start Date </label>
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" class="date" formControlName="startDate"
+                    #weekStartDateCalendar placeholder="DD-MM-YYYY" [ngClass]="{
+                  'ng-dirty': frm.get('startDate')?.touched,
+                  'ng-invalid': frm.get('startDate')?.invalid
+                }" [showIcon]="true" dateFormat="dd/mm/yy" [readonlyInput]="true"></p-calendar>
+                  <div *ngIf="
+                  frm.get('startDate')?.invalid && frm.get('startDate')?.touched
+                " class="p-error">
+                    Start Date is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group field col-6">
+                <div class="flex flex-column">
+                  <label class="mb-2" for="EndDate">Effective End Date </label>
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" class="date" formControlName="endDate"
+                    #weekStartDateCalendar placeholder="DD-MM-YYYY" [ngClass]="{
+                  'ng-dirty': frm.get('endDate')?.touched,
+                  'ng-invalid': frm.get('endDate')?.invalid
+                }" [showIcon]="true" dateFormat="dd/mm/yy" [readonlyInput]="true"></p-calendar>
+                  <div *ngIf="
+                  frm.get('endDate')?.invalid && frm.get('endDate')?.touched
+                " class="p-error">
+                    End Date is required
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group field">
+              <label for="remarks" style="display: block;">Description</label>
+              <textarea [rows]="5" class="mms-textarea" pInputTextarea formControlName="remarks"
+                placeholder="Enter Role Description..."></textarea>
+            </div>
+          </form>
+        </div>
+        <ng-template pTemplate="footer">
+          <p-button class="save-button" [label]="isEditMode ? 'Update Role' : 'Add Role'" label="Save"
+            (onClick)="onSave()" [disabled]="!frm.valid"></p-button>
+          <p-button class="cancel-button" (click)="cancelAdd()" label="Cancel" pAutoFocus [autofocus]="true"></p-button>
+
+        </ng-template>
+      </p-dialog>
+
+
+
+
+    </div>
+  </div>
+
+</div>
+
+
+<p-dialog *ngIf="permissionsVisible" [(visible)]="permissionsVisible" [closable]="true" [modal]="true"
+  [style]="{width: '300px', height: 'auto'}" [draggable]="false">
+
+  <p-header>Select Permissions</p-header>
+
+  <div class="permissions" style="display: flex; flex-direction: column; gap: 10px;">
+    <ng-container *ngFor="let role of roleModel">
+      <ng-container *ngIf="!['Tasks', 'Metrics', 'Timesheets'].includes(role.modelName)">
+
+        <!-- Settings Label -->
+        <label *ngIf="role.modelName === 'Settings'" class="permission-label main-label">
+          <input type="checkbox" [checked]="isAnySubmoduleChecked()"
+            [disabled]="!isAnySubmoduleChecked() && areAllSubmodulesUncheckedBySettings"
+            (change)="toggleSettingsGroup($event)" />
+          {{ role.modelName }}
+        </label>
+
+        <!-- Submodules under Settings -->
+        <label *ngIf="['Application Role', 'Manage User', 'Priority', 'SLA', 'Complexity'].includes(role.modelName)"
+          class="permission-label sub-label">
+          <input type="checkbox" [(ngModel)]="selectedPermissions[role.modelName]" (change)="onSubmoduleChange()" />
+          {{ role.modelName }}
+        </label>
+
+        <!-- Other Main Labels -->
+        <label
+          *ngIf="!['Settings', 'Application Role', 'Manage User', 'Priority', 'SLA', 'Complexity'].includes(role.modelName)"
+          class="permission-label main-label">
+          <input type="checkbox" [(ngModel)]="selectedPermissions[role.modelName]" (change)="onSubmoduleChange()" />
+          {{ role.modelName }}
+        </label>
+
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <p-footer>
+    <p-button label="Save" icon="pi pi-save" class="save-btn mr-2" (click)="savePermissions()">
+    </p-button>
+
+    <p-button label="Cancel" icon="pi pi-times" class="cancel-button button" (click)="hidePermissionsDialog()">
+    </p-button>
+  </p-footer>
+</p-dialog>
+
+<p-toast></p-toast>

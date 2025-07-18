@@ -1,0 +1,132 @@
+<div class="card">
+  <p-toolbar>
+    <ng-template pTemplate="left">
+      <span class="p-input-icon-left flex">
+        <span
+          class="material-symbols-outlined menu-logo"
+          style="font-weight: 300; font-size: xx-large"
+        >
+          person_search
+        </span>
+        <input
+          pInputText
+          type="text"
+          (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search..."
+        />
+      </span>
+      <!-- <button pButton pRipple  label="Delete" icon="pi pi-trash" class="p-button-danger" (click)="deleteSelectedProducts()" 
+            [disabled]="!selectedUser || !selectedUser.length"></button> -->
+    </ng-template>
+
+    <ng-template pTemplate="right">
+      <p-button
+        pRipple
+        icon="pi pi-upload"
+        (click)="exportUser()"
+        label="Export"
+        class="p-button-help"
+      ></p-button>
+    </ng-template>
+  </p-toolbar>
+
+  <div class="table-container">
+    <p-table
+      [value]="userData"
+      [scrollHeight]="'428px'"
+      #dt
+      [rowHover]="true"
+      [rows]="5"
+      [globalFilterFields]="['employeeId', 'userName', 'email']"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pFrozenColumn pSortableColumn="employeeId">
+            <div class="flex justify-content-start align-items-center gap-1">
+        
+              <div class="min-w-max">ID</div>
+              <p-sortIcon field="employeeId"></p-sortIcon>
+            </div>
+          </th>
+
+          <th pFrozenColumn pSortableColumn="userName">
+            <div class="flex flex-row flex-nowrap gap-3">
+              <div class="flex justify-content-start align-items-center gap-1">
+                <div class="min-w-max">User Name</div>
+                <p-sortIcon field="userName"></p-sortIcon>
+              </div>
+            </div>
+          </th>
+          <th pFrozenColumn pSortableColumn="email">
+            <div class="flex justify-content-start align-items-center gap-1">
+             
+              <div class="min-w-max">Email</div>
+              <p-sortIcon field="email"></p-sortIcon>
+            </div>
+          </th>
+          <th pFrozenColumn pSortableColumn="role">
+            <div class="flex justify-content-start align-items-center gap-1">
+             
+              <div class="min-w-max">Role</div>
+              <p-sortIcon field="role"></p-sortIcon>
+            </div>
+          </th>
+          <th pFrozenColumn pSortableColumn="Profile">
+            <div class="flex justify-content-start align-items-center gap-1">
+             
+              <div class="min-w-max">Profile</div>
+              <p-sortIcon field="profile"></p-sortIcon>
+            </div>
+          </th>
+          <th pFrozenColumn pSortableColumn="status">
+            <div class="flex justify-content-start align-items-center gap-1">
+             
+              <div class="min-w-max">Status</div>
+              <p-sortIcon field="status"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-userData>
+        <tr >
+          <td >
+            {{ userData.employee_ID }}
+          </td>
+          <td>
+            <!-- <img
+              src="https://primefaces.org/cdn/primeng/images/demo/avatar/ionibowcher.png"
+              width="24"
+              alt=""
+              class="vertical-align-middle"
+            /> -->
+            <span class="flex align-items-center " >             
+              <span class="flex nav-icon mr-1">{{ getFirstLetters(userData.userName) }}</span>    
+              <span>
+    
+                {{ userData.userName }}
+              </span>
+          </span>
+          </td>
+          <td>
+            {{ userData.email_Address }}
+          </td>
+          <td>
+            {{ userData.role }}
+          </td>
+          <td>
+            {{ userData.profile }}
+          </td>
+          <td>
+            {{ userData.status }}
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between">
+          Total: {{ userData ? userData.length : 0 }} users.
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

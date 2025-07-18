@@ -1,0 +1,7 @@
+[Dd]ebug/
+[Oo]bj/
+.vs/
+
+.dtbcache.v2
+*.vsidx
+*.suo

@@ -1,0 +1,281 @@
+<div class="container">
+  <p-toolbar>
+    <div class="p-input-icon-left">
+      <div
+        class="header-text"
+        style="font-size: 24px; font-weight: 600; align-items: center"
+      >
+        Approve Weekly Timesheets
+      </div>
+      <div class="mt-2">
+        <div class="grid">          
+          <div class="field col">
+            <label for="project"
+              >Project<span class="required-asterisk">*</span></label
+            >
+            <div>
+              <p-dropdown
+                appendTo="body"
+                [options]="projects"
+                [filter]="true"
+                optionLabel="projectName"
+                placeholder="Select Project"
+              ></p-dropdown>
+            </div>
+          </div>
+          <div class="field col mr-2">
+            <label for="month/year" class="text-date"
+              >Week Start Date <span class="required-asterisk">*</span></label
+            >
+            <div>
+              <p-calendar
+                appendTo="body"
+                [iconDisplay]="'input'"
+                [showOnFocus]="true"
+                class="month-calendar"
+                #weekStartDateCalendar
+                [readonlyInput]="true"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                placeholder="From Date"
+              ></p-calendar>
+            </div>
+          </div>
+
+          <div class="field col mr-2">
+            <label for="month/year" class="text-date"
+              >Week End Date <span class="required-asterisk">*</span></label
+            >
+            <div>
+              <p-calendar
+                appendTo="body"
+                [iconDisplay]="'input'"
+                [showOnFocus]="true"
+                class="month-calendar"
+                #weekEndDateCalendar
+                [readonlyInput]="true"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                placeholder="To Date"
+              ></p-calendar>
+            </div>
+          </div>
+
+          <div class="field col">
+            <label for="status"
+              >Status<span class="required-asterisk">*</span></label
+            >
+            <div>
+              <p-dropdown
+                appendTo="body"
+                [options]="status"
+                optionLabel="label"
+                [(ngModel)]="selectedStatus"
+                (onChange)="onStatusChange($event)"
+                placeholder="Select Status"
+              ></p-dropdown>
+            </div>
+          </div>
+
+        <div class="toolbar-buttons m-0 mt-5">
+          <p-button
+            pRipple
+            label="Search"
+            (onClick)="onSearchClick()"
+            icon="pi pi-search"
+            class="search-button mr-2"
+          ></p-button>
+          <p-button
+            pRipple
+            label="Clear"
+            icon="pi pi-times"
+            class="clear-button"
+          ></p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </p-toolbar>
+
+  <div class="table">
+    <p-table
+      [scrollHeight]="'659px'"
+      [value]="timesheetData"
+      #dt
+      [rowHover]="true"
+      [rows]="5"
+      [globalFilterFields]="['customer', 'project', 'engagementMode']"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Action</th>
+          <th pSortableColumn="">
+            Timesheet Month
+            <p-sortIcon field=""></p-sortIcon>
+          </th>
+          <th pSortableColumn="">
+            Period
+            <p-sortIcon field=""></p-sortIcon>
+          </th>
+
+          <th pSortableColumn="status">
+            Status
+            <p-sortIcon field="status"></p-sortIcon>
+          </th>
+          <th pSortableColumn="">
+            Employee ID
+            <p-sortIcon field=""></p-sortIcon>
+          </th>
+          <th pSortableColumn="">
+            Name
+            <p-sortIcon field=""></p-sortIcon>
+          </th>
+          <th pSortableColumn="">
+            Customer Name
+            <p-sortIcon field=""></p-sortIcon>
+          </th>          
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-timesheetData>
+        <tr>
+          <td>
+            <p-button
+              size="small"
+              class="action-button"
+              icon="pi pi-pencil"
+              (onClick)="openDialog()"
+            ></p-button>
+          </td>
+          <td>
+            {{
+              timesheetData.weeklyTimesheet[0]?.logHours[0].logTs
+                | date : "MMMM"
+            }}
+          </td>
+          <td>
+            {{
+              timesheetData.weeklyTimesheet[0]?.logHours[0].logTs
+                | date : "dd-MM-YYYY"
+            }}
+            -
+            {{
+              timesheetData.weeklyTimesheet[0]?.logHours[
+                timesheetData.weeklyTimesheet[0]?.logHours.length - 1
+              ]?.logTs | date : "dd-MM-YYYY"
+            }}
+          </td>
+          <td>{{ timesheetData.timesheetStatus }}</td>
+          <td>ECPL0723</td>
+          <td>{{ timesheetData.employeeName }}</td>
+          <td>{{ timesheetData.customerName }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">No records found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<div>
+  <p-dialog
+    header="Header"
+    [(visible)]="editDialog"
+    [draggable]="false"
+    [modal]="true"
+    [style]="{ width: '900px' }"
+  >
+    <ng-template pTemplate="header">
+      <div
+        class="header-text inline-flex align-items-center justify-content-center gap-2"
+      >
+        Approve/Reject Timsheet
+      </div>
+    </ng-template>
+
+    <p-table [scrollHeight]="'659px'" [value]="timesheetData" [rows]="5">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Project Name</th>
+          <th pSortableColumn="">Activity</th>
+
+          <th pSortableColumn="status">Onsite/Offshore</th>
+          <th pSortableColumn="">Billing Action</th>
+          <th pSortableColumn="">Mon</th>
+          <th>Tue</th>
+          <th>Wed</th>
+          <th>Thu</th>
+          <th>Fri</th>
+          <th>Sat</th>
+          <th>Sun</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-timesheetData>
+        <tr>
+          <td>P-Cation Jasmine Support</td>
+          <td>Test</td>
+          <td>Onsite</td>
+          <td>Billing</td>
+          <td>8</td>
+          <td>9</td>
+          <td>8</td>
+          <td>6</td>
+          <td>9</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td>JTB</td>
+          <td>Test</td>
+          <td>Offsite</td>
+          <td>Billing</td>
+          <td>8</td>
+          <td>9</td>
+          <td>8</td>
+          <td>6</td>
+          <td>9</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="form-group field mt-2">
+      <label for="remarks">Remarks</label>
+      <textarea
+        rows="5"
+        cols="30"
+        pInputTextarea
+        placeholder="Enter Remarks"
+      ></textarea>
+    </div>
+
+    <div class="form-group flex">
+      <p-fileUpload
+        mode="basic"
+        chooseLabel="Attachments"
+        name="files[]"
+      ></p-fileUpload>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        class="approve-button"
+        label="Approve"
+        (click)="confirm1()"         
+      ></p-button>
+
+      <p-button class="reject-button" 
+      label="Reject"
+      (click)="confirm2()" 
+      ></p-button>
+    </ng-template>
+  </p-dialog>
+</div>
+
+<p-toast></p-toast>
+<p-confirmPopup />

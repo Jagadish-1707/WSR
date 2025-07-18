@@ -1,0 +1,56 @@
+.notification-btn:focus {
+  color: rgb(36, 73, 161);
+ 
+}
+.notification-btn {
+  //padding-top: 5px;
+  border: none;
+  background-color: #ededef;
+}
+.userName{
+  font-weight: bolder;
+  font-size: 16px;
+}
+ 
+
+ 
+:host ::ng-deep {
+  .profileId {
+    color: var(--primary-color);
+  }
+
+  .user-name .p-button{
+    background-color: transparent;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+}
+ 
+::ng-deep .user-btn .p-button {
+  // width: 32px;
+  //height: 32px;
+  border-radius: 50% !important;
+  background-color: var(--primary-color) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  //padding: 6px;
+}
+ 
+.user-btn .nav-icon {
+  font-size: 20px;
+  color: #f2eaea;
+}
+.btn-logout {
+   background: none;
+      color: var(--gray-700);
+      border: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      &:enabled:hover {
+        text-decoration: none !important;
+        color: var(--primary-blue) !important;
+        background: none !important;
+}
+}

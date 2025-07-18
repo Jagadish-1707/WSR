@@ -1,0 +1,575 @@
+<div class="project-report-container p-3">
+    <div class="p-d-flex p-ai-center p-jc-between p-flex-wrap mb-3">
+        <div class="flex align-items-center p-mb-2" style="gap: 1rem;">
+
+            <p-button label="Back" icon="pi pi-arrow-left" class="p-button-secondary" (click)="goBack()"
+                [style]="{ height: '30px', padding: '8px 16px', width: 'auto' }">
+            </p-button>
+
+            <p-button label="Export" icon="pi pi-download" class="p-button-primary export-button"
+                [style]="{ height: '30px', padding: '8px 14px', width: 'auto' }" (click)="menu.toggle($event)">
+            </p-button>
+            <p-menu #menu [popup]="true" [model]="exportOptions"></p-menu>
+        </div>
+    </div>
+
+
+
+    <!-- <-- Tabs section -->
+    <div class="p-mt-4">
+        <div class="tab-buttons p-mb-3">
+            <button [ngClass]="{ 'active-tab': activeTab === 'overall' }" (click)="activeTab = 'overall'">
+                Overall Project Status
+            </button>
+            <button [ngClass]="{ 'active-tab': activeTab === 'summary' }" (click)="activeTab = 'summary'">
+                Project Summary & Ratings
+            </button>
+            <button [ngClass]="{ 'active-tab': activeTab === 'details' }" (click)="activeTab = 'details'">
+                Progress Details
+            </button>
+            <button [ngClass]="{ 'active-tab': activeTab === 'keyRisksIssues' }" (click)="activeTab = 'keyRisksIssues'">
+                Key Issues & Risks
+            </button>
+        </div>
+
+        <!-- Tab 1: Overall Project Status -->
+        <div *ngIf="activeTab === 'overall' && selectedProjects.length > 0" class="overall-status-section">
+            <h2 class="section-heading">
+                📊 {{ selectedProjects.length === 1 ? selectedProjects[0]?.projectName || 'N/A' : '' }} - Project Status
+            </h2>
+
+            <div class="overall-status-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sl. No</th>
+                            <th>Project Name</th>
+                            <th>Schedule</th>
+                            <th>Resource</th>
+                            <th>Financial</th>
+                            <th>Quality</th>
+                            <th>Scope</th>
+                            <th>Overall Status</th>
+                            <th>Planned Resource</th>
+                            <th>Actual Resource</th>
+                            <th>Measure Taken</th>
+                            <th>Remarks</th>
+                            <th>Actions</th> <!-- Always show actions column -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let project of selectedProjects; let i = index">
+                            <td class="text-center">{{ i + 1 }}</td>
+                            <td class="text-center">
+                                {{ project.clientName ? project.clientName + ' - ' : '' }}{{ project.projectName ||
+                                'N/A' }}
+                            </td>
+
+
+                            <td class="text-center">
+                                <span [ngClass]="project.schedule?.toLowerCase() || ''">
+                                    {{ getSymbol(project.schedule) }}
+                                </span>
+                                {{ project.schedule || 'N/A' }}
+                            </td>
+
+                            <td class="text-center">
+                                <span [ngClass]="project.resource?.toLowerCase() || ''">
+                                    {{ getSymbol(project.resource) }}
+                                </span>
+                                {{ project.resource || 'N/A' }}
+                            </td>
+
+                            <td class="text-center">
+                                <span [ngClass]="project.financial?.toLowerCase() || ''">
+                                    {{ getSymbol(project.financial) }}
+                                </span>
+                                {{ project.financial || 'N/A' }}
+                            </td>
+
+                            <td class="text-center">
+                                <span [ngClass]="project.quality?.toLowerCase() || ''">
+                                    {{ getSymbol(project.quality) }}
+                                </span>
+                                {{ project.quality || 'N/A' }}
+                            </td>
+
+                            <td class="text-center">
+                                <span [ngClass]="project.scope?.toLowerCase() || ''">
+                                    {{ getSymbol(project.scope) }}
+                                </span>
+                                {{ project.scope || 'N/A' }}
+                            </td>
+
+                            <td class="text-center">
+                                <span [ngClass]="project.overallStatus?.toLowerCase() || ''">
+                                    {{ getSymbol(project.overallStatus) }}
+                                </span>
+                                {{ project.overallStatus || 'N/A' }}
+                            </td>
+
+                            <td class="text-center">{{ project.plannedResource || '-' }}</td>
+                            <td class="text-center">{{ project.actualResource || '-' }}</td>
+                            <td class="text-center">{{ project.measureTaken || '-' }}</td>
+                            <td class="text-center">{{ project.remarks || '-' }}</td>
+
+                            <!-- Actions Column -->
+                            <td class="text-center">
+                                <button pButton icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-text"
+                                    (click)="editProjectStatus(project)" title="Edit Project Status">
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- No project selected -->
+        <div *ngIf="activeTab === 'overall' && selectedProjects.length === 0" class="no-selection-message">
+            <p>Please select a project to view its status.</p>
+        </div>
+
+
+        <!-- Tab 2: Project Summary & Ratings -->
+        <div *ngIf="activeTab === 'summary'">
+            <ng-container *ngFor="let project of selectedProjects">
+                <div class="individual-project-details">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3><span class="project-title">{{ project.projectName }} - </span> Summary</h3>
+                        <p-button (click)="editProjectDetails(project)" label="Edit Project Details" icon="pi pi-pencil"
+                            class="p-button-warning" [style]="{ height: '30px', padding: '8px 16px', width: 'auto' }">
+                        </p-button>
+                    </div>
+
+                    <div class="project-info-grid">
+                        <div><strong>Report Start Date:</strong> {{ project.reportStartDate | date: 'yyyy-MM-dd' }}
+                        </div>
+                        <div><strong>Report End Date:</strong> {{ project.reportEndDate | date: 'yyyy-MM-dd' }}</div>
+                        <div><strong>Manager:</strong> {{ project.managerName || 'N/A' }}</div>
+                        <div><strong>Team Size:</strong> {{ project.teamSize || 'N/A' }}</div>
+                        <div><strong>Technology:</strong> {{ project.technology || 'N/A' }}</div>
+                        <div><strong>Project Type:</strong> {{ project.projectType?.trim() || 'N/A' }}</div>
+                        <div><strong>Customer Location:</strong> {{ project.customerLocation || 'N/A' }}</div>
+                        <div><strong>Business Domain:</strong> {{ project.businessDomain || 'N/A' }}</div>
+                        <div><strong>Project Start Date:</strong> {{ project.projectStartDate | date: 'yyyy-MM-dd' }}
+                        </div>
+                        <div><strong>Project End Date:</strong> {{ project.projectEndDate | date: 'yyyy-MM-dd' }}</div>
+                    </div>
+
+                    <h4>Project Description:</h4>
+                    <p>{{ project.projectDescription?.trim() ? project.projectDescription : 'N/A' }}</p>
+
+                    <h4>Resource Ratings:</h4>
+                    <div
+                        *ngIf="(project.resourceData?.length || 0) > 0 || (project.resources?.length || 0) > 0; else noResources">
+                        <div class="resource-tables-container">
+                            <div class="resource-table-half">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No</th>
+                                            <th>Resource Name</th>
+                                            <th>Rating Out of 5</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of (project.resourceData && project.resourceData.length > 0 ? project.resourceData : project.resources); let i = index"
+                                            [class.even-row]="i % 2 !== 0">
+                                            <td class="text-center">{{ i + 1 }}</td>
+                                            <td>{{ item.emp_Name || item.resourceName || 'N/A' }}</td>
+                                            <td class="text-center">{{ item.rating || item.ratingOutOf5 || 'N/A' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ng-template #noResources>
+                        <p>No resource data available.</p>
+                    </ng-template>
+                </div>
+            </ng-container>
+        </div>
+
+
+        <!-- Tab 3: Project Details -->
+        <div *ngIf="activeTab === 'details'">
+            <ng-container *ngFor="let project of selectedProjects">
+                <div class="individual-project-details">
+                    <div class="activities-header">
+                        <h3>
+                            <span class="project-title">{{ project.projectName }} - </span> Activities
+                        </h3>
+                        <!-- <button class="add-activities-btn" (click)="toggleActivityInputs(getProjectId(project))">
+                            Add Activities
+                        </button> -->
+                    </div>
+
+
+
+                    <div *ngIf="project.progressData && project.progressData.length > 0"
+                        class="activity-inputs-section">
+
+                        <!-- Section 1: Progress & Key Achievements -->
+                        <h4>Progress since last report & Key Achievements:</h4>
+                        <div *ngIf="project.progressData && project.progressData.length > 0; else noProgress">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>Task</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngFor="let item of project.progressData; let i = index">
+                                        <tr *ngIf="!item.active" [class.even-row]="i % 2 !== 0">
+                                            <td class="text-center">{{ i + 1 }}</td>
+                                            <td>{{ item.task }}</td>
+                                            <td class="text-center">{{ item.active }}</td>
+                                            <td>{{ item.remarks }}</td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noProgress>
+                            <p>No progress data available.</p>
+                        </ng-template>
+
+                        <!-- Input to add progress
+                        <div class="input-row">
+                            <input [(ngModel)]="newProgress.task" placeholder="Task" />
+                            <input [(ngModel)]="newProgress.status" placeholder="Status" />
+                            <input [(ngModel)]="newProgress.remarks" placeholder="Remarks" />
+                            <button (click)="addProgressItem(project)">
+                                <span class="check-icon">✓</span>
+                            </button>
+                        </div> -->
+
+                        <!-- Section 2: Activities Planned -->
+                        <h4>Activities Planned for Next Period:</h4>
+                        <div *ngIf="(project.plannedActivities?.length || 0) > 0; else noPlanned">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>Task</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngFor="let item of project.progressData; let i = index">
+                                        <tr *ngIf="item.active" [class.even-row]="i % 2 !== 0">
+                                            <td class="text-center">{{ i + 1 }}</td>
+                                            <td>{{ item.task }}</td>
+                                            <td class="text-center">{{ item.active }}</td>
+                                            <td>{{ item.remarks }}</td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noPlanned>
+                            <p>No planned activities available.</p>
+                        </ng-template>
+
+                        <!-- Input to add planned activity -->
+                        <!-- <div class="input-row">
+                            <input [(ngModel)]="newPlanned.task" placeholder="Task" />
+                            <input [(ngModel)]="newPlanned.status" placeholder="Status" />
+                            <input [(ngModel)]="newPlanned.remarks" placeholder="Remarks" />
+                            <button (click)="addPlannedItem(project)">
+                                <span class="check-icon">✓</span>
+                            </button>
+                        </div> -->
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <!-- Tab 4: Key Issues & Risks -->
+
+        <div *ngIf="activeTab === 'keyRisksIssues'">
+            <ng-container *ngFor="let project of selectedProjects">
+                <div class="individual-project-details">
+
+                    <div class="activities-header">
+                        <h3><span class="project-title">{{ project.projectName }} - </span> Key Issues & Risks</h3>
+                        <!-- <button class="add-activities-btn" (click)="toggleIssueInputs(getProjectId(project))">
+                            Add Key Issues & Risks
+                        </button> -->
+                    </div>
+
+                    <div *ngIf="project.keyIssues && project.keyIssues.length > 0" class="key-issues-inputs-section">
+
+                        <!-- Key Issues -->
+                        <h4>Key Issues</h4>
+                        <div *ngIf="(project.keyIssues?.length || 0) > 0; else noKeyIssues">
+                            <table class="key-issues-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No</th>
+                                        <th>Type</th>
+                                        <th>Functional Area</th>
+                                        <th>Issue Description</th>
+                                        <th>Actions</th>
+                                        <th>Date Raised</th>
+                                        <th>Resolve By</th>
+                                        <th>Owner</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let issue of project.keyIssues; let i = index">
+                                        <td class="text-center">{{ i + 1 }}</td>
+                                        <td>{{ issue.type }}</td>
+                                        <td>{{ issue.functionalArea }}</td>
+                                        <td>{{ issue.description }}</td>
+                                        <td>{{ issue.ActionRequired }}</td>
+                                        <td>{{ issue.dateRaised | date: 'dd/MM/yyyy' }}</td>
+                                        <td>{{ issue.resolveBy | date: 'dd/MM/yyyy' }}</td>
+                                        <td>{{ issue.IssueOwner }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noKeyIssues>
+                            <p>No key issues reported.</p>
+                        </ng-template>
+
+                        <!-- Input for Key Issues -->
+                        <!-- <div class="input-row wrap-inputs">
+                            <input [(ngModel)]="newIssue.type" placeholder="Type" />
+                            <input [(ngModel)]="newIssue.functionalArea" placeholder="Functional Area" />
+                            <input [(ngModel)]="newIssue.description" placeholder="Issue Description" />
+                            <input [(ngModel)]="newIssue.actions" placeholder="Actions" />
+                            <input [(ngModel)]="newIssue.dateRaised" placeholder="Date Raised" />
+                            <input [(ngModel)]="newIssue.resolveBy" placeholder="Resolve By" />
+                            <input [(ngModel)]="newIssue.owner" placeholder="Owner" />
+                            <button (click)="addKeyIssue(project)" class="check-btn">✓</button>
+                        </div> -->
+
+                        <!-- Key Risks -->
+                        <h4 class="p-mt-3">Key Risks</h4>
+                        <div *ngIf="(project.keyRisks?.length || 0) > 0; else noKeyRisks">
+                            <table class="key-risks-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sl. No</th>
+                                        <th>Risk Description</th>
+                                        <th>Mitigation</th>
+                                        <th>Likelihood</th>
+                                        <th>Owner</th>
+                                        <th>Date Raised</th>
+                                        <th>Resolve By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let risk of project.keyRisks; let i = index">
+                                        <td class="text-center">{{ i + 1 }}</td>
+                                        <td>{{ risk.riskDescription }}</td>
+                                        <td>{{ risk.mitigation }}</td>
+                                        <td>{{ risk.likelihood }}</td>
+                                        <td>{{ risk.riskOwner }}</td>
+                                        <td>{{ risk.dateRaised | date: 'dd/MM/yyyy' }}</td>
+                                        <td>{{ risk.resolveBy | date: 'dd/MM/yyyy' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noKeyRisks>
+                            <p>No key risks reported.</p>
+                        </ng-template>
+
+                        <!-- Input for Key Risks -->
+                        <!-- <div class="input-row wrap-inputs">
+                            <input [(ngModel)]="newRisk.description" placeholder="Risk Description" />
+                            <input [(ngModel)]="newRisk.mitigation" placeholder="Mitigation" />
+                            <input [(ngModel)]="newRisk.likelihood" placeholder="Likelihood" />
+                            <input [(ngModel)]="newRisk.owner" placeholder="Owner" />
+                            <input [(ngModel)]="newRisk.dateRaised" placeholder="Date Raised" />
+                            <input [(ngModel)]="newRisk.resolveBy" placeholder="Resolve By" />
+                            <button (click)="addKeyRisk(project)" class="check-btn">✓</button>
+                        </div> -->
+
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+
+    </div>
+</div>
+
+<p-toast></p-toast>
+
+<p-dialog header="" [(visible)]="displayAddFormDialog" [modal]="true" [style]="{width:'60vw'}"
+    styleClass="custom-dialog">
+
+    <!-- Project Details Section -->
+    <div class="p-fluid p-grid">
+        <div class="p-col-12 p-md-6" *ngIf="!isEditProjectStatus">
+            <div class="project-status-container">
+                <div class="project-status-header">Project Details</div>
+
+                <div class="status-field">
+                    <label>Client Name <span class="required">*</span></label>
+                    <p-dropdown [options]="clients" optionLabel="label" optionValue="value"
+                        [(ngModel)]="formModel.clientName" placeholder="Select Client"
+                        (onChange)="onClientSelected($event.value)">
+                    </p-dropdown>
+                </div>
+
+                <div class="status-field">
+                    <label>Project Name <span class="required">*</span></label>
+                    <p-dropdown [options]="filteredZohoProjects" optionLabel="projectName" [(ngModel)]="selectedProject"
+                        placeholder="Select Project" (onChange)="onProjectSelected($event.value)">
+                    </p-dropdown>
+                </div>
+
+                <div class="status-field">
+                    <label>Manager Name <span class="required">*</span></label>
+                    <input pInputText [(ngModel)]="formModel.manager" placeholder="Enter Manager Name" />
+                </div>
+
+                <div class="status-field">
+                    <label>Project Start - End Date <span class="required">*</span></label>
+                    <p-calendar [(ngModel)]="formModel.projectDates" selectionMode="range"
+                        dateFormat="dd/mm/yy"></p-calendar>
+                </div>
+
+                <div class="status-field">
+                    <label>Team Size <span class="required">*</span></label>
+                    <input pInputText [(ngModel)]="formModel.teamSize" placeholder="Enter Team Size" />
+                </div>
+
+                <div class="status-field">
+                    <label>Technology <span class="required">*</span></label>
+                    <input pInputText [(ngModel)]="formModel.technology" placeholder="Enter Technology" />
+                </div>
+
+                <div class="status-field">
+                    <label>Customer Location <span class="required">*</span></label>
+                    <input pInputText [(ngModel)]="formModel.customerLocation" placeholder="Enter Customer Location" />
+                </div>
+
+                <div class="status-field">
+                    <label>Business Domain <span class="required">*</span></label>
+                    <input pInputText [(ngModel)]="formModel.businessDomain" placeholder="Enter Business Domain" />
+                </div>
+
+                <div class="status-field">
+                    <label>Project Type <span class="required">*</span></label>
+                    <p-dropdown [options]="projectTypes" [(ngModel)]="formModel.projectType"
+                        placeholder="Select Project Type"></p-dropdown>
+                </div>
+
+                <div class="status-field">
+                    <label>Report Start - End Date <span class="required">*</span></label>
+                    <p-calendar [(ngModel)]="formModel.reportDates" selectionMode="range"
+                        dateFormat="dd/mm/yy"></p-calendar>
+                </div>
+
+                <div class="status-field">
+                    <label>Resources <span class="required">*</span></label>
+                    <p-multiSelect [options]="resourceNames" [(ngModel)]="selectedResources"
+                        placeholder="Select Resources">
+                    </p-multiSelect>
+                </div>
+
+                <div *ngFor="let resource of selectedResources" class="status-field">
+                    <label>{{ resource }} Rating <span class="required">*</span></label>
+                    <p-dropdown [options]="ratings" [(ngModel)]="resourceRatings[resource]" placeholder="Select Rating">
+                    </p-dropdown>
+                </div>
+
+                <div class="status-field" style="grid-column: span 2;">
+                    <label>Description</label>
+                    <textarea pInputTextarea [(ngModel)]="formModel.description"
+                        placeholder="Enter Description"></textarea>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Project Status -->
+        <div class="p-col-12 p-md-6" *ngIf="!isEditProjectDetails">
+            <div class="project-status-container">
+                <div class="project-status-header">Project Status</div>
+
+                <div class="status-field" *ngFor="let field of statusFields">
+                    <label>{{ field }} <span class="required">*</span></label>
+                    <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatuses[field]" optionLabel="label"
+                        placeholder="Select Status">
+                        <ng-template pTemplate="selectedItem" let-selected>
+                            <span [ngClass]="['status-option', selected.value?.toLowerCase()]">
+                                <span *ngIf="selected.value === 'Green'">↑</span>
+                                <span *ngIf="selected.value === 'Amber'">→</span>
+                                <span *ngIf="selected.value === 'Red'">↓</span>
+                                {{ selected.value }}
+                            </span>
+                        </ng-template>
+                        <ng-template pTemplate="item" let-item>
+                            <span [ngClass]="['status-option', item.value.toLowerCase()]">
+                                <span *ngIf="item.value === 'Green'">↑</span>
+                                <span *ngIf="item.value === 'Amber'">→</span>
+                                <span *ngIf="item.value === 'Red'">↓</span>
+                                {{ item.value }}
+                            </span>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+
+                <div class="status-field">
+                    <label>Planned Resource <span class="required">*</span></label>
+                    <p-dropdown [options]="resourceCounts" [(ngModel)]="formModel.plannedResource"
+                        placeholder="Select Resource">
+                    </p-dropdown>
+                </div>
+
+                <div class="status-field">
+                    <label>Actual Resource <span class="required">*</span></label>
+                    <p-dropdown [options]="resourceCounts" [(ngModel)]="formModel.actualResource"
+                        placeholder="Select Resource">
+                    </p-dropdown>
+                </div>
+
+                <div class="status-field">
+                    <label>Measures Taken <span class="required">*</span></label>
+                    <input pInputText [(ngModel)]="formModel.measuresTaken" placeholder="Enter measures taken..." />
+                </div>
+
+                <div class="status-field" style="grid-column: span 2;">
+                    <label>Remarks</label>
+                    <textarea pInputTextarea [(ngModel)]="formModel.remarks" placeholder="Enter Remarks"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="submit-button-container">
+        <!-- Submit (Add Mode) -->
+        <button *ngIf="!isEditProjectDetails && !isEditProjectStatus" pButton label="Submit" (click)="submitForm()"
+            class="p-button-success">
+        </button>
+
+        <!-- Save Project Details -->
+        <button *ngIf="isEditProjectDetails" pButton label="Save Project Details" (click)="onEditProjectDetailsSave()"
+            class="p-button-primary">
+        </button>
+
+        <!-- Save Project Status -->
+        <button *ngIf="isEditProjectStatus" pButton label="Save Project Status" (click)="onEditProjectStatusSave()"
+            class="p-button-warning">
+        </button>
+
+        <!-- Cancel (Always visible in edit mode) -->
+        <button *ngIf="isEditProjectDetails || isEditProjectStatus" pButton label="Cancel" (click)="onCancelEdit()"
+            class="p-button-secondary">
+        </button>
+    </div>
+</p-dialog>

@@ -1,0 +1,75 @@
+<!-- <div class="role-details">
+  <p-toolbar>
+    <ng-template pTemplate="center">
+      <span class="flex">
+        <p-button
+        class="custom-button"
+        size="small"
+        label="Add Role"
+        icon="pi pi-plus"
+        (click)="addRole()"
+      ></p-button>
+      </span>
+    </ng-template>
+    </p-toolbar>
+    <p-sidebar
+    [(visible)]="addSidebarVisible"
+    [position]="'right'"
+    [showCloseIcon]="true"
+    class="custom-sidebar">
+    <ng-template pTemplate="header" class="add-role"
+      >Add Role</ng-template>
+<app-role></app-role>
+  </p-sidebar>
+ 
+  <p-table 
+  [scrollHeight]="'550px'"
+  [rowHover]="true"  
+  [value]="roles">
+    <ng-template pTemplate="header">
+      <tr>
+        <th >Action</th>
+        <th>Role Name</th>
+        <th>Description</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Status</th>
+        <th>Privileges</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-role>
+      <tr>
+        <td>
+          <p-button
+            size="small"
+            class="action-button"
+            icon="pi pi-pencil"
+            (click)="editRole(role.id)"
+          ></p-button>
+          <p-button
+            size="small"
+            class="action-button"
+            icon="pi pi-trash"
+            (click)="onDelete(role.id, this.userId)"
+          ></p-button>
+          
+        </td>
+        <td>{{ role.roleName }}</td>
+        <td>{{ role.description }}</td>
+        <td>{{ role.startDate | date : "MM-dd-yyyy" }}</td>
+        <td>{{ role.endDate | date : "MM-dd-yyyy" }}</td>
+        <td>
+          <ng-container *ngIf="role.status === 1; else inactive">
+            <span>Active</span>
+          </ng-container>
+          <ng-template #inactive>
+            <span>In Active</span>
+          </ng-template>
+        </td>
+        <td>
+          <p-button class="previlage-button" size="small" label="Priviliges" icon="pi pi-plus" (click)="onEligible(role.id)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div> -->

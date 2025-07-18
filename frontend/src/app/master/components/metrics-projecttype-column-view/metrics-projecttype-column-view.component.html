@@ -1,0 +1,486 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<!-- Header Buttons -->
+<div
+  class="title-header flex justify-content-between flex-wrap gap-4 pt-0 pl-0"
+>
+  <div class="align-items-center justify-content-start gap-2"> 
+    <div class="flex justify-content-between align-items-center">
+      <p-dropdown [filter]="true"
+        class="dropdown-asset-list mr-2"
+        [options]="ProjectOptions | sort : 'projectName'"
+        [(ngModel)]="selectedProjectName"
+        pTooltip="{{
+          selectedProjectName ? selectedProjectName.projectName : ''
+        }}"
+        (onChange)="filterTaskData()"
+        optionLabel="projectName"
+        placeholder="Project"
+      ></p-dropdown>
+      <p-dropdown [filter]="true"
+        class="dropdown-asset-list mr-2"
+        [options]="projectTypeDropdownList | sort : 'label'"
+        [(ngModel)]="selectedProjectType"
+        pTooltip="{{ selectedProjectType ? selectedProjectType.label : '' }}"
+        (onChange)="filterTaskData()"
+        optionLabel="label"
+        placeholder="Project Type"
+      ></p-dropdown>
+      <p-button
+        class=""
+        severity="secondary"
+        [text]="true"
+        (click)="onClear()">
+        <span class=" clear-btn material-symbols-outlined">backspace</span>
+        <span>Clear</span> 
+      </p-button>
+    </div>
+  </div>
+  <div
+    class="flex flex-grow-1 justify-content-between flex-nowrap gap-4 w-full md:w-auto"
+  >
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button
+          pRipple
+          icon="pi pi-plus"
+          (click)="showDialog(0)"
+          label="COLUMN FOR METRICS"
+          class="btn-primary"
+        >
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Code  -->
+<div class="overflow-visible">
+  <p-table
+    [value]="projectData"
+    #dt
+    [paginator]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 30, 40]"
+    [scrollable]="true"
+    [globalFilterFields]="[
+      'projectName',
+      'projectTypeName',
+      'metricsCount',
+      'selectedCheckBoxFieldCount'
+    ]"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn [width]="'80px'">
+          <div class="flex justify-content-center align-items-center">
+            <div class="min-w-max">Action</div>
+          </div>
+        </th>
+        <th pSortableColumn="projectName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Project Name</div>
+            <p-sortIcon field="projectName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="projectTypeName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Project Type</div>
+            <p-sortIcon field="projectTypeName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="metricsCount">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Metrics</div>
+            <p-sortIcon field="metricsCount"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="selectedCheckBoxFieldCount">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Fields</div>
+            <p-sortIcon field="selectedCheckBoxFieldCount"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-projectData>
+      <tr>
+        <td pFrozenColumn>
+          <div class="flex justify-content-center align-items-center gap-1">
+            <div class="flex">
+              <p-button
+                class="edit-btn"
+                [rounded]="true"
+                [text]="true"
+                pTooltip="Edit"
+                tooltipPosition="top"
+                (click)="showDialog(projectData.id)"
+              >
+                <i class="material-symbols-outlined">edit</i>
+              </p-button>
+              <!-- <div>
+              <p-button
+                [rounded]="true"
+                class="edit-btn"
+                [text]="true"
+                pTooltip="Delete"
+                tooltipPosition="top"
+                 (click)="confirmDelete(selectedProject)"
+              >
+                <i class="material-symbols-outlined">delete</i>
+              </p-button>
+            </div> -->
+            </div>
+          </div>
+        </td>
+        <td>{{ projectData.projectName }}</td>
+        <td>{{ projectData.projectTypeName }}</td>
+        <td>
+          <p-button
+            size="small"
+            class="action-button"
+            (click)="showMetricsDialogs(projectData.id)"
+            icon="pi pi-eye"
+            [label]="projectData.metricsCount.toString()"
+          >
+          </p-button>
+        </td>
+        <td>
+          <p-button
+            size="small"
+            class="action-button"
+            (click)="showFieldsDialogs(projectData.id)"
+            icon="pi pi-eye"
+            [label]="projectData.selectedCheckBoxFieldCount.toString()"
+          >
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+       <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No records found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [draggable]="false"
+  header="Project Selection"
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '50%' }"
+>
+  <ng-template pTemplate="header">
+    <div
+      class="p-dialog-title inline-flex align-items-center justify-content-center gap-2"
+    >
+      {{ HeaderName }}
+    </div>
+  </ng-template>
+  <div class="container">
+    <form [formGroup]="frm" (ngSubmit)="onSave()">
+      <div class="formgrid grid mb-2">
+        <div class="field col-12 md:col-4">
+          <label for="FieldName"
+            >Project<span class="required-asterisk">*</span></label
+          >
+          <p-dropdown [filter]="true"
+            [options]="ProjectOptions"
+            formControlName="projectId"
+            optionLabel="projectName"
+            (onChange)="onProjectSelected($event.value)"
+            placeholder="Select Project"
+            optionValue="id"
+            [ngClass]="{
+              'ng-dirty': frm.get('projectId')?.touched,
+              'ng-invalid': frm.get('projectId')?.invalid
+            }"
+          ></p-dropdown>
+          <div>
+            <small
+              class="p-error"
+              *ngIf="
+                frm.get('projectId')?.touched &&
+                frm.get('projectId')?.hasError('required')
+              "
+            >
+              &nbsp; &#9888; Project is required.
+            </small>
+
+            <small
+              class="p-error"
+              *ngIf="
+                frm.get('projectId')?.touched &&
+                frm.get('projectId')?.hasError('alreadyExists')
+              "
+            >
+              &nbsp; &#9888; Metrics already exists for this Project.
+            </small>
+          </div>
+        </div>
+        <div class="field col-12 md:col-4">
+          <label for="FieldName">Project Type</label>
+          <input
+            type="text"
+            pInputText
+            [value]="projectType"
+            formControlName="projectTypeId"
+            readonly
+            placeholder="Project Type"
+          />
+        </div>
+        <div class="field col-12 md:col-4">
+          <label for="status"
+            >Metrics<span class="required-asterisk">*</span></label
+          >
+          <p-multiSelect
+            formControlName="metricsIds"
+            [options]="metricsMaster"
+            placeholder="-Select Metrics-"
+            optionValue="metricId"
+            optionLabel="metricName"
+          ></p-multiSelect>
+          <div>
+            <small
+              class="p-error"
+              *ngIf="
+                frm.get('metricsIds')?.touched &&
+                frm.get('metricsIds')?.hasError('required')
+              "
+            >
+              &nbsp; &#9888; Metrics is required.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid for field selection -->
+      <p-table
+        [value]="masterColumnData"
+        #dt
+        dataKey="id"
+        [globalFilterFields]="['fieldName']"
+        [paginator]="true"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+        [rows]="100"
+        [rowsPerPageOptions]="[10, 20, 30, 40]"
+        
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="select-checkbox">
+              Select All
+              <p-checkbox
+                class="select-all-checkbox"
+                #selectAllCheckbox
+                [value]="selectAllValue"
+                [binary]="true"
+                (onChange)="onSelectAllChange($event)"
+              >
+                Select All
+              </p-checkbox>
+            </th>
+            <th pSortableColumn="fieldName" class="text-left">
+              Field Name
+              <p-sortIcon field="fieldName"></p-sortIcon>
+            </th>
+            <th class="text-left">Is Mandatory?</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-metric let-i="rowIndex">
+          <tr [formGroup]="getFieldFormGroup(i)">
+            <td>
+              <p-checkbox
+                [binary]="true"
+                formControlName="isSelected"
+                (onChange)="onCheckboxChange($event, metric, i)"
+              >
+              </p-checkbox>
+            </td>
+            <td>{{ metric.fieldName }}</td>
+            <td>
+              <p-inputSwitch
+                formControlName="isMandatory"
+                class="mandatory-switch"
+                [disabled]="!getFieldFormGroup(i).get('isSelected')?.value"
+                (onChange)="onMandatotyCheckboxChange($event, metric)"
+              >
+              </p-inputSwitch>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="text-center">No Fields found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </form>
+  </div>
+  <ng-template pTemplate="footer">
+     <p-button
+      class="save-btn"
+      type="submit"
+      [label]="btnlabel"
+      (click)="onSave()"
+      [disabled]="!frm.dirty ||!frm.valid"
+    ></p-button>
+    <p-button
+      class="btn-secondary"
+      (click)="closeDialog()"
+      label="CANCEL"
+      pAutoFocus
+      [autofocus]="true"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Confirm Delete"
+  [(visible)]="displayDeleteDialog"
+  [modal]="true"
+  [closable]="false"
+>
+  <p>Are you sure you want to Delete?</p>
+  <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px">
+    <p-button
+      label="Delete"
+      class="save-btn mr-2"
+      (click)="deleteMeticsColumn()"
+    ></p-button>
+    <p-button
+      label="Cancel"
+      class="cancel-button"
+      id="p-dialog_cancel_btn"
+      (click)="displayDeleteDialog = false"
+    ></p-button>
+  </div>
+</p-dialog>
+
+<!--Counts Dialog -->
+<p-dialog
+  [header]="selectedprojectdialog + '  Fileds Column'"
+  [(visible)]="displayEmpDialog"
+  [modal]="true"
+  [style]="{ width: '50%' }"
+  [closable]="true"
+  [draggable]="false"
+>
+<ng-template pTemplate="header">
+    <div class="dialog-header">
+      <span>Fields for {{ selectedprojectdialog }}</span>
+    <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="table.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div> 
+    </div>
+  </ng-template>
+  <p-table
+    [paginator]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    [scrollable]="true"
+    #table
+    appendTo="body"
+    [value]="selectedFieldsName"
+    [globalFilterFields]="['fieldName', 'isMandatory']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn pSortableColumn="fieldName" class="table-header">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Field Name</div>
+            <p-sortIcon field="fieldName"></p-sortIcon>
+          </div>
+        </th>        
+        <th pFrozenColumn pSortableColumn="isMandatory" class="table-header">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Is Mandatory?</div>
+            <p-sortIcon field="isMandatory"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-emp>
+      <tr class="table-row">
+        <td>{{ emp.fieldName }}</td>
+        <td>{{ emp.isMandatory }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="3" class="text-center">No Fields found.</td>
+    </tr>
+  </ng-template>
+  </p-table>
+</p-dialog>
+
+<p-dialog
+  [header]="selectedprojectdialog + '  Metrics'"
+  [(visible)]="displayMetricsDialog"
+  [modal]="true"
+  [style]="{ width: '50%' }"
+  [closable]="true"
+  [draggable]="false"
+>
+  <!-- Custom Header Template -->
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <span>Metrics for {{ selectedprojectdialog }}</span>
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="mtable.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div> 
+    </div>
+  </ng-template>
+
+
+ <p-table
+    #mtable
+    [value]="selectedMetricsName"
+    [globalFilterFields]="['emp']"
+    [paginator]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    [scrollable]="true"
+    appendTo="body"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn pSortableColumn="metricName" class="table-header">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Metric Name</div>
+            <p-sortIcon field="metricName"></p-sortIcon>
+          </div>
+        </th>
+        
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-emp>
+        <tr class="table-row">
+          <td>{{emp}}</td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="3" class="text-center">No Metrics found.</td>
+    </tr>
+  </ng-template>
+  </p-table>
+ 
+</p-dialog>
+<p-toast></p-toast>

@@ -1,0 +1,30 @@
+<header class="page-header mb-2 pl-3">
+  <div class="flex justify-content-between mb-1">
+    <div class="header-head flex align-items-center">
+      <div class="flex gap-3 align-items-center">        
+        <div>
+          <button
+            class="sidebar-toggle min-w-max flex align-content-center align-items-center justify-content-center"
+            (click)="toggleSidebarClicked()"
+          >
+            <span class="material-symbols-outlined menu"> menu</span>
+          </button>
+        </div>
+        <div class="app-logo">
+          <img
+            src="../../assets/excelencia-logo-new.svg"
+            alt="Excelencia"
+            class="logo-default"
+          />
+        </div>
+      </div>
+      <h3 class="h2 m-0 flex align-items-center">{{title}}</h3>
+    </div>
+    <div class="app-actions">
+      <app-userprofile></app-userprofile>
+    </div>
+  </div>
+  <!--<div class="card flex justify-content-start">
+    <p-breadcrumb class="max-w-full" [model]="items" [home]="home" ></p-breadcrumb>
+  </div>-->
+</header>

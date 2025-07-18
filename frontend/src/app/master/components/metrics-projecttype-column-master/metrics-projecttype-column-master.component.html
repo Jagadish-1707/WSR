@@ -1,0 +1,241 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="title-header flex justify-content-between flex-wrap gap-4 pt-0 pl-0">
+  <div class="align-items-center justify-content-start gap-2">
+    <div class="flex justify-content-between align-items-center">
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-grow-1 justify-content-between flex-nowrap gap-4 w-full md:w-auto">
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button pRipple (click)="showDialog()" icon="pi pi-plus" label="FIELD" class="btn-primary"></p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-container">
+  <p-table [value]="projectData" #dt [paginator]="true" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 15, 20]" [scrollable]="true"
+    [globalFilterFields]="['fieldName', 'status','fieldType']">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn [width]="'90px'">
+          <div class="flex justify-content-center align-items-center">
+            <div class="min-w-max">Action</div>
+          </div>
+        </th>
+        <th pSortableColumn="fieldName">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Field Name</div>
+            <p-sortIcon field="fieldName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="fieldType">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Field Type</div>
+            <p-sortIcon field="fieldType"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="orderBy">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Order By</div>
+            <p-sortIcon field="orderBy"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="status">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Status</div>
+            <p-sortIcon field="status"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+
+        <ng-template pTemplate="body" let-projectData>
+          <tr class="p-selectable-row">
+            <td>
+              <div class="flex justify-content-center align-items-center">
+              <p-button
+              [disabled]="projectData.editable === 'No'"
+                size="small"
+                [rounded]="true"
+                [text]="true"
+                pTooltip="Edit"
+                tooltipPosition="top"
+                class="edit-btn"                
+                (click)="editProject(projectData.id)"
+              ><i class="material-symbols-outlined">edit</i></p-button>
+              <div>
+              <p-button
+              [disabled]="projectData.editable === 'No'"
+                class="edit-btn"
+                size="small"
+                [text]="true"
+                [rounded]="true"
+                pTooltip="Delete"
+                tooltipPosition="top"
+                (click)="confirmDelete(projectData)"
+              >
+                <i class="material-symbols-outlined">delete</i>
+              </p-button>
+            </div>
+          </div>
+        </td>
+        <td>{{ projectData.fieldName }}</td>
+        <td>{{ projectData.fieldType }}</td>
+        <td>{{ projectData.orderBy }}</td>
+        <td>
+          <p-tag [value]="projectData.status === 1 ? 'Active' : 'Inactive'"
+            [severity]="getSeverity(projectData.status)"></p-tag>
+        </td>
+      </tr>
+    </ng-template>
+     <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No records found.</td>
+          </tr>
+        </ng-template>
+      
+  </p-table>
+</div>
+
+<p-dialog header="Confirm Delete" [(visible)]="displayDeleteDialog" [modal]="true" [closable]="false">
+  <p>Are you sure you want to Delete?</p>
+  <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px">
+    <p-button label="DELETE" class="save-btn mr-2" (click)="deleteProjectColumn()"></p-button>
+    <p-button label="CANCEL" class="btn-secondary" id="p-dialog_cancel_btn"
+      (click)="displayDeleteDialog = false"></p-button>
+  </div>
+</p-dialog>
+
+
+<p-dialog header="Delete Failed" [(visible)]="showWarningDialog" [modal]="true" [closable]="false"[draggable] ="false">
+  <p>This field is in use.</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem;">
+
+    <p-button label="OK" class="btn-secondary" (click)="showWarningDialog = false"></p-button>
+  </div>
+</p-dialog>
+
+<p-dialog [draggable]="false" [(visible)]="visible" [modal]="true" [style]="{ width: '900px' }">
+  <ng-template pTemplate="header">
+    <div class="header-text">
+      {{ isEditMode ? 'Edit Field' : 'Add Field' }}
+    </div>
+  </ng-template>
+
+  <div class="container">
+    <form [formGroup]="frm" (ngSubmit)="onSaveOrUpdate()">
+      <div class="formgrid grid mb-2">
+        <!-- Field Name -->
+        <div class="field col-12 md:col-6">
+          <label for="FieldName">Field Name<span class="required-asterisk">*</span></label>
+          <input pInputText id="FieldName" formControlName="fieldName" placeholder="Enter Field Name" appCaseSensitive           
+            [ngClass]="{ invalid: frm.get('fieldName')?.invalid && frm.get('fieldName')?.touched }" />
+          <small class="p-error" *ngIf="frm.get('fieldName')?.touched && frm.get('fieldName')?.hasError('required')">
+  &#9888; Field Name is required.
+</small>
+
+<small class="p-error" *ngIf="frm.get('fieldName')?.hasError('duplicateCombo')">
+  &#9888; This Field Name already exists for the selected Field Type.
+</small>
+        
+        </div>
+
+        <!-- Field Type -->
+        <div class="field col-12 md:col-6">
+          <label for="fieldType">Field Type<span class="required-asterisk">*</span></label>
+          <p-dropdown id="fieldType" formControlName="fieldType" [options]="fieldTypeOptions" optionLabel="label"
+            placeholder="Select Field Type" [filter]="true"
+            [ngClass]="{ invalid: frm.get('fieldType')?.invalid && frm.get('fieldType')?.touched }" appendTo="body"
+            (onChange)="onFieldTypeChange($event, isEditMode ? 'edit' : 'add')">
+          </p-dropdown>
+          <small class="p-error" *ngIf="frm.get('fieldType')?.touched && frm.get('fieldType')?.hasError('required')">
+            &#9888; Field Type is required.
+          </small>
+        </div>
+      </div>
+
+      <div class="formgrid grid mb-2">
+        <div class="field col-12 md:col-6">
+          <div class="form-group field">
+            <label for="orderBy">Order By<span class="required-asterisk">*</span></label>
+            <input pInputText id="orderBy" type="number" formControlName="orderBy" placeholder="Enter Order" 
+              (onChange)="isEditMode ? onEditOrderExist($event) : onOrderExist($event)"
+              [ngClass]="{ invalid: frm.get('orderBy')?.invalid && frm.get('orderBy')?.touched }" />
+            <small class="p-error" *ngIf="frm.get('orderBy')?.touched && frm.get('orderBy')?.hasError('required')">
+              &#9888; Order By is required.
+            </small>
+            <small class="p-error" *ngIf="frm.get('orderBy')?.hasError('alreadyExists')">
+              &#9888; Order By already exists.
+            </small>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="field col-12 md:col-6">
+          <label for="status">Status<span class="required-asterisk">*</span></label>
+          <p-dropdown [options]="status" formControlName="status" optionLabel="label" optionValue="value"
+            placeholder="Select Status" [filter]="true"
+            [ngClass]="{ invalid: frm.get('status')?.invalid && frm.get('status')?.touched }" appendTo="body">
+          </p-dropdown>
+          <small class="p-error" *ngIf="frm.get('status')?.touched && frm.get('status')?.invalid">
+            &#9888; Status is required.
+          </small>
+        </div>
+      </div>
+      <div class="formgrid grid mb-2">
+        <div *ngIf="selectedFieldType === 'dropdown'" class="field col-12 md:col-6">
+          <div class="form-group field">
+            <label for="dropdownValues">Dropdown Values<span class="required-asterisk">*</span></label>
+            <textarea pInputTextarea rows="3" formControlName="dropdownValues"
+              placeholder="Enter comma-separated values"
+              [ngClass]="{ invalid: frm.get('dropdownValues')?.invalid && frm.get('dropdownValues')?.touched }">
+            </textarea>
+            <small class="disclaimer-text">Fill the values with commas</small>
+            <small class="p-error"
+              *ngIf="frm.get('dropdownValues')?.touched && frm.get('dropdownValues')?.hasError('required')">
+              &#9888; Dropdown Values are required.
+            </small>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button class="save-btn" type="submit" label="{{ isEditMode ? 'UPDATE' : 'SAVE' }}" (onClick)="onSaveOrUpdate()"
+      [disabled]="!frm.dirty ||!frm.valid">
+    </p-button>
+    <p-button class="btn-secondary" (click)="visible = false" label="CANCEL" pAutoFocus></p-button>
+  </ng-template>
+</p-dialog>
+
+  <p-dialog
+  header="Edit Not Allowed"
+  [(visible)]="showEditWarningDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+>
+  <p>This field is in use, you can't edit it</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem">
+    <p-button
+      label="OK"
+      class="btn-secondary"
+      (click)="showEditWarningDialog = false"
+    >
+    </p-button>
+  </div>
+</p-dialog>
+
+
+<p-toast></p-toast>

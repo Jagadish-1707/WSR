@@ -1,0 +1,428 @@
+<!-- Header Buttons -->
+<div class="page-bg">
+<div class="card">
+    <p-toolbar>
+      <ng-template pTemplate="left">
+        <div class="header-text mb-3">
+          Complexity
+        </div>
+      </ng-template>
+  
+      <ng-template pTemplate="right">
+        <p-button
+          pRipple
+          (click)="showDialog()"
+          icon="pi pi-plus"
+          label="Add Complexity"
+          class="button-add"
+        >
+        </p-button>
+      </ng-template>
+    </p-toolbar>
+  </div>
+  
+ <!-- Table Code  -->
+ <div class="table-container">
+  <p-table
+    [value]="complexityData"
+    #dt
+    [paginator]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+    [rows]="5"
+    [rowsPerPageOptions]="[5, 10, 15, 20]"
+    [scrollable]="true"
+    [globalFilterFields]="['customer', 'project', 'projectComplexity', 'status']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Action</th>
+        <th pSortableColumn="customer">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Customer</div>
+            <p-sortIcon field="customer"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="project">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Project</div>
+            <p-sortIcon field="project"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="projectComplexity">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Complexity</div>
+            <p-sortIcon field="projectComplexity"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="status">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Status</div>
+            <p-sortIcon field="status"></p-sortIcon>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-complexityData>
+      <tr class="p-selectable-row">
+        <td>
+          <p-button
+            size="small"
+            class="table-action-btn"
+            icon="pi pi-pencil"
+            (click)="editComplexity(complexityData.id)"
+          ></p-button>
+        </td>
+        <td>{{ complexityData.customer }}</td>
+        <td>{{ complexityData.project }}</td>
+        <td>{{ complexityData.projectComplexity }}</td>
+        <td>
+          <p-tag
+            [value]="complexityData.status === 1 ? 'Active' : 'Inactive'"
+            [severity]="getSeverity(complexityData.status)"
+          ></p-tag>
+        </td>
+      </tr>
+    </ng-template>
+    <!-- <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+        Total: {{ complexityData ? complexityData.length : 0 }} Complexities.
+      </div>
+    </ng-template> -->
+  </p-table>
+</div>
+    <!-- Save data - Model -->
+  
+    <div>
+      <p-dialog
+      [draggable]="false"
+        header="Header"
+        [(visible)]="visible"
+        [modal]="true"
+        [style]="{ width: '900px' }"
+      >
+        <ng-template pTemplate="header">
+          <div
+            class="header-text inline-flex align-items-center justify-content-center gap-2"
+          >
+            Add Complexity
+          </div>
+        </ng-template>
+  
+        <div class="container">
+          <form [formGroup]="frm" (ngSubmit)="onSave(frm.value)">
+            <div class="grid">
+              <div class="form-group field col">
+                <label for="client"
+                  >Customer<span class="required-asterisk">*</span></label
+                >
+                <div class="mb-2">
+                  <p-dropdown
+                    class="mms-dropdown"
+                    id="customer"
+                    formControlName="customer"
+                    [options]="clients | sort:'clientName'"
+                    optionLabel="clientName"
+                    (onChange)="onClientSelected($event.value)"
+                    autoWidth="false"
+                    [style]="{ width: '100%' }"
+                    placeholder="Select Customer"
+                    [ngClass]="{
+                      invalid:
+                      frm.get('customer')?.invalid && frm.get('customer')?.touched
+                    }"
+                  ></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="frm.get('customer')?.touched && frm.get('customer')?.invalid && !frm.get('customer')?.errors?.['alreadyExists']">
+                      &nbsp; &#9888; Customer name is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group field col">
+                <label for="project"
+                  >Project<span class="required-asterisk">*</span></label
+                >
+                <div class="mb-2">
+                  <p-dropdown
+                    class="mms-dropdown"
+                    id="ProjectName"
+                    [options]="projects | sort:'projectName'"
+                    optionLabel="projectName"
+                    (onChange)="onProjectSelected($event.value)"
+                    formControlName="project"
+                    autoWidth="false"
+                    [style]="{ width: '100%' }"
+                    placeholder="Select Project"
+                    [ngClass]="{
+                      invalid:
+                      frm.get('project')?.invalid && frm.get('project')?.touched
+                    }"
+                  ></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="frm.get('project')?.touched && frm.get('project')?.invalid">
+                      &nbsp; &#9888; Project name is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="form-group field col">
+                <label for="PrioritytName">Complexity<span class="required-asterisk">*</span></label>
+                  <input
+                    pInputText
+                    label="Priority"
+                    formControlName="projectComplexity"
+                    placeholder="Enter Complexity"
+                    appCaseSensitive
+                    (blur)="onComplexityExist()"
+                    [(ngModel)]="complexity"
+                    class="priority-input"
+                    autoWidth="false"
+                    [style]="{ 'width': '100%', 'height': '34px' }"
+                    [ngClass]="{
+                      invalid:
+                      frm.get('projectComplexity')?.invalid && frm.get('projectComplexity')?.touched
+                    }"
+                  />
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="frm.get('projectComplexity')?.touched && frm.get('projectComplexity')?.invalid && !frm.get('projectComplexity')?.errors?.['alreadyExists']">
+                      &nbsp; &#9888; Complexity is required.
+                    </small>
+                    <small
+                    id="project-error"
+                    class="p-error"
+                    *ngIf="frm.get('projectComplexity')?.touched && frm.get('projectComplexity')?.invalid && frm.get('projectComplexity')?.errors?.['alreadyExists']">
+                    &nbsp; &#9888; Complexity already exists.
+                  </small>
+                  </div>
+                </div>
+                <div class="form-group field col">
+                <label for="status"
+                  >Status<span class="required-asterisk">*</span></label
+                >
+                  <p-dropdown
+                    [options]="Status"
+                    formControlName="status"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select Status"
+                    [style]="{ width: '100%' }"
+                    autowidth="false"
+                    [ngClass]="{
+                      invalid:
+                      frm.get('status')?.invalid && frm.get('status')?.touched
+                    }"
+                  ></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="frm.get('status')?.touched && frm.get('status')?.invalid">
+                      &nbsp; &#9888; Status is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+  
+            <div class="form-group field">
+              <label for="remarks">Remarks</label>
+              <textarea
+                pInputTextarea
+                pInputText
+                [rows]="4"
+                class="mms-textarea"
+                [style]="{ width: '100%', height:'78px' }"
+                formControlName="remarks"
+                placeholder="Enter Remarks"
+              ></textarea>
+            </div>
+            <p-toast></p-toast>
+          </form>
+        </div>
+  
+        <ng-template pTemplate="footer">
+          <p-button
+            class="cancel-button"
+            (click)="visible = false"
+            label="Cancel"
+            pAutoFocus
+            [autofocus]="true"
+          ></p-button>
+  
+          <p-button
+            class="save-button"
+            type="submit"
+            label="Save"
+            (onClick)="onSave(frm.value)"
+            [disabled]="!frm.valid"
+          ></p-button>
+        </ng-template>
+      </p-dialog>
+    </div>
+  
+    <div>
+      <p-dialog
+      [draggable]="false"
+        header="Header"
+        [(visible)]="editDialog"
+        [modal]="true"
+        [style]="{ width: '900px' }">
+        <ng-template pTemplate="header">
+          <div
+            class="header-text inline-flex align-items-center justify-content-center gap-2">
+            Edit Complexity
+          </div>
+        </ng-template>
+  
+        <div class="container">
+          <form [formGroup]="editFrm" (ngSubmit)="onUpdate(editFrm.value)">
+            <div class="grid">
+              <div class="form-group field col">
+                <label for="client">Customer<span class="required-asterisk">*</span></label>
+                <div class="mb-2">
+                  <p-dropdown
+                  class="mms-dropdown"
+                  id="id"
+                  formControlName="customer"
+                  [options]="clients | sort:'clientName'"
+                  optionLabel="clientName"
+                  (onChange)="onClientSelected($event.value)"
+                  autoWidth="false"
+                  [style]="{ width: '100%' }"
+                  placeholder="Select Customer"
+                  [ngClass]="{
+                    invalid:
+                    editFrm.get('customer')?.invalid && editFrm.get('customer')?.touched
+                  }"
+                ></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="editFrm.get('customer')?.touched && editFrm.get('customer')?.invalid">
+                      &nbsp; &#9888; Customer name is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group field col">
+                <label for="project"
+                  >Project<span class="required-asterisk">*</span></label
+                > 
+                <div class="mb-2">
+                  <p-dropdown
+                    class="mms-dropdown"
+                    id="id"
+                    [options]="projects | sort:'projectName'"
+                    optionLabel="projectName"
+                    (onChange)="onProjectSelected($event.value)"
+                    formControlName="project"
+                    autoWidth="false"
+                    [style]="{ width: '100%' }"
+                    placeholder="Select Project"
+                    [ngClass]="{
+                      invalid:
+                      editFrm.get('project')?.invalid && editFrm.get('project')?.touched
+                    }"
+                  ></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="editFrm.get('project')?.touched && editFrm.get('project')?.invalid">
+                      &nbsp; &#9888; Project name is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="form-group field col">
+                  <label for="priority"
+                    >Complexity<span class="required-asterisk">*</span></label
+                  >
+                  <input
+                    pInputText
+                    formControlName="projectComplexity"
+                    placeholder="Enter Priority"
+                    (blur)="onEditComplexityExist()"
+                    appCaseSensitive
+                    [(ngModel)]="editComplexityName"
+                    class="priority-input"
+                    autoWidth="false"
+                    [style]="{ 'width': '100%' }"
+                    [ngClass]="{
+                      invalid:
+                      editFrm.get('projectComplexity')?.invalid && editFrm.get('projectComplexity')?.touched
+                    }"
+                  />
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="editFrm.get('projectComplexity')?.touched && editFrm.get('projectComplexity')?.invalid && !editFrm.get('projectComplexity')?.errors?.['alreadyExists']">
+                      &nbsp; &#9888; Complexity is required.
+                    </small>
+                    <small
+                    id="project-error"
+                    class="p-error"
+                    *ngIf="editFrm.get('projectComplexity')?.touched && editFrm.get('projectComplexity')?.invalid && editFrm.get('projectComplexity')?.errors?.['alreadyExists']">
+                    &nbsp; &#9888; Complexity already exists.
+                  </small>
+                  </div>
+              </div>
+              <div class="form-group field col">
+                <label for="status"
+                  >Status<span class="required-asterisk">*</span></label
+                >
+                <div class="mb-2">
+                  <p-dropdown
+                    [options]="Status"
+                    formControlName="status"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select Status"
+                    [style]="{ 'width': '100%' }"
+                    autowidth="false"
+                    [ngClass]="{
+                      invalid:
+                      editFrm.get('status')?.invalid && editFrm.get('status')?.touched
+                    }"
+                  ></p-dropdown>
+                  <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="editFrm.get('status')?.touched && editFrm.get('status')?.invalid">
+                      &nbsp; &#9888; Status is required.
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="form-group field">
+              <label for="remarks">Remarks</label>
+              <textarea
+                pInputTextarea
+                pInputText
+                [rows]="4"
+                class="mms-textarea"
+                formControlName="remarks"
+                placeholder="Enter Remarks."
+                [style]="{ width: '100%' ,  height:'78px'}"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+  
+        <ng-template pTemplate="footer">
+          <p-button
+            class="cancel-button"
+            (onClick)="cancelEdit()"
+            label="Cancel"
+            pAutoFocus
+            [autofocus]="true"
+          ></p-button>
+  
+          <p-button
+            class="save-button"
+            type="submit"
+            label="Update"
+            (onClick)="onUpdate(editFrm.value)"
+            [disabled]="!editFrm.valid"
+          ></p-button>
+        </ng-template>
+      </p-dialog>
+    </div>
+  </div>
+    <p-toast></p-toast>
+    
+  

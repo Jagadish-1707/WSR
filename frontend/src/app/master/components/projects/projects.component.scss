@@ -1,0 +1,35 @@
+td{
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+:host ::ng-deep {
+.custom-button button {
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+
+  .custom-button-export button{
+    background-color: var(--blue-100);
+    color: var(--primary-blue);
+    border: none;
+    cursor: pointer;
+
+  }
+
+  .custom-sidebar .p-sidebar {
+    width: 400px !important;
+  }
+
+  .custom-sidebar .sidebar-header {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .custom-sidebar .sidebar-header h2 {
+    margin: 0;
+    color: #333;
+  }
+}

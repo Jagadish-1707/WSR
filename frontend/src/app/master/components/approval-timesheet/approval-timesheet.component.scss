@@ -1,0 +1,56 @@
+
+:host ::ng-deep {
+
+.search-button button{
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+
+  .action-button button{
+    background-color: transparent;
+    color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+    &:hover{
+      background-color: var(--primary-blue);
+      color: white;
+    } 
+  }
+
+  .p-fileupload .p-button {
+    background-color: var(--blue-100);
+        color:var(--primary-blue)
+  }
+
+  .clear-button button{
+    background-color: var(--blue-100);
+    color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+  .approve-button button{
+    background-color: var(--green-100);
+    color: var(--primary-green);
+    cursor: pointer;
+    border: none;
+  }
+  .reject-button button{
+    background-color: var(--red-100);
+    color: var(--primary-red);
+    cursor: pointer;
+    border: none;
+  }
+
+
+}
+
+.toolbar-buttons{
+  margin-top: 23px;
+}
+
+
+.header-text{
+  font-size: 18px;
+  font-weight: 900;
+}

@@ -1,0 +1,42 @@
+:host ::ng-deep {
+
+  .p-dialog .p-dialog-content:last-of-type {
+    overflow-y: visible;
+  }
+
+  .p-dropdown-filter-container input {
+    min-width: 100%;
+  }
+  
+  .p-button-sm {
+    padding: 3px 6px; 
+    font-size: 12px; 
+    background-color: white; 
+    border: none; 
+    color: #000; 
+  }
+  
+  .p-button-sm:hover {
+    background-color: #f1f1f1; 
+  }
+  
+  .p-button-sm:focus {
+    box-shadow: none; 
+  }
+
+  .dropdown-asset-list {
+    width: 200px !important;
+  }
+
+  .custom-dialog .p-dialog {
+    z-index: 1100 !important;
+  }
+
+  }
+  .p-button-text{
+    padding: 8px 8px;
+  }
+  .p-button-text:hover {
+    background-color: #f1f1f1;
+  }
+

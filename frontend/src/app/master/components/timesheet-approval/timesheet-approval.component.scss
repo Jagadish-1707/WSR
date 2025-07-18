@@ -1,0 +1,43 @@
+
+
+  ::ng-deep .approve-btn .p-button {
+  background-color: var(--green-100); /* Bootstrap green */
+  border: none !important;
+  color: white !important;
+}
+
+::ng-deep .reject-btn .p-button {
+  background-color: var(--red-100); /* Bootstrap red */
+  }
+
+::ng-deep .reject-btn .p-button {
+  font-size: 1rem !important;      /* smaller text */
+  border: none !important;
+  color: #ff0000 !important;
+}
+
+::ng-deep .approve-btn .p-button {
+  font-size: 1rem !important;      /* smaller text */
+  border: none !important;
+  color: green !important;
+}
+
+::ng-deep .approve-btn .p-button {
+  margin-right: 1rem;
+}
+
+::ng-deep .disabled-row {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+
+::ng-deep .selected-row td {
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+
+.back-button-icon{
+  cursor: pointer;
+}

@@ -1,0 +1,133 @@
+.p-button-custom{
+  cursor: pointer;
+}
+
+.p-view-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 5px; 
+}
+
+.list-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; /* Adjust size as needed */
+  height: 32px; /* Adjust size as needed */
+  background-color: var(--blue-100); /* Background color for the icon */
+  border-radius: 50%; /* Makes it circular */
+  font-size: 20px; /* Adjust icon size */
+  transition: background-color 0.3s, color 0.3s; /* Smooth hover effect */
+}
+
+/* Toolbar styling for consistency */
+.p-toolbar {
+  background-color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+/* Clear filter button styling */
+.clear-filter {
+  margin-left: 0.5rem;
+}
+
+
+/* Calendar container styling */
+.calendar-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation bar for week/month switching */
+.week-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+
+  .p-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+
+    .pi {
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    &:focus {
+      outline: 2px solid #007bff;
+      outline-offset: 2px;
+    }
+  }
+
+  div {
+    font-size: 1.1rem;
+    color: #333;
+  }
+}
+
+/* FullCalendar customizations */
+.fc-event {
+  background-color: #e0f9e4; /* Light green background */
+  color: #166534; /* Darker green text */
+  border: 1px solid #a3e635; /* Green border */
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(0, 100, 0, 0.1);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.fc-event:hover {
+  box-shadow: 0 3px 6px rgba(0, 100, 0, 0.2);
+  transform: scale(1.02);
+}
+
+.fc-day-today {
+  background-color: #f0fff4 !important; /* Even lighter green for today highlight */
+  border: 1px solid #bbf7d0;
+}
+
+.fc-col-header-cell {
+  background-color: #f1f8e9; /* Very subtle green header */
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.fc-daygrid-day-number {
+  color: #388e3c;
+  font-weight: 500;
+}
+
+/* Adjusting the header and navigation buttons */
+.week-navigation {
+  background-color: #f1f8e9;
+  padding: 8px;
+  border-radius: 8px;
+  color: #388e3c;
+}
+
+.week-navigation .p-button {
+  background-color: #a3e635;
+  color: white;
+}
+
+.week-navigation .p-button:hover {
+  background-color: #84cc16;
+}

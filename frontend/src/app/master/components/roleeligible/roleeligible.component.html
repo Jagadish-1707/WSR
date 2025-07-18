@@ -1,0 +1,25 @@
+<div class="container">
+<form [formGroup]="eligibleForm" (ngSubmit)="onSubmit()">
+  <div class="p-field">
+    <label for="modelName">Model Name</label>
+    <input id="modelName" type="text" pInputText formControlName="modelName">
+  </div>
+  <div class="p-field">
+    <label for="roleId">Role ID</label>
+    <input id="roleId" type="text" pInputText formControlName="roleId">
+  </div>
+  <div class="p-field-checkbox">
+    <p-checkbox formControlName="add" [binary]="true" label="Add"></p-checkbox>
+  </div>
+  <div class="p-field-checkbox">
+    <p-checkbox formControlName="edit" [binary]="true" label="Edit"></p-checkbox>
+  </div>
+  <div class="p-field-checkbox">
+    <p-checkbox formControlName="view" [binary]="true" label="View"></p-checkbox>
+  </div>
+  <div class="p-field-checkbox">
+    <p-checkbox formControlName="delete" [binary]="true" label="Delete"></p-checkbox>
+  </div>
+  <button type="submit" pButton label="Submit">Submit</button>
+</form>
+</div>

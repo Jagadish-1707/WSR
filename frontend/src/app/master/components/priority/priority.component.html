@@ -1,0 +1,357 @@
+<!-- Header Buttons -->
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="title-header flex justify-content-between flex-wrap gap-4 pt-0 pl-0">
+  <div class="align-items-center justify-content-start gap-2">
+    <div class="flex justify-content-between align-items-center">
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div>      
+    </div>
+  </div>
+  <div
+    class="flex flex-grow-1 justify-content-between flex-nowrap gap-4 w-full md:w-auto">
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button pRipple icon="pi pi-plus" (click)="showDialog()" label="PRIORITY" class="btn-primary"></p-button>        
+      </div>
+    </div>
+  </div>
+</div>      
+
+  <!-- Table Code  -->
+  <div class="table-container">
+    <p-table
+      [value]="priorityData"
+      #dt
+      [paginator]="true"     
+      [showCurrentPageReport]="true"
+      [globalFilterFields]="['customer', 'project', 'projectPriority', 'status']"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+      [rows]="10" [rowsPerPageOptions]="[10, 20, 30, 40]"
+      [scrollable]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pFrozenColumn style="width: 75px;">
+              <div class="flex justify-content-center align-items-center">
+                <div class="min-w-max">Action</div>
+              </div>
+            </th>
+          <th pSortableColumn="customer" class="left-fix">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Customer</div>
+              <p-sortIcon field="customer"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="project">
+            <div class="flex justify-content-start align-items-end gap-1">
+              <div class="header-content"></div>
+              <div class="min-w-max">Project</div>
+              <p-sortIcon field="project"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="projectPriority">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="header-content"></div>
+              <div class="min-w-max">Priority</div>
+              <p-sortIcon field="projectPriority"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="status">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="header-content"></div>
+              <div class="min-w-max">Status</div>
+              <p-sortIcon field="status"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-priorityData>
+        <tr class="p-selectable-row">
+          <td>
+            <div class="flex justify-content-center align-items-center">
+              <div>
+                <p-button
+                  size="small"
+                  [rounded]="true"
+                  [text]="true"
+                  class="edit-btn"
+                  pTooltip="Edit"
+                tooltipPosition="top"
+                  (click)="editPriority(priorityData.id)"
+                ><i class="material-symbols-outlined">edit</i></p-button>
+              </div>
+              <div>
+                <p-button 
+                class="edit-btn" 
+                [rounded]="true"
+                [text]="true"
+                size="small" 
+                pTooltip="Delete"
+                tooltipPosition="top"
+                (click)="confirmDelete(priorityData)">
+                <i class="material-symbols-outlined">delete</i>
+                </p-button>
+              </div>
+            </div>
+          </td>
+          <td>{{ priorityData.customer }}</td>
+          <td>
+            <span>
+              {{ priorityData.project }}
+            </span>
+          </td>
+          <td>
+            <span>
+              {{ priorityData.projectPriority }}
+            </span>
+          </td>
+          <td>
+            <span>
+              <p-tag
+                [value]="priorityData.status === 1 ? 'Active' : 'Inactive'"
+                [severity]="getSeverity(priorityData.status)"
+              ></p-tag>
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+       <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No records found.</td>
+          </tr>
+        </ng-template>
+    </p-table>
+    </div>
+
+    <p-dialog
+      [(visible)]="priorityDialogVisible"
+      [draggable]="false"
+      header="Header"
+      [modal]="true"
+      [style]="{ width: '900px' }"
+    >
+      <ng-template pTemplate="header">
+        <div
+          class="header-text inline-flex align-items-center justify-content-center gap-2"
+        >
+          {{ isEditMode ? "Edit Priority" : "Add Priority" }}
+        </div>
+      </ng-template>
+
+      <div class="container">
+        <form
+          [formGroup]="priorityFrm"
+          (ngSubmit)="onSubmit()"
+          class="mms-form flex flex-column"
+        >
+          <!-- Customer -->
+          <div class="formgrid grid">
+            <div class="field col-12 md:col-6">
+              <label for="client"
+                >Customer<span class="required-asterisk">*</span></label
+              >
+              <div class="mb-2">
+                <p-dropdown [filter]="true"
+                  formControlName="customer"
+                  [options]="zohoClients | sort : 'clientName'"
+                  optionLabel="clientName"
+                  appendTo="body"
+                  placeholder="Select Customer"
+                  (onChange)="onClientSelected($event.value)"
+                  [ngClass]="{
+                    invalid:
+                      priorityFrm.get('customer')?.invalid &&
+                      priorityFrm.get('customer')?.touched
+                  }"
+                ></p-dropdown>
+                <div>
+                  <small
+                    id="assigned-to-help"
+                    class="p-error"
+                    *ngIf="
+                      priorityFrm.get('customer')?.touched &&
+                      priorityFrm.get('customer')?.invalid
+                    "
+                  >
+                    &nbsp; &#9888; Customer name is required.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project -->
+            <div class="field col-12 md:col-6">
+              <label for="project"
+                >Project<span class="required-asterisk">*</span></label
+              >
+              <div class="mb-2">
+                <p-dropdown [filter]="true"
+                  formControlName="project"
+                  [options]="filteredZohoProjects | sort : 'projectName'"
+                  optionLabel="projectName"
+                  appendTo="body"
+                  placeholder="Select Project"
+                  (onChange)="onProjectSelected($event.value)"
+                  [ngClass]="{
+                    'ng-dirty': priorityFrm.get('project')?.touched,
+                    'ng-invalid': priorityFrm.get('project')?.invalid
+                  }"
+                ></p-dropdown>
+                <div>
+                  <small
+                    id="assigned-to-help"
+                    class="p-error"
+                    *ngIf="
+                      priorityFrm.get('project')?.touched &&
+                      priorityFrm.get('project')?.invalid
+                    "
+                  >
+                    &nbsp; &#9888; Project name is required.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Priority & Status -->
+          <div class="formgrid grid">
+            <div class="field col-12 md:col-6">
+              <label for="priority"
+                >Priority<span class="required-asterisk">*</span></label
+              >
+              <input
+                pInputText
+                label="Priority"
+                formControlName="projectPriority"
+                appCaseSensitive
+                placeholder="Enter Priority"
+                (blur)="isEditMode ? onEditPriorityExist() : onPriorityExist()"
+                class="priority-input"
+                autoWidth="false"
+                [style]="{ width: '100%' }"
+                [ngClass]="{
+                  invalid:
+                    priorityFrm.get('projectPriority')?.invalid &&
+                    priorityFrm.get('projectPriority')?.touched
+                }"
+              />
+              <small
+                class="p-error"
+                *ngIf="priorityFrm.get('projectPriority')?.touched && priorityFrm.get('projectPriority')?.invalid && !priorityFrm.get('projectPriority')?.errors?.['alreadyExists']"
+              >
+                &nbsp; &#9888; Priority is required.
+              </small>
+              <small
+                id="project-error"
+                class="p-error"
+                *ngIf="priorityFrm.get('projectPriority')?.dirty && priorityFrm.get('projectPriority')?.touched && priorityFrm.get('projectPriority')?.invalid && priorityFrm.get('projectPriority')?.errors?.['alreadyExists']"
+              >
+                &nbsp; &#9888; Priority already exists.
+              </small>
+            </div>
+
+            <div class="field col-12 md:col-6">
+              <label>Status<span class="required-asterisk">*</span></label>
+              <p-dropdown [filter]="true"
+                formControlName="status"
+                [options]="Status"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select Status"
+                [style]="{ width: '100%' }"
+                autowidth="false"
+                [ngClass]="{
+                  invalid:
+                    priorityFrm.get('status')?.invalid &&
+                    priorityFrm.get('status')?.touched
+                }"
+              ></p-dropdown>
+              <small
+                class="p-error"
+                *ngIf="
+                  priorityFrm.get('status')?.touched &&
+                  priorityFrm.get('status')?.invalid
+                "
+              >
+                &nbsp; &#9888; Status is required.
+              </small>
+            </div>
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-group field">
+            <label for="remarks">Remarks</label>
+            <textarea
+              class="mms-textarea"
+              pInputTextarea
+              pInputText
+              [rows]="4"
+              formControlName="remarks"
+              placeholder="Enter Remarks"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+
+      <ng-template pTemplate="footer">
+         <p-button
+          class="btn-primary"
+          type="submit"
+          [label]="isEditMode ? 'UPDATE' : 'SAVE'"
+          (onClick)="onSubmit()"
+          [disabled]="!priorityFrm.dirty || priorityFrm.invalid"
+        ></p-button>
+        <p-button
+          class="btn-secondary"
+          (click)="cancel()"
+          label="CANCEL"
+          pAutoFocus
+          [autofocus]="true"
+        ></p-button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Confirm Delete" [(visible)]="displayDeleteDialog" [modal]="true" [closable]="true" [draggable] ="false">
+  <p>Are you sure you want to Delete?</p>
+  <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px;">
+    <p-button label="DELETE" class="save-btn mr-2" (click)="deleteTask()">
+    </p-button>
+    <p-button label="CANCEL" class="btn-secondary" id="p-dialog_cancel_btn" (click)="displayDeleteDialog = false">
+    </p-button>
+  </div>
+</p-dialog>
+
+ <p-dialog header="Delete Failed" [(visible)]="showWarningDialog" [modal]="true" [closable]="false">
+    <p>This Priority is in use.</p>
+
+    <div style="display: flex; justify-content: center; margin-top: 1rem;">
+
+      <p-button label="OK" class="btn-secondary" (click)="showWarningDialog = false"></p-button>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+  header="Edit Not Allowed"
+  [(visible)]="showEditWarningDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+>
+  <p>This priority is in use, you can't edit it</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem">
+    <p-button
+      label="OK"
+      class="btn-secondary"
+      (click)="showEditWarningDialog = false"
+    >
+    </p-button>
+  </div>
+</p-dialog>
+
+
+    <p-toast></p-toast>
+

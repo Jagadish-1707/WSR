@@ -1,0 +1,542 @@
+<div>
+  <!-- TOP FILTER + CONTROLS SECTION -->
+  <div class="flex align-items-center justify-content-start gap-2 pb-4">
+    <div class="flex align-items-center">
+      <p-dropdown class="dropdown-asset-list mr-2" [options]="sortedProjects" [filter]="true" optionLabel="projectName"
+        placeholder="Project" [(ngModel)]="selectedProject" (onChange)="onProjectSelectionChange($event)"></p-dropdown>
+
+      <p-calendar [(ngModel)]="selectedMonth" view="month" dateFormat="MM-yy"
+        (onSelect)="loadFilteredWSRData()"></p-calendar>
+
+      <div *ngIf="getUniqueProjectNames().length > 0" class="mt-3">
+        <h4>Projects for {{ selectedMonth | date: 'MMMM yyyy' }}:</h4>
+        <ul>
+          <li *ngFor="let name of getUniqueProjectNames()">
+            {{ name }}
+          </li>
+        </ul>
+      </div>
+
+      <p-button class="flex align-items-center flex-direction row" severity="secondary" [text]="true"
+        (click)="onClear()">
+        <span class="clear-btn material-symbols-outlined">backspace</span>
+        <span>Clear</span>
+      </p-button>
+    </div>
+
+    <div class="flex flex-grow-1 justify-content-end flex-nowrap gap-4 w-full md:w-auto">
+      <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+        <!-- Add WSR -->
+        <p-button (click)="openAddFormDialog()" label="Add WSR" icon="pi pi-plus" class="p-button-success"
+          [style]="{ height: '30px', padding: '8px 16px', width: 'auto' }">
+        </p-button>
+
+        <!-- View WSR for Multiple Selection -->
+        <p-button label="View WSR" icon="pi pi-eye" class="p-button-primary" [disabled]="selectedProjects.length === 0"
+          (click)="viewSelectedProjects()" [style]="{ height: '30px', padding: '8px 16px', width: 'auto' }">
+        </p-button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-container">
+    <p-table [value]="wsrData" [tableStyle]="{ 'min-width': '60rem' }" #dt [paginator]="true"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+      [rows]="10" [rowsPerPageOptions]="[10, 20, 30, 40]" [scrollable]="true">
+
+      <!-- HEADER -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th pFrozenColumn class="text-center">
+            <div class="min-w-max">Action</div>
+          </th>
+          <th pSortableColumn="customerName" class="text-left">
+            <div class="min-w-max flex align-items-center gap-1">
+              Customer <p-sortIcon field="customerName"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="wsrName" class="text-left">
+            <div class="min-w-max flex align-items-center gap-1">
+              Project <p-sortIcon field="wsrName"></p-sortIcon>
+            </div>
+          </th>
+          <th class="text-left">
+            <div class="min-w-max">Report Month</div>
+          </th>
+          <th class="text-left">
+            <div class="min-w-max">Start Date</div>
+          </th>
+          <th class="text-left">
+            <div class="min-w-max">End Date</div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <!-- BODY -->
+      <ng-template pTemplate="body" let-wsrRecord>
+        <tr class="p-selectable-row">
+          <td class="text-center">
+            <div class="flex justify-content-center align-items-center gap-2">
+              <p-checkbox [binary]="true" [(ngModel)]="wsrRecord.selected" [id]="'check-' + wsrRecord.wsrReportDto.id"
+                tooltip="Select" tooltipPosition="top" class="edit-btn" (onChange)="onSelectionChange()">
+              </p-checkbox>
+
+              <!-- <p-button class="edit-btn" [rounded]="true" pTooltip="View" tooltipPosition="top" [text]="true"
+                (click)="viewrecord(wsrRecord)">
+                <i class="material-symbols-outlined">visibility</i>
+              </p-button> -->
+
+              <p-button class="edit-btn" [rounded]="true" pTooltip="Edit" tooltipPosition="top" [text]="true"
+                (click)="editTask(wsrRecord.wsrReportDto.id, wsrRecord.wsrReportDto.flagType)">
+                <i class="material-symbols-outlined">edit</i>
+              </p-button>
+            </div>
+          </td>
+
+          <td class="text-left white-space-nowrap">
+            {{ wsrRecord.wsrReportDto.customerName || '-' }}
+          </td>
+          <td class="text-left white-space-nowrap">
+            {{ wsrRecord.wsrReportDto.wsrName }}
+          </td>
+          <td class="text-left white-space-nowrap">
+            {{ wsrRecord.wsrReportDto.reportStartDate | date: 'MM-yyyy' }}
+          </td>
+          <td class="text-left white-space-nowrap">
+            {{ wsrRecord.wsrReportDto.reportStartDate | date: 'yyyy-MM-dd' }}
+          </td>
+          <td class="text-left white-space-nowrap">
+            {{ wsrRecord.wsrReportDto.reportEndDate | date: 'yyyy-MM-dd' }}
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- EMPTY MESSAGE -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">No WSR records found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-toast></p-toast>
+<p-dialog header="" [(visible)]="displayAddFormDialog" [modal]="true" [style]="{width:'60vw'}"
+  styleClass="custom-dialog">
+
+  <!-- Project Details Section -->
+  <div class="p-fluid p-grid">
+    <div class="p-col-12 p-md-6" *ngIf="!isEditProjectStatus">
+      <div class="project-status-container">
+        <div class="project-status-header">Project Details</div>
+
+        <div class="status-field">
+          <label>Client Name <span class="required">*</span></label>
+          <p-dropdown [options]="clients" optionLabel="label" optionValue="value" [(ngModel)]="formModel.clientName"
+            placeholder="Select Client" (onChange)="onClientSelected($event.value)">
+          </p-dropdown>
+
+        </div>
+
+        <div class="status-field">
+          <label>Project Name <span class="required">*</span></label>
+          <p-dropdown [options]="filteredZohoProjects" optionLabel="projectName" [(ngModel)]="selectedProject"
+            placeholder="Select Project" (onChange)="onProjectSelected($event.value)">
+          </p-dropdown>
+        </div>
+
+        <div class="status-field">
+          <label>Manager Name <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="formModel.manager" placeholder="Enter Manager Name" />
+        </div>
+
+        <div class="status-field">
+          <label>Project Start - End Date <span class="required">*</span></label>
+          <p-calendar [(ngModel)]="formModel.projectDates" selectionMode="range" dateFormat="dd/mm/yy"></p-calendar>
+        </div>
+
+        <div class="status-field">
+          <label>Team Size <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="formModel.teamSize" placeholder="Enter Team Size" />
+        </div>
+
+        <div class="status-field">
+          <label>Technology <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="formModel.technology" placeholder="Enter Technology" />
+        </div>
+
+        <div class="status-field">
+          <label>Customer Location <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="formModel.customerLocation" placeholder="Enter Customer Location" />
+        </div>
+
+        <div class="status-field">
+          <label>Business Domain <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="formModel.businessDomain" placeholder="Enter Business Domain" />
+        </div>
+
+        <div class="status-field">
+          <label>Project Type <span class="required">*</span></label>
+          <p-dropdown [options]="projectTypes" [(ngModel)]="formModel.projectType" placeholder="Select Project Type">
+          </p-dropdown>
+
+        </div>
+
+        <div class="status-field">
+          <label>Report Start - End Date <span class="required">*</span></label>
+          <p-calendar [(ngModel)]="formModel.reportDates" selectionMode="range" dateFormat="dd/mm/yy"
+            [minDate]="minReportDate" (onSelect)="validateDateRange()" appendTo="body"></p-calendar>
+
+        </div>
+
+
+        <div class="status-field mb-2">
+          <label>Resources <span class="required">*</span></label>
+          <button pButton type="button" icon="pi pi-plus" label="Add Resource" (click)="addResource()"
+            class="p-button-sm p-button-success"></button>
+        </div>
+
+        <div *ngFor="let res of resourceList; let i = index" class="p-grid mb-2">
+          <div class="p-col-5">
+            <p-dropdown [options]="resourceNames" [(ngModel)]="resourceList[i].resourcename"
+              placeholder="Select Resource" (onChange)="onResourceChange(i, $event.value)">
+            </p-dropdown>
+          </div>
+
+          <div class="p-col-4">
+            <input type="number" pInputText min="0" max="5" step="0.1" [(ngModel)]="resourceList[i].rating"
+              placeholder="Enter Rating (e.g., 4.2)" />
+          </div>
+
+          <div class="p-col-2">
+            <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm"
+              (click)="removeResource(i)"></button>
+          </div>
+        </div>
+
+
+        <div class="status-field">
+          <label>Project Description <span class="required">*</span></label>
+          <textarea rows="3" pInputTextarea [(ngModel)]="formModel.projectDescription"
+            placeholder="Enter Description"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Project Status -->
+    <div class="p-col-12 p-md-6" *ngIf="!isEditProjectDetails">
+      <div class="project-status-container">
+        <div class="project-status-header">Project Status</div>
+
+        <div class="status-field" *ngFor="let field of statusFields">
+          <label>{{ field }} <span class="required">*</span></label>
+          <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatuses[field]" optionLabel="label"
+            placeholder="Select Status">
+            <ng-template pTemplate="selectedItem" let-selected>
+              <span [ngClass]="['status-option', selected.value?.toLowerCase()]">
+                <span *ngIf="selected.value === 'Green'">↑</span>
+                <span *ngIf="selected.value === 'Amber'">→</span>
+                <span *ngIf="selected.value === 'Red'">↓</span>
+                {{ selected.value }}
+              </span>
+            </ng-template>
+            <ng-template pTemplate="item" let-item>
+              <span [ngClass]="['status-option', item.value.toLowerCase()]">
+                <span *ngIf="item.value === 'Green'">↑</span>
+                <span *ngIf="item.value === 'Amber'">→</span>
+                <span *ngIf="item.value === 'Red'">↓</span>
+                {{ item.value }}
+              </span>
+            </ng-template>
+          </p-dropdown>
+        </div>
+
+        <div class="status-field">
+          <label>Planned Resource <span class="required">*</span></label>
+          <p-dropdown [options]="resourceCounts" [(ngModel)]="formModel.plannedResource" placeholder="Select Resource">
+          </p-dropdown>
+        </div>
+
+        <div class="status-field">
+          <label>Actual Resource <span class="required">*</span></label>
+          <p-dropdown [options]="resourceCounts" [(ngModel)]="formModel.actualResource" placeholder="Select Resource">
+          </p-dropdown>
+        </div>
+
+        <div class="status-field">
+          <label>Measures Taken <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="formModel.measuresTaken" placeholder="Enter measures taken..." />
+        </div>
+
+        <div class="status-field" style="grid-column: span 2;">
+          <label>Remarks</label>
+          <textarea pInputTextarea [(ngModel)]="formModel.remarks" placeholder="Enter Remarks"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress & Planned Activities Combined -->
+  <div class="project-status-container">
+    <div *ngIf="formModel.progressData?.length > 0">
+      <table class="individual-project-details">
+        <thead>
+          <tr>
+            <th>Sl No</th>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of formModel.progressData; let i = index" [class.even-row]="i % 2 !== 0">
+            <td class="text-center">{{ i + 1 }}</td>
+            <td>{{ item.task }}</td>
+            <td class="text-center">{{ item.status }}</td>
+            <td>{{ item.remarks }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="project-status-header mt-4">Add Progress</div>
+    <div class="p-fluid p-grid">
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Task <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="newProgress.task" placeholder="Enter Task" />
+        </div>
+      </div>
+
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Status <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="newProgress.status" placeholder="Enter Status" />
+        </div>
+      </div>
+
+      <div class="p-col-12">
+        <div class="status-field">
+          <label>Remarks</label>
+          <textarea pInputTextarea rows="3" [(ngModel)]="newProgress.remarks" placeholder="Enter Remarks"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="formModel.plannedActivities?.length > 0">
+      <table class="individual-project-details">
+        <thead>
+          <tr>
+            <th>Sl No</th>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of formModel.plannedActivities; let i = index" [class.even-row]="i % 2 !== 0">
+            <td class="text-center">{{ i + 1 }}</td>
+            <td>{{ item.task }}</td>
+            <td class="text-center">{{ item.status }}</td>
+            <td>{{ item.remarks }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="project-status-header mt-4">Add Planned Activity</div>
+    <div class="p-fluid p-grid">
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Task <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="newPlanned.task" placeholder="Enter Task" />
+        </div>
+      </div>
+
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Status <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="newPlanned.status" placeholder="Enter Status" />
+        </div>
+      </div>
+
+      <div class="p-col-12">
+        <div class="status-field">
+          <label>Remarks</label>
+          <textarea pInputTextarea rows="3" [(ngModel)]="newPlanned.remarks" placeholder="Enter Remarks"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Key Issues & Risks Combined Section -->
+  <div class="project-status-container">
+    <div class="project-status-header">Key Issues</div>
+
+    <div *ngIf="formModel.keyIssues?.length > 0">
+      <table class="individual-project-details">
+        <thead>
+          <tr>
+            <th>Sl No</th>
+            <th>Type</th>
+            <th>Functional Area</th>
+            <th>Description</th>
+            <th>Actions</th>
+            <th>Date Raised</th>
+            <th>Resolve By</th>
+            <th>Owner</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let issue of formModel.keyIssues; let i = index">
+            <td class="text-center">{{ i + 1 }}</td>
+            <td>{{ issue.type }}</td>
+            <td>{{ issue.functionalArea }}</td>
+            <td>{{ issue.description }}</td>
+            <td>{{ issue.actions }}</td>
+            <td>{{ issue.dateRaised }}</td>
+            <td>{{ issue.resolveBy }}</td>
+            <td>{{ issue.owner }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="p-fluid p-grid">
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Type</label>
+          <input pInputText [(ngModel)]="newIssue.type" placeholder="Enter Issue Type" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Functional Area</label>
+          <input pInputText [(ngModel)]="newIssue.functionalArea" placeholder="Enter Functional Area" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Description</label>
+          <input pInputText [(ngModel)]="newIssue.description" placeholder="Enter Description" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Actions</label>
+          <input pInputText [(ngModel)]="newIssue.ActionRequired" placeholder="Enter Actions" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Date Raised</label>
+          <p-calendar [(ngModel)]="formModel.issuedate" dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy">
+          </p-calendar>
+
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>ResolveByDate</label>
+          <p-calendar [(ngModel)]="newIssue.resolveBy" dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy">
+          </p-calendar>
+        </div>
+
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Owner</label>
+          <input pInputText [(ngModel)]="newIssue.IssueOwner" placeholder="Enter Owner" />
+        </div>
+      </div>
+    </div>
+
+    <div class="project-status-header mt-5">Key Risks</div>
+
+    <div *ngIf="formModel.keyRisks?.length > 0">
+      <table class="individual-project-details">
+        <thead>
+          <tr>
+            <th>Sl No</th>
+            <th>Description</th>
+            <th>Mitigation</th>
+            <th>Likelihood</th>
+            <th>Owner</th>
+            <th>Date Raised</th>
+            <th>Resolve By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let risk of formModel.keyRisks; let i = index">
+            <td class="text-center">{{ i + 1 }}</td>
+            <td>{{ risk.description }}</td>
+            <td>{{ risk.mitigation }}</td>
+            <td>{{ risk.likelihood }}</td>
+            <td>{{ risk.owner }}</td>
+            <td>{{ risk.dateRaised }}</td>
+            <td>{{ risk.resolveBy }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="p-fluid p-grid">
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Risk Description</label>
+          <input pInputText [(ngModel)]="newRisk.RiskDescription" placeholder="Enter Description" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Mitigation</label>
+          <input pInputText [(ngModel)]="newRisk.mitigation" placeholder="Enter Mitigation" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Likelihood</label>
+          <input pInputText [(ngModel)]="newRisk.likelihood" placeholder="Enter Likelihood" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Owner</label>
+          <input pInputText [(ngModel)]="newRisk.RiskOwner" placeholder="Enter Owner" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Date Raised</label>
+          <p-calendar [(ngModel)]="newRisk.riskdate" dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy">
+          </p-calendar>
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>ResolveByDate</label>
+          <p-calendar [(ngModel)]="newRisk.riskresolvedate" dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy">
+          </p-calendar>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  <div class="submit-button-container">
+    <button *ngIf="!isEditProjectDetails && !isEditProjectStatus" pButton label="Submit" (click)="submitForm()">
+    </button>
+    <button *ngIf="isEditProjectDetails" pButton label="Save Project Details" (click)="onEditProjectDetailsSave()">
+    </button>
+    <button *ngIf="isEditProjectStatus" pButton label="Save Project Status" (click)="onEditProjectStatusSave()">
+    </button>
+  </div>
+</p-dialog>

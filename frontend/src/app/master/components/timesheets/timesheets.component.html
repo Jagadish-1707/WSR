@@ -1,0 +1,441 @@
+<div class="page-bg">
+  <p-toast position="top-center"></p-toast>
+  <div>
+    <div *ngIf="gridView">
+          <div >          
+            <div class="header-section">
+              <p-splitButton 
+                label="Weekly Timesheet" 
+                class="split-btn"
+                [model]="timesheetItems" 
+                 >
+              </p-splitButton>
+              <div class="calender-container">
+                <div class="cal-action-container">
+                  <span role="button" tabindex="0" (click)="goToPreviousMonth()" (keydown.enter)="goToPreviousMonth()"
+                    (keydown.space)="goToPreviousMonth()" class="material-symbols-outlined left-arrow"
+                    aria-label="Previous Month">
+                    chevron_left
+                  </span>
+                  <span role="button" tabindex="0" (click)="monthPicker.toggle()" (keydown.enter)="monthPicker.toggle()"
+                    (keydown.space)="monthPicker.toggle()" class="material-symbols-outlined calendar-icon"
+                    aria-label="Open Month Picker">
+                    calendar_month
+                  </span>
+                  <span class="month-label" (click)="monthPicker.toggle()">{{ reloadMonth | date: 'MMMM yyyy' }}</span>
+                  <span role="button" tabindex="0" (click)="goToNextMonth()" (keydown.enter)="goToNextMonth()"
+                    (keydown.space)="goToNextMonth()" class="material-symbols-outlined right-arrow"
+                    aria-label="Previous Month">
+                    chevron_right
+                  </span>
+                </div>
+                <p-calendar [(ngModel)]="reloadMonth" (onSelect)="onMonthSelect($event)" view="month"
+                  class="custom-calendar" dateFormat="MM/yy" [readonlyInput]="true" appendTo="body"
+                  styleClass="hidden-calendar" #monthPicker></p-calendar>
+              </div>              
+              <div>
+                <p-button class="btn-secondary" (click)="goToTimesheetRequest()"> REQUESTS
+                </p-button>
+                <p-button class="btn-secondary" (click)="goToTimesheetApproval()"> APPROVALS
+                </p-button>
+              </div>
+            </div>
+
+          </div>
+      <div class="table-container mt-3">
+        <p-table class="grid-table" [value]="weeklySummaryList" responsiveLayout="scroll">
+          <ng-template pTemplate="body" let-weekSummary let-rowData let-rowIndex="rowIndex">
+            <tr>
+              <td style="font-size: 120%">
+                <p-button class="weekRange"
+                  (onClick)="openSelectedWeek([weekSummary.weekStartDate, weekSummary.weekEndDate], timesheetStatus[rowIndex])"
+                  [disabled]="weekSummary.isFutureWeek">
+                  {{
+                  (weekSummary.weekStartDate | momentFormat: 'DD MMM YYYY') +
+                  ' - ' +
+                  (weekSummary.weekEndDate | momentFormat: 'DD MMM YYYY')
+                  }}
+                </p-button>               
+              </td>
+
+              <td class="grid-td">
+                <b>{{ weekSummary.totalBillableHours }}</b><br />
+                <span style="color: dimgray">Billable Hrs</span>
+              </td>
+
+              <td class="grid-td">
+                <b>{{ weekSummary.totalNonBillableHours }}</b><br />
+                <span style="color: dimgray">Non-Billable Hrs</span>
+              </td>
+
+              <td class="grid-td">
+                <b>{{ weekSummary.totalHours }}</b><br />
+                <span style="color: dimgray">Total Hrs</span>
+              </td>
+
+              <td class="grid-td Withdraw-btn">
+                <p-button [label]="timesheetStatus[rowIndex][0]?.toLowerCase() === 'withdrawn' ? 'Draft' : 'Withdraw'"
+                  (onClick)="
+    timesheetStatus[rowIndex][0]?.toLowerCase() === 'withdrawn' 
+      ? openSelectedWeek([weekSummary.weekStartDate, weekSummary.weekEndDate], timesheetStatus[rowIndex]) 
+      : showWithdrawDialog(weekSummary, rowIndex)
+  " [disabled]="
+    !timesheetStatus[rowIndex]?.length || 
+    ['approved', 'rejected'].includes(timesheetStatus[rowIndex][0]?.toLowerCase?.())
+  ">
+                </p-button>
+
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <br><br>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="!gridView">
+    <div class="card">
+      <p-toolbar>
+        <ng-template pTemplate="left">
+          <div>
+            <span class="flex">
+              <p-button class="back-button" (onClick)="WeeklyTimeLog()">
+                <span class="material-symbols-outlined" style="font-weight: 900">
+                  arrow_back_ios
+                </span>
+              </p-button>
+              <div class="header-text" *ngIf="editHead" style="font-size: 18px; font-weight: 600">
+                Add Weekly Timesheet
+              </div>
+              <div class="header-text" *ngIf="!editHead" style="font-size: 18px; font-weight: 600">
+                Edit Weekly Timesheet
+              </div>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="right">
+        <button pButton label="Clone" icon="pi pi-copy" [disabled]="!hasPreviousWeekData" class="header-btn p-button-rounded"
+            (click)="cloneLastWeek()">
+          </button>
+        </ng-template>
+      </p-toolbar>
+    </div>
+    <form [formGroup]="timesheetForm">
+      <div class="flex align-items-center justify-content-center gap-2 mb-3"> 
+  <p-button class="back-button" (onClick)="navigateWeek(-1)">
+                <span class="material-symbols-outlined">
+                  arrow_back_ios
+                </span>
+    </p-button>
+
+  <div class="timesheet-entry">
+    {{     
+      (weekDaysShow[0] | momentFormat : "DD-MMM-YYYY") +
+      " to " +
+      (weekDaysShow[weekDaysShow.length - 1] | momentFormat : "DD-MMM-YYYY")
+    }}
+  </div>
+
+  <p-button class="back-button" (onClick)="navigateWeek(1)">
+                <span class="material-symbols-outlined">
+                  arrow_forward_ios
+                </span>
+    </p-button>
+</div>      
+      <!-- <div class="employee-status flex justify-content-center mt-4 mb-3">
+        <div>
+          <label for="month/year" class="text-date ml-2" style="font-size: 14px"><strong>Employee Id:</strong> {{ empId
+            }}</label>
+        </div>
+        <div>
+          <label for="month/year" class="text-date" style="font-size: 14px"><strong>Employee Name:</strong> {{ userName
+            }}</label>
+        </div>
+
+      </div> -->
+      <div formArrayName="weeklyTimesheet">
+        <p-table [scrollable]="true" [rowHover]="true" [rows]="5" [value]="timesheets.controls">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Client Name<span class="required-asterisk">*</span></th>
+              <th>Project Name<span class="required-asterisk">*</span></th>
+              <th>Activity<span class="required-asterisk">*</span></th>
+              <th>Onsite/Offshore<span class="required-asterisk">*</span></th>
+              <th>Billing type<span class="required-asterisk">*</span></th>
+              <ng-container>
+                <th style="align-items: center" *ngFor="let weekRange of weekDaysShow">
+                  {{ weekRange | momentFormat : "DD" }}<br />{{
+                  weekRange | momentFormat : "ddd"
+                  }}
+                </th>
+              </ng-container>
+              <th>Action</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-control let-idx="rowIndex" let-index="rowIndex">
+            <ng-container [formGroupName]="idx">
+              <tr>
+                <td>
+                  <p-dropdown class="WeeklySelect fixed-dropdown" [options]="clients | sort: 'clientName'"
+                    optionLabel="clientName" optionValue="id" (onChange)="onClientSelected($event.value,idx)"
+                    placeholder="Select Client" [readonly]="selectedTimesheetStatus === 'approved'"
+                    formControlName="customerId" appendTo="body" [disabled]="isReadOnly"></p-dropdown>
+                </td>
+                <td>
+                  <p-dropdown [options]="projects[idx] | sort:'projectName'" optionLabel="projectName"
+                    optionValue="projectName" placeholder="Select Project" formControlName="projectName"
+                    (onChange)="onProjectSelected($event, idx)" appendTo="body"
+                    [title]="control.get('projectName')?.value || ''"></p-dropdown>
+
+                </td>
+                <td>
+                  <div>
+                    <input type="text" style="min-width: 150px" placeholder="Enter activity" pInputText
+                      [readonly]="selectedTimesheetStatus === 'approved'" formControlName="activity"
+                      [title]="control.get('activity')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('activity')?.touched,
+                      'ng-invalid': control.get('activity')?.invalid
+                    }" />
+                    <!-- <div>
+                    <small id="assigned-to-help" class="p-error" *ngIf="control.get('activity')?.touched && control.get('activity')?.invalid">
+                      &nbsp; &#9888; Activity is required.
+                    </small>
+                  </div> -->
+                  </div>
+                </td>
+                <td>
+                  <p-dropdown appendTo="body" [options]="site | sort: 'site'" class="WeeklySelect"
+                    placeholder="Select type" formControlName="site" [title]="control.get('site')?.value ||''"
+                    [disabled]="isReadOnly" [readonly]="selectedTimesheetStatus === 'approved'" [ngClass]="{
+                    'ng-dirty': control.get('site')?.touched,
+                    'ng-invalid': control.get('site')?.invalid
+                  }"></p-dropdown>
+                </td>
+                <td>
+                  <p-dropdown appendTo="body" [options]="billing | sort: 'billing'" placeholder="Select type"
+                    class="WeeklySelect" [title]="control.get('billingType')?.value ||''" formControlName="billingType"
+                    [readonly]="selectedTimesheetStatus === 'approved'" [ngClass]="{
+                    'ng-dirty': control.get('billingType')?.touched,
+                    'ng-invalid': control.get('billingType')?.invalid
+                  }"></p-dropdown>
+                </td>
+                <ng-container formArrayName="logs">
+                  <td *ngFor="let log of timesheetLog(idx).controls; let i = index">
+                    <ng-container [formGroupName]="i">
+                      <input placeholder="Enter" style="align-items: center" type="number"
+                        [readonly]="selectedTimesheetStatus === 'approved'" formControlName="logHours" pInputText />
+                    </ng-container>
+                  </td>
+                </ng-container>
+                <td>
+                  <p-button icon="pi pi-minus" class="minus-button" [text]="true" [raised]="true" severity="danger"
+                    title="Remove Row" [disabled]="selectedTimesheetStatus === 'approved'"
+                    (onClick)="removeRow(idx)"></p-button>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-template>
+
+          <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+              <p-button icon="pi pi-plus" class="secondary-btn" [text]="true"
+                [disabled]="selectedTimesheetStatus === 'approved'" title="Add Row"
+                (click)="addRow()"></p-button>
+            </div>
+          </ng-template>
+        </p-table>
+      </div>
+      <div class="button-container">
+        <p-button label="Submit" (onClick)="openConfirmDialog()">
+        </p-button>
+        <p-button [text]="true" class="secondary-btn" 
+          label="Cancel" (onClick)="backToGrid()"></p-button>
+        <p-dialog [(visible)]="displaySubmitConfirmDialog" [modal]="true" [closable]="false" header="Confirm Submission"
+          [style]="{ width: '350px' }">
+
+          <p>
+            Are you sure you want to
+            <strong>{{ selectedTimesheetStatus === 'rejected' ? 're-submit' : 'submit' }}</strong>
+            the timesheet?
+          </p>
+
+          <div class="flex justify-center mt-3 gap-6">            
+            <p-button class="p-button-success" (click)="confirmSubmit()">
+              Submit
+            </p-button>
+
+            <p-button class="p-button-secondary"
+              (click)="displaySubmitConfirmDialog = false">
+              Cancel
+            </p-button>
+          </div>
+        </p-dialog>
+
+
+
+      </div>
+    </form>
+  </div>
+
+  <p-dialog [(visible)]="displayWithdrawDialog" [modal]="true" [closable]="false" header="Confirm Withdrawal"
+    [style]="{ width: '300px' }">
+
+    <p>Are you sure you want to Withdraw the timesheet?</p>
+
+    <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px;">
+      <button pButton  id="p-dialog_cancel_btn" class="p-button-secondary p-mr-2"
+        (click)="cancelWithdrawal()">Cancel
+      </button>
+      <button pButton class="p-button-warning" (click)="confirmWithdrawal()">Withdraw
+      </button>
+    </div>
+  </p-dialog>
+
+  <p-dialog [(visible)]="displayApproveDialog" [modal]="true" [closable]="false" header="Confirm Approval"
+    [style]="{ width: '300px' }">
+
+    <p>Are you sure you want to Approve the timesheet?</p>
+
+    <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px;">
+      <button pButton class="p-button-secondary p-mr-2" (click)="cancelApprove()">Cancel
+      </button>
+      <button pButton class="p-button-success" (click)="confirmApprove()" style="margin-left: 45px;">Approve
+      </button>
+    </div>
+  </p-dialog>
+
+
+  <p-dialog [(visible)]="displayRejectDialog" [modal]="true" [closable]="false" header="Confirm Rejection"
+    [style]="{ width: '300px' }">
+
+    <p>Are you sure you want to Reject the timesheet?</p>
+
+    <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px;">
+      <button pButton  class="p-button-secondary p-mr-2" (click)="cancelReject()">Cancel
+      </button>
+      <button pButton class="p-button-danger" (click)="confirmReject()" style="margin-left: 45px;">Reject
+      </button>
+    </div>
+  </p-dialog>
+
+</div>
+
+
+
+<p-dialog [(visible)]="showDailyDialog" 
+          [draggable]="false" 
+          [blockScroll]="true" [modal]="true" header="Daily Timesheet Entry" 
+          [style]="{ width: '870px', height: '1030px', 'z-index': '9999' }" 
+          [closable]="true">
+  <form [formGroup]="dailyTimesheetForm">
+    <div class="p-fluid mb-3 flex">
+      <div class="form-group field col mb-2">
+        <label for="logDate">Log Date</label>
+        <p-calendar formControlName="logDate" 
+        [showIcon]="true" 
+        [iconDisplay]="'input'"
+        appendTo="body"
+        [showOnFocus]="true"
+        class="log-date"
+        dateFormat="dd/mm/yy"
+         [maxDate]="reloadMonth"
+        [readonlyInput]="true"
+         [style]="{ 'width': '150px' }"
+         (onSelect)="onLogDateSelect($event)"></p-calendar>
+      </div>
+        <div>
+          <p-button icon="pi pi-copy" label="Clone" class="p-button-sm p-button-success" [disabled]="!hasPreviousDayLogs" (click)="clonePreviousDayLogs()"></p-button>
+        </div>
+
+    </div>
+
+    <div formArrayName="entries">
+      <p-table [scrollable]="true" [rowHover]="true" [rows]="5" [value]="entries.controls" scrollHeight="300px">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Client Name<span class="required-asterisk">*</span></th>
+      <th>Project Name<span class="required-asterisk">*</span></th>
+      <th>Activity<span class="required-asterisk">*</span></th>
+      <th>Onsite/Offshore<span class="required-asterisk">*</span></th>
+      <th>Billing Type<span class="required-asterisk">*</span></th>
+      <th>Log Hours<span class="required-asterisk">*</span></th>
+      <th>Action</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-control let-i="rowIndex">
+    <tr [formGroupName]="i">
+      <td>
+        <p-dropdown 
+  [options]="clients | sort: 'clientName'" 
+  optionLabel="clientName" 
+  optionValue="id"
+  formControlName="customerId" 
+  placeholder="Select Client"
+  appendTo="body"
+  (onChange)="onDailyClientSelected($event.value, i)">
+</p-dropdown>
+      </td>
+      <td>
+        <p-dropdown 
+          [options]="projects[i] || []"
+          optionLabel="projectName"
+          optionValue="id"
+          appendTo="body"
+          formControlName="projectId"
+           placeholder="Select Project"
+          (onChange)="onDailyProjectSelected($event.value, i)">
+        </p-dropdown>
+
+      </td>
+
+      <td>
+        <input type="text" pInputText placeholder="Enter Activity" formControlName="activity"
+          [title]="control.get('activity')?.value || ''" />
+      </td>
+      <td>
+        <p-dropdown [options]="site | sort:'label'" formControlName="site" placeholder="Select Site"
+          appendTo="body">
+        </p-dropdown>
+      </td>
+      <td>
+        <p-dropdown [options]="billing | sort:'label'" formControlName="billingType" placeholder="Billing Type"
+          appendTo="body">
+        </p-dropdown>
+      </td>
+      <td>
+        <input type="number" min="0" max="24" pInputText placeholder="Hours" formControlName="logHours" />
+      </td>
+      <td>
+        <p-button icon="pi pi-trash" class="minus-button" [text]="true" severity="danger" title="Remove Row"
+          (onClick)="removeDailyRow(i)">
+        </p-button>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <tr>
+      <td colspan="7">
+        <p-button icon="pi pi-plus" label="" class="add-button" [text]="true" (onClick)="addDailyRow()">
+        </p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+    </div>
+
+    <div class="mt-3 text-right">
+      <button pButton class="p-button-secondary mr-2" (click)="showDailyDialog = false">Cancel
+
+      </button>
+      <button pButton class="p-button-success" (click)="submitDailyTimesheet()">Submit
+
+      </button>
+    </div>
+  </form>
+</p-dialog>

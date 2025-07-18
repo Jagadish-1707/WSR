@@ -1,0 +1,424 @@
+<!-- eslint-disable @angular-eslint/template/elements-content -->
+ <div class="page-bg">
+<div class="card">
+      <div class="p-input-icon-left">
+        <span class="flex">
+          <span role="button" tabindex="0" (keydown.enter)="WeeklyTimeLog()"
+                  (keydown.space)="WeeklyTimeLog()" 
+                  class="p-button-custom" (click)="WeeklyTimeLog()">
+                  <span class="material-symbols-outlined back-button-icon" style="font-weight: 900" >
+                    arrow_back_ios
+                  </span>
+                </span>
+                <div class="header-text mb-3" style="font-size: 18px; font-weight: 600">
+                  My Timesheet Approvals
+                </div>
+        </span>
+        <div class="flex flex-row flex-nowrap gap-3 align-content-center">
+      <!-- Project Filter -->
+      <div class="p-input-icon-left">
+        <p-dropdown 
+          [options]="projectOptions" 
+          [(ngModel)]="filterProject" 
+          *ngIf="!filtersVisible"
+          placeholder="Project"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+      </div>
+
+      <!-- Customer Filter -->
+      <!-- <div class="p-input-icon-left">
+        <p-dropdown 
+          [options]="customerOptions" 
+          *ngIf="!filtersVisible"
+          [(ngModel)]="filterCustomer" 
+          placeholder="Select Customer"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+      </div> -->
+
+      <!-- Employee Name Filter -->
+      <div class="p-input-icon-left">
+        <p-dropdown 
+          [options]="employeeNames" 
+          *ngIf="!filtersVisible"
+          [(ngModel)]="filterEmployeeName" 
+          placeholder="Employee"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+      </div>
+
+      <!-- Employee ID Filter -->
+      <!-- <div class="p-input-icon-left">
+        <p-dropdown 
+          [options]="employeeIds" 
+          *ngIf="!filtersVisible"
+          [(ngModel)]="filterEmployeeId" 
+          placeholder="Employee ID"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+      </div> -->
+
+      <!-- Status Filter -->
+      <div class="p-input-icon-left">
+        <p-dropdown 
+          [options]="statusOptions" 
+          [(ngModel)]="filterStatus" 
+          *ngIf="!filtersVisible"
+          placeholder="Status"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+
+      </div>
+      <div class="p-input-icon-left">
+            <p-calendar 
+              placeholder="Select Date Range"
+              appendTo="body"
+              selectionMode="range"
+              *ngIf="!filtersVisible"
+              dateFormat="dd/mm/yy"
+              [(ngModel)]="filterLogDate" 
+              (onSelect)="applyFilters()">
+            </p-calendar>
+
+      </div>
+
+      <!-- Billing Type Filter -->
+      <!-- <div class="p-input-icon-left">
+        <p-dropdown 
+          [options]="billingTypes" 
+          *ngIf="!filtersVisible"
+          [(ngModel)]="filterBillingType" 
+          placeholder="Select Billing Type"
+          (onChange)="applyFilters()">
+        </p-dropdown>
+        </div> -->
+        </div>
+
+         <p-button
+            class="clear-filter"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            *ngIf="filtersVisible"
+            label="Show Filters"
+            icon="pi pi-filter"
+            (click)="showFilters()"
+          ></p-button>
+          <p-button
+            class="clear-filter"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            label="Clear"
+            icon="pi pi-filter-slash"
+            (click)="onClearFilters()"
+          ></p-button>
+      </div>
+
+
+      <p-button
+        *ngIf="selectedTimesheets?.length"
+        icon="pi pi-check"
+        severity="success"
+        class="approve-btn p-mr-2"        
+        (click)="openBulkApproveDialog(selectedTimesheets)"
+        label="Approve"
+      ></p-button>
+      <p-button
+        *ngIf="selectedTimesheets?.length"
+        icon="pi pi-times"
+        severity="danger"
+        class="reject-btn mr-2"
+        (click)="openBulkRejectDialog(selectedTimesheets)"
+        label="Reject"
+      ></p-button>
+    <!-- <p-button
+      pRipple
+      icon="pi pi-upload"
+      label="Export"
+      (click)="exportToExcel()"
+      class="export-btn"
+    ></p-button> -->
+</div>
+
+
+
+<div class="table-container">
+
+  <p-table
+  [value]="filteredTimesheets"
+  [(selection)]="selectedTimesheets"
+  #dt
+  [rowHover]="true"
+  dataKey="timesheetId"
+  [rows]="10"
+  [globalFilterFields]="[
+    'employeeId',
+    'employeeName',
+    'projectName',
+    'billingType',
+    'timesheetStatus',
+    'activity'
+  ]"
+>      
+  <ng-template pTemplate="header">
+
+  <tr>
+    <tr class="white-space-nowrap">
+      <th >Select
+      </th>
+      <th>Actions</th>
+      <th pSortableColumn="employee">Employee <p-sortIcon field="employee"></p-sortIcon></th>
+      <th pSortableColumn="logDate">Date <p-sortIcon field="logDate"></p-sortIcon></th>
+      <th pSortableColumn="projectName">Project <p-sortIcon field="projectName"></p-sortIcon></th>
+      <th pSortableColumn="customerName">Customer <p-sortIcon field="customerName"></p-sortIcon></th>
+      <th pSortableColumn="activity">Activity <p-sortIcon field="activity"></p-sortIcon></th>
+      <th pSortableColumn="site">Site <p-sortIcon field="site"></p-sortIcon></th>
+      <th pSortableColumn="billingType">Billing Type <p-sortIcon field="billingType"></p-sortIcon></th>
+      <th pSortableColumn="logHours">Hours <p-sortIcon field="logHours"></p-sortIcon></th>
+      <th pSortableColumn="logTime">Submitted On <p-sortIcon field="logTime"></p-sortIcon></th>
+      <th pSortableColumn="timesheetStatus">Status <p-sortIcon field="timesheetStatus"></p-sortIcon></th>
+    </tr>
+  </ng-template>
+  
+
+  <ng-template pTemplate="body" let-timesheet let-i="rowIndex">
+    <tr class="white-space-nowrap"
+      [pSelectableRow]="timesheet"
+      [ngClass]="{
+        'selected-row': isSelected(timesheet),
+        'disabled-row': timesheet.timesheetStatus !== 'Pending'
+      }"
+    >
+      <td>
+        <p-tableCheckbox
+          [value]="timesheet"
+          [disabled]="timesheet.timesheetStatus !== 'Pending'"
+        ></p-tableCheckbox>
+      </td>
+      <td>
+        <div class="flex">
+          <p-button
+          class="edit-btn"
+            [text]="true"     
+            [rounded]="true"
+            [disabled]="isSelected(timesheet)"
+            (click)="openApproveDialog(timesheet)"
+            pTooltip="Approve"
+          > <i class="material-symbols-outlined">check</i></p-button>
+          <p-button
+          class="edit-btn"
+          [text]="true"      
+            [rounded]="true"
+            [disabled]="isSelected(timesheet)"
+            (click)="openRejectDialog(timesheet)"
+            pTooltip="Reject"
+          > <i class="material-symbols-outlined">close</i></p-button>
+        </div>
+</td>
+
+      <td>{{ timesheet.employeeId }} - {{ timesheet.employeeName }}</td>
+      <td>{{ timesheet.logDate | date: 'dd MMM yyyy' }}</td>
+
+      <td>{{ timesheet.projectName }}</td>
+      <td>{{ timesheet.customerName || '-' }}</td>
+      <td>{{ timesheet.activity }}</td>
+      <td>{{ timesheet.site }}</td>
+      <td>{{ timesheet.billingType }}</td>
+      <td>{{ timesheet.logHours }}</td>
+      <td>{{ formatDateTime(timesheet.createdOn) }}</td>
+      <td> 
+        <p-tag
+        [value]="timesheet.timesheetStatus"
+        [severity]="getSeverity(timesheet.timesheetStatus)"
+      ></p-tag>
+    </td>
+
+
+
+<ng-template #emptyCell>
+  <!-- Empty cell for merged rows -->
+</ng-template>
+
+
+
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="summary">
+    <div class="flex align-items-center justify-content-between">
+      Total: {{ filteredTimesheets?.length ?? 0 }} entries.
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="10" class="text-center">No timesheets found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+</div>
+
+ </div>
+
+<p-dialog
+  header="Confirm Approval ✅"
+  [(visible)]="displayApproveDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+>
+  <p>
+    Are you sure you want to approve the timesheet for
+    <b>{{ selectedTimesheetForAction?.employeeName }}</b> on
+    <b>{{ selectedTimesheetForAction?.logDate | date:'dd MMM yyyy' }}</b>?
+  </p>
+  <div class="p-field mt-3">
+    <textarea
+      id="remarks"
+      name="approvalComments"
+      [(ngModel)]="approvalComments"
+      pInputTextarea
+      rows="4"
+      class="p-inputtextarea p-component"
+      placeholder="Enter comments(Optional)..."      
+    ></textarea>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Yes"      
+      class="p-button-success"
+      (click)="confirmApprove()"
+    >
+  </p-button>
+    <p-button      
+      label="No"
+      class="p-button-secondary"
+      (click)="cancelApprove()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+
+<p-dialog
+  header="Confirm Rejection ❌"
+  [(visible)]="displayRejectDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+>
+  <p>
+    Are you sure you want to reject the timesheet for
+    <b>{{ selectedTimesheetForAction?.employeeName }}</b> on
+    <b>{{ selectedTimesheetForAction?.logDate | date:'dd MMM yyyy' }}</b>?
+  </p>
+  <div class="p-field p-mt-3">
+    <textarea
+      id="remarks"
+      name="rejectionComments"
+      [(ngModel)]="rejectionComments"
+      pInputTextarea
+      rows="4"
+      class="p-inputtextarea p-component"
+      placeholder="Enter comments(Optional)..."
+      style="width: 100%; border-radius: 6px; padding: 10px;"
+    ></textarea>
+  </div>
+  
+  
+
+  <ng-template pTemplate="footer">
+    <p-button      
+      label="Yes"
+      class="p-button-danger"
+      (click)="confirmReject()"
+    ></p-button>
+    <p-button
+      label="No"
+      class="p-button-secondary"
+      (click)="cancelReject()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+
+<p-dialog
+  header="Confirm Approval ✅"
+  [(visible)]="displayBulkApproveDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+>
+  <p>
+    Are you sure you want to approve the timesheets?
+  </p>
+  <div class="p-field mt-3">
+    <textarea
+      id="remarks"
+      name="approvalComments"
+      [(ngModel)]="bulkApprovalComments"
+      pInputTextarea
+      rows="4"
+      class="p-inputtextarea p-component"
+      placeholder="Enter comments(Optional)..."      
+    ></textarea>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button      
+      label="Yes"      
+      class="p-button-success"
+      (click)="bulkApproveSelected()"
+    ></p-button>
+    <p-button      
+      label="No"
+      class="p-button-secondary"
+      (click)="cancelBulkApprove()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Confirm Rejection ❌"
+  [(visible)]="displayBulkRejectDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+>
+  <p>
+    Are you sure you want to reject the timesheets?
+  </p>
+  <div class="p-field p-mt-3">
+    <textarea
+      id="remarks"
+      name="rejectionComments"
+      [(ngModel)]="bulkRejectionComments"
+      pInputTextarea
+      rows="4"
+      class="p-inputtextarea p-component"
+      placeholder="Enter comments(Optional)..."
+      style="width: 100%; border-radius: 6px; padding: 10px;"
+    ></textarea>
+  </div>
+  
+  
+
+  <ng-template pTemplate="footer">
+    <p-button      
+      label="Yes"
+      class="p-button-danger"
+      (click)="bulkRejectSelected()"
+    ></p-button>
+    <p-button      
+      label="No"
+      class="p-button-secondary"
+      (click)="cancelBulkReject()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>

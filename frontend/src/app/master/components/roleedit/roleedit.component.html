@@ -1,0 +1,62 @@
+<div class="container">
+  <form [formGroup]="frm" (ngSubmit)="onSave()">
+    <div class="form-group">
+      <label for="RoleId"> Role Id </label>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <input [(ngModel)]="this.id" style="height: 30px; width: 200px;" formControlName="Id" id="Id" class="form-control">
+      <div *ngIf="frm.get('Id')?.invalid && frm.get('Id')?.touched" class="alert alert-danger">
+        Role Id is required
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="RoleName"> Role Name </label>
+      &nbsp;&nbsp;
+      <input pInputText [(ngModel)]="roleData.roleName" style="height: 30px; width: 200px;" formControlName="RoleName" id="RoleName" class="form-control">
+      <div *ngIf="frm.get('RoleName')?.invalid && frm.get('RoleName')?.touched" class="alert alert-danger">
+        Role Name is required
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="Description"> Description </label>
+      &nbsp;
+      <input pInputText [(ngModel)]="roleData.description" style="height: 30px;width:200px" formControlName="Description" id="Description" class="form-control">
+      <div *ngIf="frm.get('Description')?.invalid && frm.get('Description')?.touched" class="alert alert-danger">
+        Description must be filled
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="StartDate">Start Date </label>
+      &nbsp;&nbsp;&nbsp;
+      <p-calendar [(ngModel)]="this.startDate" [style]="{ 'width': '200px', 'height': '30px' }" formControlName="StartDate" id="StartDate" class="form-control"></p-calendar>
+      <div *ngIf="frm.get('StartDate')?.invalid && frm.get('StartDate')?.touched" class="alert alert-danger">
+        Start Date is required
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="EndDate">End Date </label>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <p-calendar [(ngModel)]="this.endDate" [style]="{ 'width': '200px', 'height': '30px' }" formControlName="EndDate" id="EndDate" class="form-control"></p-calendar>
+      <div *ngIf="frm.get('EndDate')?.invalid && frm.get('EndDate')?.touched" class="alert alert-danger">
+        End Date is required
+      </div>
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="Status">Status </label>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <p-dropdown [options]="options" [style]="{ 'width': '200px', 'height': '30px' }" [(ngModel)]="roleStatus" value="roleStatus" optionLabel="label" id="Status" formControlName="Status"></p-dropdown>
+      <div *ngIf="frm.get('Status')?.invalid && frm.get('Status')?.touched" class="alert alert-danger">
+        Status is required
+      </div>
+    </div>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button pButton type="submit" label="Save" [disabled]="frm.invalid"></button>
+    &nbsp;&nbsp;
+    <button pButton type="button" label="Back" class="btn btn-secondary" (click)="onback()"></button>
+  </form>
+</div>

@@ -1,0 +1,35 @@
+:host {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: block;
+}
+
+:host ::ng-deep {
+.p-breadcrumb {
+  background: #ffffff;
+  border: none;
+  padding: 0.2rem 0rem;
+}
+}
+
+.header-head {
+gap: 5rem
+}
+
+.sidebar-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: white;
+  border: none;
+  cursor: pointer;
+}
+
+.app-logo{
+  width: 124px;
+  height:auto;
+
+}
+.nav-text min-w-min{
+  color: #ffffff;
+}

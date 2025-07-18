@@ -1,0 +1,47 @@
+<div class="flex flex-column p-1">
+  <div class="app-nav">
+    <ng-container *ngFor="let nav of menu">
+      <ng-container *ngTemplateOutlet="renderNav; context: { $implicit: nav, level: 0 }"></ng-container>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #renderNav let-item let-level="level">
+  <div class="nav-item">
+      <a  (click)="item.children ? toggleExpand(item.label) : navigateToRoute(item, $event)" 
+         class="nav-link flex flex-nowrap align-items-center mb-1" 
+         style="height: 40px;"
+         [routerLink]="item.path ? [item.path] : null" 
+         [routerLinkActive]="['active']" 
+         pStyleClass="@parent"
+         toggleClass="nav-child-expand" 
+         [class.admin]="item.label === ''">
+        <div class="flex flex-nowrap align-items-center flex-grow-1">
+          <div *ngIf="item.icon" class="nav-icon material-symbols-outlined">
+            {{ item.icon }}
+          </div>
+          <div class="nav-text min-w-min">
+            {{ item.label }}
+          </div>
+          <div *ngIf="item.children && item.children.length"
+               class="nav-toggle-icon material-symbols-outlined cursor-pointer p-2 ml-auto"
+               [class.rotated]="expandedItems[item.label]">
+            expand_more
+          </div>
+        </div>
+      </a>
+
+      <div
+        [ngClass]="{
+          'nav-child-list': level + 1 === 1,
+          'nav-sub-sub-list': level + 1 === 2
+        }"
+        *ngIf="item.children && item.children.length"
+      >
+
+      <ng-container *ngFor="let child of item.children">
+        <ng-container *ngTemplateOutlet="renderNav; context: { $implicit: child, level: level + 1 }"></ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

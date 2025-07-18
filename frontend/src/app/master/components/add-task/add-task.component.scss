@@ -1,0 +1,48 @@
+:host ::ng-deep {
+    .p-dropdown  {
+        min-width: 100%;
+    }
+    .save-button button{
+        background-color: var(--primary-blue);
+        cursor: pointer;
+        font-weight: 400;
+        border: none;
+      }
+      .cancel-button button{
+        background-color: var(--blue-100);
+        color: var(--primary-blue);
+        cursor: pointer;
+        border: none;
+      }
+      .p-button.p-fileupload-choose{
+        background-color:  var(--primary-blue);
+        color: var(--blue-50)
+      }
+      // .test>div{
+      //   padding: 6px 6px;
+      // }
+}
+.mms-textarea{
+  resize: none;
+  padding: 8px 12px;
+}
+
+.metrics-text{
+    // font-weight: 800px;
+    font-size: 20px;
+    line-height: 23px;
+    color: black;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.required-asterisk {
+  font-weight: 400;
+  color: red;
+}
+/* For the non-editable Project Type input */
+.custom-input-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: not-allowed;
+}

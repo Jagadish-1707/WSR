@@ -1,0 +1,108 @@
+// :host {
+//     display: flex;
+//   }
+ 
+.head{
+  transition: 300ms all ease-in-out;
+}
+
+main {
+  max-width:100%;
+  flex: 1 0 calc(100% - 260px);
+  padding: 15px;
+  margin-left: 245px;
+  transition: 300ms all ease-in-out;
+  padding-top: 0px;
+}
+
+.sidebar {
+  width: 235px;
+  flex: 1 0 235px;
+  position: fixed;
+  background-color:#fff;
+  transition: 300ms all ease-in-out;
+  z-index: 999;
+  padding-top: 10px;
+  margin-left: 10px;
+  border-radius: 10px;
+}
+
+.sidebar-toggle {
+  border: 0;
+  cursor: pointer;
+  background-color: #30498b;
+  border-radius: 50%;
+  padding: 8px;
+  color: white;
+  position: absolute;
+  right: -1.25rem;
+  top: 2.25rem;
+  z-index: 99;
+  // transition: 300ms all ease-in-out;
+}
+
+.sidebar-closed {
+  :host .sidebar {
+    // width: 0px;
+    flex: 1 0 75px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translateX(-20rem);
+  }
+  :host .sidebar-toggle {
+    border: 0;
+    cursor: pointer;
+    background-color: #ffffff;
+    border-radius: 50%;
+    padding: 8px;
+    color: var(--primary-blue);
+    position: absolute;
+    right: -108px;
+    top: 26px;
+    z-index: 99;
+  }
+  :host .menu-logo{
+    font-size: 2.25rem;
+  }
+  :host main {
+    max-width: calc(100% - 0px);
+    flex: 1 0 calc(100% - 0px);
+    margin-left: 0px;
+    // transition: 300ms all ease-in-out;
+  }
+
+}
+
+.page-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+}
+
+
+@media only screen and (max-width: 767px) {
+  main {
+    // background-color: lightblue;
+    max-width: calc(100% - 0px);
+    flex: 1 0 calc(100% - 0px);
+    padding: 1rem;
+    margin-left: 0px;
+  }
+
+  .sidebar-toggle {
+    top: 1rem;
+  }
+
+  .sidebar-closed {
+    :host .sidebar-toggle {
+      right: -54px;
+      top: 12px;
+    }
+  }
+
+  :host .head {
+    margin-left: 3.5rem;
+  }
+}

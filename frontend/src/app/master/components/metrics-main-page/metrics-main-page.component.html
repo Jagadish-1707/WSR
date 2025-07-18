@@ -1,0 +1,363 @@
+  <div *ngIf="!addMetrics">    
+    <div class="flex align-items-center justify-content-start gap-2 pb-4">      
+      <div class="flex align-items-center">
+     <p-dropdown class="dropdown-asset-list mr-2" [options]="taskData | sort:'projectName'"
+              [(ngModel)]="selectedProjectName" [filter]="true"
+              pTooltip="{{ selectedProjectName ? selectedProjectName.projectName : '' }}" (onChange)="filterTaskData()"
+              optionLabel="projectName" placeholder="Project"></p-dropdown>
+            <p-dropdown [filter]="true"
+              class="dropdown-asset-list mr-2"
+              [options]="ProjectTypeOption | sort : 'label'"
+              [(ngModel)]="selectedProjecttype"
+              pTooltip="{{ selectedProjecttype ? selectedProjecttype.value : '' }}"
+              (onChange)="filterTaskData()"
+              optionLabel="projectTypeName"
+              placeholder="Project Type"
+            ></p-dropdown>      
+              
+              <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" view="month" dateFormat="MM-yy"  
+              placeholder="Month-Year"  (onSelect)="filterTaskData()"
+ [(ngModel)]="selectedMonthYears"          [readonlyInput]="true" [showIcon]="true">
+            </p-calendar>
+            <p-button
+                class="flex align-items-center flex-direction row"
+                severity="secondary"
+                [text]="true"
+                (click)="onClear()">
+                <span class=" clear-btn material-symbols-outlined">backspace</span>
+                <span>Clear</span> 
+             </p-button>                            
+    </div>
+    <div class="flex flex-grow-1 justify-content-end flex-nowrap gap-4 w-full md:w-auto">
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button icon="pi pi-plus" (click)="onAddMetrics()" label="Metrics" class="btn-primary">
+      </p-button>        
+      </div>
+    </div>
+  </div>
+  </div>  
+
+
+    <div class="table-container">
+      <p-table [value]="metricsData" [tableStyle]="{ 'min-width': '50rem' }" #dt [paginator]="true"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+        [rows]="10" [rowsPerPageOptions]="[10, 20, 30, 40]" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pFrozenColumn>
+            <div class="flex justify-content-center align-items-center">
+              <div class="min-w-max">Action</div>
+            </div>
+            </th>   
+            <th pSortableColumn="customerName" class="text-left">
+              Customer
+              <p-sortIcon field="customerName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="projectName" class="text-left">
+              Project
+              <p-sortIcon field="projectName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="projectType" class="white-space-nowrap text-left">
+              Project Type
+              <p-sortIcon field="projectType"></p-sortIcon>
+            </th>
+            <th pSortableColumn="monthYear" class="white-space-nowrap text-left">
+              Month & Year
+              <p-sortIcon field="monthYear"></p-sortIcon>
+            </th>
+            <th pSortableColumn="weekStartDate" class="white-space-nowrap text-left" >
+              Week Start Date
+              <p-sortIcon field="weekStartDate"></p-sortIcon>
+            </th>
+            <th pSortableColumn="weekEndDate" class="white-space-nowrap text-left">
+              Week End Date
+              <p-sortIcon field="weekEndDate"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-metricsRecord>
+          <tr class="p-selectable-row">
+            <td pFrozenColumn>
+              <div class="flex justify-content-center align-items-center gap-1">
+                <div class="flex" > 
+              <p-button
+              class="edit-btn"
+                [rounded]="true"
+                [text]="true"
+                pTooltip="Edit"
+                tooltipPosition="top"
+                 (click)="editTask(metricsRecord.id, metricsRecord.flagType)"
+              >
+                <i class="material-symbols-outlined">edit</i>
+              </p-button>
+              </div>
+              </div>                        
+            </td>
+            <td class="white-space-nowrap">
+              {{ metricsRecord.customerName }}
+            </td>
+            <td class="white-space-nowrap">
+              {{ metricsRecord.projectName }}
+            </td>
+            <td class="white-space-nowrap">
+              {{ metricsRecord.projectType }}
+            </td>
+            <td class="white-space-nowrap">
+              {{ metricsRecord.monthYear | date: 'MMMM-YYYY'}}
+            </td>
+            <td class="white-space-nowrap">
+              {{ metricsRecord.weekStartDate | date : "dd-MM-YYYY" }}
+            </td>
+            <td class="white-space-nowrap">
+              {{ metricsRecord.weekEndDate | date : "dd-MM-YYYY" }}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No metrics records found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+   
+  </div>
+
+  <form [formGroup]="supportForm" (ngSubmit)="onArraySubmit()">
+    <div class="card" *ngIf="addMetrics">
+      <div class="relative">
+        <!-- <div class="timesheet-entry absolute text-center w-full" *ngIf="onWeekSelected">
+               {{     "From " +
+                 (weekDaysShow[0] | momentFormat : "DD-MMM-YYYY") +
+                 " to " +
+                 (weekDaysShow[weekDaysShow.length - 1] | momentFormat : "DD-MMM-YYYY")
+               }}
+             </div> -->
+        <div class="flex">
+          <p-button (onClick)="backToMetricsGrid()" class="edit-btn back-btn"
+          [rounded]="true"
+                [text]="true">
+            <i class="material-symbols-outlined">arrow_back_ios</i>
+          </p-button>
+          <div class="header-text">
+            {{editMetrics ? "Edit Weekly Metrics" :"Add Weekly Metrics"}}
+          </div>
+        </div>
+
+        <div class="calendar-box" *ngIf="!onWeekSelected && !editMetrics">
+
+          <div class="calendar-container">
+            <span role="button" tabindex="0" (click)="goToPreviousMonth()" (keydown.enter)="goToPreviousMonth()"
+                    (keydown.space)="goToPreviousMonth()" class="material-symbols-outlined left-arrow"
+                    aria-label="Previous Month">
+                    chevron_left
+                  </span>
+            <span class="calendar-icon" role="button" tabindex="0" (click)="monthPicker.toggle()"
+              (keydown.enter)="monthPicker.toggle()" (keydown.space)="monthPicker.toggle()"
+              class="material-symbols-outlined calendar-icon" aria-label="Open Month Picker">
+              calendar_month
+            </span>
+            <span class="month-label" (click)="monthPicker.toggle()" (keydown.enter)="monthPicker.toggle()"
+              (keydown.space)="monthPicker.toggle()">
+              {{ reloadMonth | date: 'MMMM yyyy' }}</span>
+            <p-calendar appendTo="body" [iconDisplay]="'input'" [(ngModel)]="reloadMonth" [showOnFocus]="true"
+              class="metrics-calendar" formControlName="monthYear" (ngModelChange)="updateWeekCalendars($event)"
+              (onFocus)="onStartDateClick()" view="month" dateFormat="MM/yy" #monthPicker styleClass="hidden-calendar"
+              [showIcon]="true" placeholder="MM/YYYY">
+            </p-calendar>
+          </div>
+          <span class="month-label" (click)="monthPicker.toggle()">{{ reloadMonth | date: 'MMMM yyyy' }}</span>
+                  <span role="button" tabindex="0" (click)="goToNextMonth()" (keydown.enter)="goToNextMonth()"
+                    (keydown.space)="goToNextMonth()" class="material-symbols-outlined right-arrow"
+                    aria-label="Previous Month">
+                    chevron_right
+                  </span>
+        </div>
+
+        <div class="mt-1 mb-1 grid">
+          <div class="col-2 field" *ngIf="onWeekSelected || editMetrics">
+            <label for="monthYear" class="text-date" style="font-size: 14px">Month/Year <span
+                class="required-asterisk">*</span></label>
+            <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" view="month" dateFormat="MM/yy"
+              formControlName="monthYear" [readonlyInput]="true" [showIcon]="true">
+            </p-calendar>
+
+          </div>
+          <div class="col-2 field" *ngIf="onWeekSelected || editMetrics">
+            <label for="weekStartDate" class="calendar-btn" style="font-size: 14px">Week Start Date <span
+                class="required-asterisk">*</span></label>
+            <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar gap-2"
+              formControlName="weekStartDate" #weekStartDateCalendar dateFormat="dd M yy" [showIcon]="true"
+              placeholder="From Date">
+            </p-calendar>
+          </div>
+          <div class="col-2 field" *ngIf="onWeekSelected || editMetrics">
+            <label for="weekEndDate" class="calendar-btn" style="font-size: 14px">Week End Date <span
+                class="required-asterisk">*</span></label>
+            <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar"
+              formControlName="weekEndDate" #weekEndDateCalendar dateFormat="dd M yy" [showIcon]="true"
+              placeholder="To Date">
+            </p-calendar>
+          </div>
+
+          <div class="col-2 field" *ngIf="onWeekSelected || editMetrics">
+            <label class="cust-text">
+              Customer <span class="required-asterisk">*</span>
+            </label>
+            <p-dropdown class="project-dropdown w-full" [options]="taskData | sort: 'customerName'"
+              formControlName="customerId" optionValue="customerId" optionLabel="customerName" [readonly]="editMetrics"
+              (onChange)="onClientSelected($event.value)" placeholder="Customer" appendTo="body" [filter]="true"></p-dropdown>
+            <small *ngIf="supportForm.get('customerId')?.invalid && supportForm.get('customerId')?.touched"
+              class="p-error">Customer is required</small>
+          </div>
+          <div class="col-2 field" *ngIf="onWeekSelected || editMetrics">
+            <label class="cust-text">
+              Project <span class="required-asterisk">*</span>
+            </label>
+            <p-dropdown class="project-dropdown w-full" [options]="filteredProjects | sort: 'projectName'"
+              [readonly]="editMetrics" optionLabel="projectName" optionValue="projectId" placeholder="Project"
+              formControlName="projectId" (onChange)="onProjectSelected($event.value)" appendTo="body" [filter]="true"></p-dropdown>
+           <ng-container *ngIf="supportForm.get('projectId')?.touched">
+  <small *ngIf="supportForm.get('projectId')?.hasError('required')" class="p-error">
+    &#9888; Project is required
+  </small>
+  <small *ngIf="supportForm.get('projectId')?.hasError('duplicateWeek') && !supportForm.get('projectId')?.hasError('required')" class="p-error">
+    &#9888; Metrics already exists for the selected week
+  </small>
+  <small class="p-error" *ngIf="supportForm.get('projectId')?.hasError('outOfAssignmentRange')">
+  &#9888; Selected week range is outside assignment period.
+</small>
+
+</ng-container>
+
+          </div>
+          <div class="col-2 field" *ngIf="onWeekSelected || editMetrics">
+            <label class="cust-text" for="projectType">Project Type: </label>
+            <input type="text" pInputText [value]="projectType" formControlName="projectTypeId" readonly
+              placeholder="Project Type" class="custom-input-box" />
+          </div>
+
+        </div>
+      </div>
+      <!-- weeks -->
+      <div class="mb-3" *ngIf="!editMetrics">
+        <p-table class="grid-table" [value]="weekStatus" responsiveLayout="scroll">
+          <ng-template pTemplate="body" let-weekSummary let-rowIndex="rowIndex">
+            <tr>
+              <!-- Week Range Column -->
+              <td style="font-size: 100%">
+                <p-button class="weekRange" (onClick)="onWeekSelect(weekSummary, rowIndex)"
+                  [disabled]="weekSummary.isFutureWeek">
+                  {{ (weekSummary.start | date: 'dd MMM yyyy') + ' - ' + (weekSummary.end | date: 'dd MMM yyyy') }}
+                </p-button>
+              </td>
+
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+
+      <div *ngIf="onProjectselect || editMetrics">
+
+        <div class="table-container">
+          <div formArrayName="selectedMetricsArray">
+            <p-table #dt class="p-datatable-gridlines" [value]="selectedMetricsArray.controls" dataKey="id"
+              styleClass="p-datatable-sm p-datatable-striped" selectionMode="single" [rows]="10"
+              [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [paginator]="false">
+              <ng-template pTemplate="header">
+                <tr class="dynamic-header">
+                  <th  style="min-width:50px;" [style.background-color]="'#ededef'">Action</th>
+                  <th *ngFor="let metric of selectedColumnDefinitions" [style.minWidth.px]="150"
+                    [style.background-color]="'#ededef'">
+                    {{ metric.fieldName }}
+                    <span class="required-asterisk" *ngIf="metric.isMandatory">*</span>
+                  </th>
+                </tr>
+
+              </ng-template>
+
+              <ng-template pTemplate="body" let-rowData let-idx="rowIndex">
+                <ng-container [formGroupName]="idx">
+                  <tr>
+                    <td>
+                      <div class="flex justify-content-center align-items-center gap-1">
+                        <div class="flex">
+                          <p-button size="small" class="edit-btn" [text]="true"   
+                            (click)="addRow()"><i class="material-symbols-outlined">Add_2</i>
+                          </p-button>
+                          <p-button *ngIf="selectedMetricsArray.length > 1" class="edit-btn" [text]="true"   
+                            (click)="removeRow(idx)"><i class="material-symbols-outlined">remove</i>
+                          </p-button>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td *ngFor="let metric of selectedColumnDefinitions; let colIdx = index">
+                      <ng-container [ngSwitch]="metric.fieldType">
+                        <ng-container *ngSwitchCase="'text'">
+                          <input pInputText [formControlName]="metric.fieldColumnId" type="text"
+                            [placeholder]="metric.fieldName" class="form-field"
+                            [class.ng-invalid]="getFormControl(idx, metric.fieldColumnId)?.invalid && getFormControl(idx, metric.fieldColumnId)?.touched" />
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'date'">
+  <p-calendar
+    [formControlName]="metric.fieldColumnId"
+    dateFormat="dd/mm/yy HH:mm"
+    [showTime]="true"
+    hourFormat="24"
+    [showIcon]="true"
+    [iconDisplay]="'input'"
+    [placeholder]="metric.fieldName"
+    appendTo="body"
+    [style]="{ width: '100%' }"
+    [class.ng-invalid]="getFormControl(idx, metric.fieldColumnId)?.invalid && getFormControl(idx, metric.fieldColumnId)?.touched">
+  </p-calendar>
+</ng-container>
+
+
+                        <ng-container *ngSwitchCase="'dropdown'">
+                          <p-dropdown [formControlName]="metric.fieldColumnId" [filter]="true"
+                            [options]="getDropdownOptions(metric.fieldName)" optionLabel="name" optionValue="code"
+                            [placeholder]="metric.fieldName" appendTo="body" [style]="{ width: '100%' }"
+                            [class.ng-invalid]="getFormControl(idx, metric.fieldColumnId)?.invalid && getFormControl(idx, metric.fieldColumnId)?.touched"></p-dropdown>
+
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="'textarea'">
+                          <textarea pInputTextarea [formControlName]="metric.fieldColumnId" class="form-field"
+                            [placeholder]="metric.fieldName" rows="3" cols="30" style="height: 34px;"
+                            [class.ng-invalid]="getFormControl(idx, metric.fieldColumnId)?.invalid && getFormControl(idx, metric.fieldColumnId)?.touched"></textarea>
+
+                        </ng-container>
+
+                        <ng-container *ngSwitchDefault>
+                          <span class="p-error">Unsupported Field Type: {{ metric.fieldType }}</span>
+                        </ng-container>
+                      </ng-container>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+
+        <div class="flex justify-content-end mt-3">
+          <div>
+            <p-button class="save-btn mr-2" (onClick)="onArraySubmit()" [disabled]="!supportForm.dirty ||!supportForm.valid"
+              [label]="editMetrics?'UPDATE':'SUBMIT' "></p-button>
+          </div>
+          <div>
+            <p-button type="reset" class="btn-secondary" label="CANCEL"
+              (onClick)="backToMetricsGrid()"></p-button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+<p-toast></p-toast>

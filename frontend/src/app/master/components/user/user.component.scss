@@ -1,0 +1,24 @@
+
+:host ::ng-deep {
+  .p-button{
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+}
+
+.nav-icon {
+  border: none;
+  width: 30px; 
+  height: 30px;
+  border-radius: 50%; 
+  cursor: pointer;
+  background-color: rgb(183, 199, 222); 
+  color: var(--primary-color); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px; 
+  font-weight: bolder;
+  // border: 1px solid black;
+}

@@ -1,0 +1,85 @@
+<p-dialog [(visible)]="dialogVisible" 
+[closable]="true"
+[draggable]="false"
+appendTo="body"
+[modal]="true" [closable]="false" [style]="{width: '50%'}">
+<ng-template pTemplate="header">
+    <div class="dialog-header">
+      <span>Add Metrics</span>    
+    </div>
+    <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div> 
+  </ng-template> 
+
+  <div class="table-container">    
+
+<p-table 
+  [value]="metricsList" 
+  [scrollHeight]="'100vh'" 
+  #dt 
+  dataKey="id"       
+  [globalFilterFields]="['metricsName']" 
+  [paginator]="true"
+  [showCurrentPageReport]="true" 
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+  [rows]="10" 
+  [rowsPerPageOptions]="[10, 20, 30, 40]" 
+  [scrollable]="true">
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th class="flex items-center gap-2">
+        <p-checkbox 
+          [binary]="true"
+          [(ngModel)]="selectAllValue"
+          (onChange)="onSelectAllChange($event)">
+        </p-checkbox>
+        Select All 
+      </th>
+      <th pSortableColumn="metricsName" class="text-left">
+        Metrics Name 
+        <p-sortIcon field="metricsName"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-metric let-i="rowIndex">
+    <tr>
+      <td class="flex item-center">
+        <p-checkbox 
+          [binary]="true"
+          [ngModel]="isMetricSelected(metric.id)"
+          (onChange)="onCheckboxChange($event, metric)">
+        </p-checkbox>
+      </td>
+      <td>{{ metric.metricsName }}</td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="3" class="text-center">No Metrics found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+  </div>
+
+  <p-footer>
+    
+    <p-button 
+      [label]="btnlabel" 
+      class="save-btn mr-2" 
+      (click)="saveMetrics()">
+    </p-button>
+
+    <p-button 
+      label="CANCEL" 
+      class="btn-secondary" 
+      (click)="closeDialog()">
+    </p-button>
+  </p-footer>
+</p-dialog>

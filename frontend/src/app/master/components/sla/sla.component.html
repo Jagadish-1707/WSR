@@ -1,0 +1,263 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="title-header flex justify-content-between flex-wrap gap-4 pt-0 pl-0 pb-4">
+  <div class="align-items-center justify-content-start gap-2">
+    <div class="flex justify-content-between align-items-center">
+      <div class="p-input-icon-right flex align-items-center">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          placeholder="Search" />
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-grow-1 justify-content-between flex-nowrap gap-4 w-full md:w-auto">
+    <div class="flex flex-grow-1 justify-content-end gap-3 white-space-nowrap">
+      <div>
+        <p-button pRipple icon="pi pi-plus" (click)="addSLA()" label="Resolution SLA" class="btn-primary"></p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-container">
+  <p-table [value]="SLA" #dt [paginator]="true" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 30, 40]"
+    [globalFilterFields]="['customerName', 'projectName', 'priority', 'slaHours', 'status']">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn>
+          <div class="flex align-items-center">
+            <div class="min-w-max">Action</div>
+          </div>
+        </th>
+        <th pSortableColumn="customerName">
+          <div class="flex align-items-center gap-1">
+            <div class="min-w-max">Customer</div>
+            <p-sortIcon field="customerName"></p-sortIcon>
+          </div>
+        </th>
+
+        <th pSortableColumn="projectName">
+          <div class="flex flex-row flex-nowrap gap-3">
+            <div class="flex  align-items-center gap-1">
+              <div class="min-w-max">Project</div>
+              <p-sortIcon field="projectName"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+
+        <th pFrozenColumn pSortableColumn="priority">
+          <div class="flex justify-content-start align-items-center gap-1">
+            <div class="min-w-max">Priority</div>
+            <p-sortIcon field="priority"></p-sortIcon>
+          </div>
+        </th>
+
+        <th pSortableColumn="slaHours">
+          <div class="flex flex-row flex-nowrap gap-3">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">SLA(Hrs)</div>
+              <p-sortIcon field="slaHours"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+        <th pSortableColumn="status">
+          <div class="flex flex-row flex-nowrap gap-3">
+            <div class="flex justify-content-start align-items-center gap-1">
+              <div class="min-w-max">Status</div>
+              <p-sortIcon field="status"></p-sortIcon>
+            </div>
+          </div>
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-SLA>
+      <tr>
+        <td>
+          <div class="flex align-items-center">
+            <p-button class="edit-btn" [rounded]="true" [text]="true" pTooltip="Edit" tooltipPosition="top"
+              (click)="editSLA(SLA.slaId)">
+              <i class="material-symbols-outlined">edit</i>
+            </p-button>
+            <div>
+              <p-button class="edit-btn" [rounded]="true" [text]="true" pTooltip="Delete" tooltipPosition="top"
+                (click)="confirmDelete(SLA)">
+                <i class="material-symbols-outlined">delete</i>
+              </p-button>
+            </div>
+          </div>
+        </td>
+        <td>
+          {{ SLA.customerName }}
+        </td>
+        <td>
+          <span>
+            {{ SLA.projectName }}
+          </span>
+        </td>
+        <td>
+          <span>
+            {{ getPriorityLabel(SLA.priority) }}
+          </span>
+        </td>
+        <td>
+          <span>
+            {{ SLA.slaHours }}
+          </span>
+        </td>
+        <td>
+          <span>
+
+            <p-tag [value]="SLA.status === 1 ? 'Active' : 'Inactive'" [severity]="getSeverity(SLA.status)"
+              class="p-tag"></p-tag>
+          </span>
+
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No records found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog [draggable]="false" [(visible)]="visible" [modal]="true" [style]="{ width: '70rem' }">
+  <ng-template pTemplate="header">
+    <div class="header-text">
+      {{ isEditMode ? 'Edit Resolution SLA' : 'Add Resolution SLA' }}
+    </div>
+  </ng-template>
+
+  <div class="container">
+    <form [formGroup]="frm">
+      <!-- Customer and Project -->
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label for="client">Customer<span class="required-asterisk">*</span></label>
+          <div class="">
+            <p-dropdown [options]="projectData | sort : 'clientName'" formControlName="client"
+              optionLabel="customerName" appendTo="body" [filter]="true" placeholder="Select Customer"
+              (onChange)="onClientSelected($event.value)" [ngClass]="{
+                'ng-dirty': frm.get('client')?.touched,
+                'ng-invalid': frm.get('client')?.invalid
+              }"></p-dropdown>
+
+            <small class="p-error block" *ngIf="
+                frm.get('client')?.touched &&
+                frm.get('client')?.invalid
+              ">
+              &nbsp; &#9888; Customer name is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label for="project">Project<span class="required-asterisk">*</span></label>
+          <p-dropdown [options]="filteredProjects | sort : 'projectName'" formControlName="project" [filter]="true"
+            optionLabel="projectName" placeholder="Select Project" appendTo="body"
+            (onChange)="onProjectSelected($event.value)" [ngClass]="{
+                'ng-dirty': frm.get('project')?.touched,
+                'ng-invalid': frm.get('project')?.invalid
+              }"></p-dropdown>
+
+          <small class="p-error"
+            *ngIf="frm.get('project')?.touched && frm.get('project')?.invalid && !frm.get('project')?.errors?.['alreadyExists']">
+            &nbsp; &#9888; Project name is required.
+          </small>
+        </div>
+      </div>
+
+      <!-- Priority and SLA Hours -->
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label>Priority<span class="required-asterisk">*</span></label>
+          <p-dropdown [options]="filteredPriorityData" formControlName="priority" optionLabel="label" [filter]="true"
+            optionValue="value" placeholder="Select Priority" (onChange)="onPrioritySelected($event.value)" [ngClass]="{
+              invalid: frm.get('priority')?.invalid && frm.get('priority')?.touched
+            }" />
+
+          <small class="p-error" *ngIf="frm.get('priority')?.touched && frm.get('priority')?.hasError('required')">
+            &#9888; Priority is required.
+          </small>
+
+          <small class="p-error" *ngIf="frm.get('priority')?.touched && frm.get('priority')?.hasError('duplicate')">
+            &#9888; Priority already exists for the selected project.
+          </small>
+          <small class="p-error" *ngIf="frm.get('priority')?.hasError('nopriority')">
+            &#9888; Priority is not set for this project.
+          </small>
+
+
+        </div>
+
+        <div class="field col-12 md:col-6">
+          <label>SLA(Hrs)<span class="required-asterisk">*</span></label>
+          <input type="number" pInputText formControlName="slaHours" placeholder="Enter SLA in Hours"
+            [ngClass]="{ invalid: frm.get('slaHours')?.invalid && frm.get('slaHours')?.touched }" />
+          <small class="p-error" *ngIf="frm.get('slaHours')?.touched && frm.get('slaHours')?.hasError('required')">
+            &#9888; SLA hours is required.
+          </small>
+          <!--<small class="p-error" *ngIf="frm.get('slaHours')?.hasError('pattern')">
+            &#9888; Max 2 digits only.
+          </small>-->
+          <small class="p-error" *ngIf="frm.get('slaHours')?.hasError('duplicate')">
+            &#9888; Duplicate SLA exists for this project and priority.
+          </small>
+
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+          <label>Status<span class="required-asterisk">*</span></label>
+          <p-dropdown [options]="Status" formControlName="status" optionLabel="label" optionValue="value"
+            placeholder="Select Status" [filter]="true"
+            [ngClass]="{ invalid: frm.get('status')?.invalid && frm.get('status')?.touched }"></p-dropdown>
+          <small class="p-error" *ngIf="frm.get('status')?.touched && frm.get('status')?.invalid">
+            &#9888; Status is required.
+          </small>
+        </div>
+      </div>
+
+      <!-- Remarks -->
+      <div class="text-area">
+        <div class="form-group field">
+          <label>Remarks</label>
+          <textarea pInputTextarea rows="4" class="mms-textarea" formControlName="remarks"
+            placeholder="Enter Remarks"></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button [label]="isEditMode ? 'UPDATE' : 'SAVE'" class="save-btn" type="submit"
+      [disabled]="!frm.dirty || frm.invalid" (click)="onSubmit()"></p-button>
+    <p-button label="CANCEL" class="btn-secondary" (click)="visible = false" pAutoFocus></p-button>
+
+  </ng-template>
+</p-dialog>
+
+<p-dialog header="Confirm Delete" [(visible)]="displayDeleteDialog" [modal]="true" [closable]="true"
+  [draggable]="false">
+  <p>Are you sure you want to Delete?</p>
+  <div class="p-d-flex p-jc-end p-mt-3" style="margin-left: 30px">
+    <p-button label="DELETE" class="save-btn mr-2" (click)="deleteTask()"></p-button>
+    <p-button label="CANCEL" class="btn-secondary" id="p-dialog_cancel_btn"
+      (click)="displayDeleteDialog = false"></p-button>
+  </div>
+</p-dialog>
+
+<p-dialog header="Delete Failed" [(visible)]="showWarningDialog" [modal]="true" [closable]="false">
+  <p>This SLA is in use.</p>
+
+  <div style="display: flex; justify-content: center; margin-top: 1rem;">
+
+    <p-button label="OK" class="btn-secondary" (click)="showWarningDialog = false"></p-button>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

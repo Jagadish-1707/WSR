@@ -1,0 +1,131 @@
+
+:host ::ng-deep {
+
+  .clear-filter > button:focus {
+    box-shadow: none;
+  }
+
+  .p-input-icon-left .p-dropdown {
+    // max-width: 150px;
+    width: 200px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+  }
+  .p-inputtext{
+    padding: 0.75rem 1rem;
+  }
+  .project-dropdown .p-inputtext{
+    padding: 6px 6px 6px 6px;
+    gap: 6px;
+  }
+  p-calendar > span {
+    width: 100%;
+  }
+  .mms-textarea{
+    resize: none;
+    padding: 8px 12px;
+}
+  
+   button-add
+  .save-button button {
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+    .save-button button{
+      background-color: var(--primary-blue);
+      cursor: pointer;
+      border: none;
+    }
+    .cancel-button button{
+      background-color: var(--blue-100);
+      color: var(--primary-blue);
+      cursor: pointer;
+      border: none;
+    }
+
+    .action-button button{
+      background-color: transparent;
+      color:var(--primary-blue);
+      border: none;
+      margin-right: 3px;
+      &:hover{
+        background-color: var(--primary-blue);
+        color: #ccc;
+      }
+    }
+    .trash-icon-btn {
+      background-color: transparent;
+      color: var(--primary-blue);
+      border: none;
+      padding: 9px;
+      border-radius: 5px;
+      &:hover {
+        background-color: var(--primary-blue);
+        color: #ccc;
+      }
+    }
+
+    .p-dropdown  {
+      min-width: 100%;
+  }
+
+  .typeInput>div{
+    border-radius: 0px 6px 6px 0px;
+  }
+
+  .date {
+      width: 100%;
+  }
+  .p-multiselect {
+      width: 100%;
+  }
+  .p-fileupload .p-fileupload-content{
+    padding: 0;
+  }
+  .drop-area {
+    border: 2px dashed #959595;
+    padding: 0px;
+    text-align: center;
+  }
+  .p-fileupload .p-fileupload-buttonbar{
+    border: none;
+    background: none;
+  }
+  .p-fileupload .p-fileupload-buttonbar .p-button{
+    background-color: var(--primary-blue);
+        color: white
+  }
+  .p-fileupload-row>div:last-child{
+    text-align: center;
+  }
+  .p-fileupload .p-fileupload-row > div{
+    padding: 0;
+  }
+  .p-fileupload .p-fileupload-content{
+    padding: 10px;
+  }
+  .p-button .p-button-label{
+    margin-bottom: -3px;
+  }
+  .p-button.p-fileupload-choose{
+    background-color:  var(--primary-blue);
+    color: var(--blue-50)
+  }
+  .p-datatable .p-datatable-tbody > tr > td{
+    padding: 0.5rem;
+  }
+  }
+
+  .required-asterisk {
+    font-weight: 400;
+    color: red;
+}
+#p-dialog_cancel_btn{
+  margin-right: 40px;
+ 
+}
+::ng-deep .p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.2) !important; 
+}

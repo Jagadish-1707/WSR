@@ -1,0 +1,57 @@
+:host ::ng-deep {
+  .button-add button {
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+  .save-button button {
+    background-color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+  .cancel-button button {
+    background-color: var(--blue-100);
+    color: var(--primary-blue);
+    cursor: pointer;
+    border: none;
+  }
+
+  .action-button button {
+    background-color: transparent;
+    color: var(--font-color);
+    border: none; 
+  }
+  }
+  .lock-button button {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: none;
+  }
+
+  .p-dropdown {
+    min-width: 100%;
+  }
+  
+  .mms-dropdown > div {
+    padding: 2px 0px;
+  }
+  .mms-input {
+    padding: 8px 12px;
+  }
+  .mms-textarea {
+    resize: none;
+    padding: 8px 12px;
+    width: 100%;
+    border-radius: 1rem;
+  }
+  
+.mms-textarea:hover {
+  border-color: #4682b4;
+}
+.mms-textarea:focus {
+  background-color: #f9f9f9;
+  border-color: #4682b4;
+  outline: none;
+}
+
+

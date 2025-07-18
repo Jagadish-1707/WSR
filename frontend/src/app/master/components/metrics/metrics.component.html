@@ -1,0 +1,1090 @@
+<p-toast></p-toast>
+<div class="page-bg">
+  <div *ngIf="!addMetrics && !editMetrics && !editDevMetrics">
+    <p-toolbar>
+      <ng-template pTemplate="left">
+        <div class="header-text mb-3">
+          Metrics
+        </div>
+      </ng-template>
+      <ng-template pTemplate="right">
+        <p-button pRipple label="Metrics" icon="pi pi-plus" class="button-add"
+          (onClick)="onAddMetrics()"></p-button>
+      </ng-template>
+    </p-toolbar>
+    <div class="table-container">
+      <p-table [value]="metricsData" [tableStyle]="{ 'min-width': '50rem' }" #dt [paginator]="true"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+        [rows]="5" [rowsPerPageOptions]="[5, 10, 15, 20]" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Action</th>
+
+            <th pSortableColumn="customerName">
+              Customer
+              <p-sortIcon field="customerName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="projectName">
+              Project
+              <p-sortIcon field="projectName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="projectType">
+              Project Type
+              <p-sortIcon field="projectType"></p-sortIcon>
+            </th>
+            <th pSortableColumn="monthYear">
+              Month & Year
+              <p-sortIcon field="monthYear"></p-sortIcon>
+            </th>
+            <th pSortableColumn="weekStartDate">
+              Week Start Date
+              <p-sortIcon field="weekStartDate"></p-sortIcon>
+            </th>
+            <th pSortableColumn="weekEndDate">
+              Week End Date
+              <p-sortIcon field="weekEndDate"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-metricsData>
+          <tr class="p-selectable-row">
+            <td>
+              <p-button size="small" class="table-action-btn" icon="pi pi-pencil"
+                (click)="editTask(metricsData.id, metricsData.flagType)"></p-button>
+            </td>
+            <td>
+              {{ metricsData.customerName }}
+            </td>
+            <td>
+              {{ metricsData.projectName }}
+            </td>
+            <td>
+              {{ metricsData.projectType }}
+            </td>
+            <td>
+              {{ metricsData.monthYear | date: 'MMMM-YYYY'}}
+            </td>
+            <td>
+              {{ metricsData.weekStartDate | date : "dd/MM/YYYY" }}
+            </td>
+            <td>
+              {{ metricsData.weekEndDate | date : "dd/MM/YYYY" }}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No records found.</td>
+          </tr>
+        </ng-template>
+
+        <!-- <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between">
+          Total: {{ metricsData ? metricsData.length : 0 }} Metric(s).
+        </div>
+      </ng-template> -->
+      </p-table>
+    </div>
+  </div>
+  <form [formGroup]="supportForm" (ngSubmit)="onArraySubmit(supportForm.value)">
+    <div class="card" *ngIf="addMetrics">
+      <p-toolbar>
+        <ng-template pTemplate="left">
+          <div>
+            <span class="flex">
+              <p-button (onClick)="backToMetricsGrid()" class="back-button">
+                <span class="material-symbols-outlined" style="font-weight: 600" fontSize="16px">
+                   arrow_back_ios
+                </span>
+              </p-button>
+              <div class="header-text" style="font-size: 18px; font-weight: 600; line-height: 2">
+                {{ selectedProject ? selectedProject : 'Metrics' }}
+
+              </div>
+            </span>
+            <div class="dropdowns mt-3 flex mb-3">
+              <div style="display: flex; align-items:flex-start; flex-direction: column; gap:5px">
+
+                <div class="cust-text mt-2">
+                  Customer <span class="required-asterisk">*</span></div>
+                <div>
+                  <p-dropdown class="project-dropdown" [options]="taskData | sort: 'customerName'"
+                    formControlName="client" optionLabel="customerName" (onChange)="onClientSelected($event.value)"
+                    (ngModelChange)="onCustomerChange()" placeholder="Customer" appendTo="body"></p-dropdown>
+                </div>
+              </div>
+              <div style="display: flex; align-items:flex-start; flex-direction: column; gap:5px">
+                <div class="cust-text mt-2">
+                  Project <span class="required-asterisk">*</span>
+                </div>
+                <div>
+                  <p-dropdown class="project-dropdown" [options]="filteredProjects | sort: 'projectName'"
+                    optionLabel="projectName" placeholder="Project" formControlName="project"
+                    (onChange)="onProjectSelected($event.value)" appendTo="body"></p-dropdown>
+                </div>
+              </div>
+              <div style="display: flex; align-items:flex-start; flex-direction: column; gap:5px">
+                <label class="cust-text mt-2" for="projectType">Project Type: </label>
+                <input class="project-dropdown" type="text" [disabled]="true" pInputText placeholder="Type"
+                  [value]="selectedProjectType ? selectedProjectType : 'Project type'" />
+              </div>
+              <div>
+                <div style="display: flex; align-items:baseline; flex-direction: column; gap:5px">
+                  <label for="month/year" class="text-date mt-2" style="font-size: 14px">Month/Year <span
+                      class="required-asterisk">*</span>
+                  </label>
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar ml-1"
+                    [minDate]="startDate" [maxDate]="endDate" formControlName="monthYear"
+                    (ngModelChange)="updateWeekCalendars($event)" (onFocus)="onStartDateClick()" view="month"
+                    [readonlyInput]="true" dateFormat="MM/yy" [showIcon]="true" placeholder="MM/YYYY"></p-calendar>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; align-items:baseline; flex-direction: column; gap:5px">
+
+                  <label for="weekStartDate" class="text-date mt-2" style="font-size: 14px">Week Start Date <span
+                      class="required-asterisk">*</span></label>
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" [minDate]="startDate"
+                    [maxDate]="endDate" class="month-calendar gap-2 ml-2" formControlName="weekStartDate"
+                    (onFocus)="onselectEndDate()" #weekStartDateCalendar [readonlyInput]="true" dateFormat="dd/mm/yy"
+                    [showIcon]="true" placeholder="From Date"></p-calendar>
+                </div>
+              </div>
+              <div class="gap-2">
+                <div style="display: flex; align-items:baseline; flex-direction: column; gap:5px">
+
+                  <label for="weekEndDate" class="text-date mt-2" style="font-size: 14px">Week End Date <span
+                      class="required-asterisk">*</span></label>
+                  <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar ml-2"
+                    formControlName="weekEndDate" (onSelect)="onEndDateSelected($event)" #weekEndDateCalendar
+                    [minDate]="supportForm.get('weekStartDate')?.value" [maxDate]="endDate" [readonlyInput]="true"
+                    dateFormat="dd/mm/yy" [showIcon]="true" placeholder="To Date"></p-calendar>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-toolbar>
+    </div>
+
+    <!-- <div class="mt-4"> -->
+
+    <div class="table-container mt-4" *ngIf="addMetrics && projectType === 'Support'">
+      <div>
+        <!-- <div class="ticket-status">
+        Ticket Status Report - {{ selectedProject }}
+      </div> -->
+
+
+        <div class="submit-button style=" flex align-items-flex-end>
+          <p-button pRipple [disabled]="!supportForm.valid" label="Save" (onClick)="onArraySubmit(supportForm)"
+            class="button-add"></p-button>
+        </div>
+      </div>
+      <form [formGroup]="supportForm">
+        <div formArrayName="ticketDetails">
+          <p-table *ngIf="!metricsExist" [scrollHeight]="'550px'" [value]="tickets.controls" [rowHover]="true"
+            [rows]="5">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Ticket No <span class="required-asterisk">*</span></th>
+                <th>Ticket Description</th>
+                <th>Create Date & Time<span class="required-asterisk">*</span></th>
+                <th>Created By</th>
+                <th>Assigned To</th>
+                <th>Assigned Date & Time<span class="required-asterisk">*</span></th>
+                <th>Assigned By</th>
+                <th>Priority<span class="required-asterisk">*</span></th>
+                <th>Complexity<span class="required-asterisk">*</span></th>
+                <th>Expected Closure Date & Time</th>
+                <th>Expected Closure Effort (Hrs)</th>
+                <th>Actual Resolved Date & Time<span class="required-asterisk">*</span></th>
+                <th>Actual Resolution Effort (hrs)<span class="required-asterisk">*</span></th>
+                <th>Worked By<span class="required-asterisk">*</span></th>
+                <th>Closed By<span class="required-asterisk">*</span></th>
+                <th>Reopened (Yes / No)<span class="required-asterisk">*</span></th>
+                <th>Reopened Date & Time</th>
+                <th>Ticket Status<span class="required-asterisk">*</span></th>
+                <th>SLA Met (Yes / No)<span class="required-asterisk">*</span></th>
+                <th>Action</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-control let-idx="rowIndex">
+              <ng-container [formGroupName]="idx">
+                <tr>
+                  <td>
+                    <input type="text" class="form-control" pInputText formControlName="ticketNo"
+                      placeholder="Enter Ticket Number" [title]="control.get('ticketNo')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('ticketNo')?.touched,
+                      'ng-invalid': control.get('ticketNo')?.invalid
+                    }" />
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" pInputText formControlName="ticketDesc"
+                      placeholder="Enter Ticket Description" [title]="control.get('ticketDesc')?.value ||''" />
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [showIcon]="true" [readonlyInput]="true" formControlName="createDate"
+                      [minDate]="supportForm.get('weekStartDate')?.value"
+                      [maxDate]="supportForm.get('weekEndDate')?.value" [showTime]="true"
+                      (ngModelChange)="onCreateDateChange($event, idx)" [showSeconds]="true"
+                      [title]="control.get('createDate')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('createDate')?.touched,
+                      'ng-invalid': control.get('createDate')?.invalid
+                    }"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="text" (keypress)="AlpahabetOnly($event)" class="form-control" pInputText
+                      placeholder="Enter Creater Name" formControlName="createdBy"
+                      [title]="control.get('createdBy')?.value ||''" />
+                  </td>
+                  <td>
+                    <div>
+                      <p-multiSelect appendTo="body" class="test" formControlName="ticketAssignedTo" [options]="users"
+                        [resetFilterOnHide]="true" placeholder="Select Assignee" optionLabel="userName"></p-multiSelect>
+
+                    </div>
+                  </td>
+                  <!-- [minDate]="minDates[idx]" -->
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" [showIcon]="true"
+                      dateFormat="dd/mm/yy" formControlName="assignedDate"
+                      [minDate]="supportForm.get('weekStartDate')?.value"
+                      [maxDate]="supportForm.get('weekEndDate')?.value" [readonlyInput]="true"
+                      (ngModelChange)="onAssignedDateChange($event, idx)" [showTime]="true" [showSeconds]="true"
+                      [ngClass]="{
+                      'ng-dirty': control.get('assignedDate')?.touched,
+                      'ng-invalid': control.get('assignedDate')?.invalid
+                    }"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="text" pInputText (keypress)="AlpahabetOnly($event)" placeholder="Enter Assigner Name"
+                      formControlName="assignedBy" [title]="control.get('assignedBy')?.value ||''" />
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="filteredPriority | sort:'value'" optionValue="value"
+                      optionLabel="label" formControlName="priority" placeholder="Select Priority" [ngClass]="{
+                      'ng-dirty': control.get('priority')?.touched,
+                      'ng-invalid': control.get('priority')?.invalid
+                    }"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="filteredComplexity | sort :'value'" optionValue="value"
+                      optionLabel="label" formControlName="complexity" placeholder="Select Complexity" [ngClass]="{
+                      'ng-dirty': control.get('complexity')?.touched,
+                      'ng-invalid': control.get('complexity')?.invalid
+                    }"></p-dropdown>
+                  </td>
+                  <!-- [minDate]="minAssignDates[idx]" -->
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [showIcon]="true" [minDate]="supportForm.get('weekStartDate')?.value"
+                      [maxDate]="supportForm.get('weekEndDate')?.value" formControlName="expectedClosureDate"
+                      [showTime]="true" [showSeconds]="true" [readonlyInput]="true"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                      placeholder="Enter in hours(9.00)" formControlName="expectedClosureEffort"
+                      [title]="control.get('expectedClosureEffort')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('expectedClosureEffort')?.touched,
+                      'ng-invalid': control.get('expectedClosureEffort')?.invalid
+                    }" />
+                  </td>
+                  <!-- [minDate]="minAssignDates[idx]" -->
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" dateFormat="dd/mm/yy" [iconDisplay]="'input'"
+                      [showIcon]="true" [minDate]="supportForm.get('weekStartDate')?.value"
+                      [maxDate]="supportForm.get('weekEndDate')?.value" formControlName="actualResolvedDate"
+                      [readonlyInput]="true" [ngClass]="{
+                      'ng-dirty': control.get('actualResolvedDate')?.touched,
+                      'ng-invalid': control.get('actualResolvedDate')?.invalid
+                    }" [showTime]="true" [showSeconds]="true"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                      placeholder="Enter in hours(9.00)" formControlName="actualResolutionEffort"
+                      [title]="control.get('actualResolutionEffort')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('actualResolutionEffort')?.touched,
+                      'ng-invalid': control.get('actualResolutionEffort')?.invalid,
+                    }" />
+                  </td>
+                  <td>
+                    <div>
+                      <p-multiSelect appendTo="body" class="test" formControlName="workedBy"
+                        [options]="users| sort: 'userName'" placeholder="Select Worked By" [ngClass]="{
+                        'ng-dirty': supportForm.get('workedBy')?.touched,
+                        'ng-invalid': supportForm.get('workedBy')?.invalid
+                      }" optionLabel="userName" [resetFilterOnHide]="true"></p-multiSelect>
+
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <p-multiSelect appendTo="body" class="test" formControlName="closedBy" [options]="users"
+                        placeholder="Select closed By" [ngClass]="{
+                        'ng-dirty': supportForm.get('closedBy')?.touched,
+                        'ng-invalid': supportForm.get('closedBy')?.invalid
+                      }" optionLabel="userName" [resetFilterOnHide]="true"></p-multiSelect>
+                    </div>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="options | sort :'options'"
+                      (onChange)="reopenedMetrics($event, idx)" formControlName="reopened"
+                      placeholder="Select"></p-dropdown>
+                  </td>
+                  <!-- [minDate]="minAssignDates[idx]" -->
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [showIcon]="true" formControlName="reopenedDate"
+                      [minDate]="supportForm.get('weekStartDate')?.value"
+                      [maxDate]="supportForm.get('weekEndDate')?.value" [showTime]="true" [showSeconds]="true"
+                      [ngClass]="{
+                      'ng-dirty': control.get('reopenedDate')?.touched,
+                      'ng-invalid': control.get('reopenedDate')?.invalid
+                    }"></p-calendar>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="ticketOptions| sort :'ticketOptions'"
+                      formControlName="ticketStatus" placeholder="Select Ticket Status" [ngClass]="{
+                      'ng-dirty': control.get('ticketStatus')?.touched,
+                      'ng-invalid': control.get('ticketStatus')?.invalid
+                    }"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="options | sort :'options'" formControlName="slaMet"
+                      placeholder="Select" [ngClass]="{
+                      'ng-dirty': control.get('slaMet')?.touched,
+                      'ng-invalid': control.get('slaMet')?.invalid
+                    }"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-button icon="pi pi-minus" class="minus-button" [text]="true" [raised]="true" severity="danger"
+                      (onClick)="removeRow(idx)"></p-button>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-template>
+            <ng-template pTemplate="summary">
+              <div class="flex align-items-center justify-content-between">
+                <p-button icon="pi pi-plus" class="add-button mr-2" [text]="true" [raised]="true"
+                  (onClick)="addRow()"></p-button>
+              </div>
+            </ng-template>
+          </p-table>
+        </div>
+      </form>
+    </div>
+  </form>
+  <div class="table-container mt-4" *ngIf="addMetrics && projectType === 'Testing'">
+   
+    <p-table [scrollHeight]="'550px'" #dt [rowHover]="true" [rows]="5">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Ticket No <span class="required-asterisk">*</span></th>
+          <th>Ticket Description</th>
+          <th>Create Date & Time<span class="required-asterisk">*</span></th>
+          <th>Created By</th>
+          <th>Assigned To</th>
+          <th>Assigned Date & Time<span class="required-asterisk">*</span></th>
+          <th>Assigned By</th>
+          <th>Priority<span class="required-asterisk">*</span></th>
+          <th>Complexity</th>
+          <th>Expected Closure Date & Time</th>
+          <th>Expected Closure Effort (Hrs)</th>
+          <th>Actual Resolved Date & Time<span class="required-asterisk">*</span></th>
+          <th>Actual Resolution Effort (hrs)<span class="required-asterisk">*</span></th>
+          <th>Worked By<span class="required-asterisk">*</span></th>
+          <th>Closed By<span class="required-asterisk">*</span></th>
+          <th>Reopened (Yes / No)<span class="required-asterisk">*</span></th>
+          <th>Reopened Date & Time</th>
+          <th>Ticket Status<span class="required-asterisk">*</span></th>
+          <th>SLA Met (Yes / No)</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body">
+        <tr></tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <form [formGroup]="developmentForm" (ngSubmit)="onDevelopmentSubmit(developmentForm.value)"
+    *ngIf="addDevelopmentMetrics && projectType === 'Development & Maintenance'">
+    <div class="table-container mt-4">
+      <div>
+        <!-- <div class="ticket-status">
+            Ticket Status Report - {{ selectedProject }}
+          </div> -->
+        
+        <div class="submit-button">
+          <p-button pRipple label="Save" [disabled]="!developmentForm.valid"
+            (onClick)="onDevelopmentSubmit(developmentForm)" class="button-add"></p-button>
+        </div>
+      </div>
+      <!-- <form [formGroup]="developmentForm"> -->
+      <div formArrayName="developmentTasks">
+        <p-table *ngIf="!metricsExist" [scrollHeight]="'550px'" [value]="developmentTickets.controls" [rowHover]="true"
+          [rows]="5">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Task Name/Ticket No<span class="required-asterisk">*</span></th>
+              <th>CR Number</th>
+              <th>Priority</th>
+              <th>Planned Start Date<span class="required-asterisk">*</span></th>
+              <th>Planned End Date<span class="required-asterisk">*</span></th>
+              <th>Planned Duration</th>
+              <th>Actual Start Date<span class="required-asterisk">*</span></th>
+              <th>Actual End Date<span class="required-asterisk">*</span></th>
+              <th>Actual Duration</th>
+              <th>On Time Delivery</th>
+              <th>Planned Effort(In Hours)<span class="required-asterisk">*</span></th>
+              <th>Actual Effort(In Hours)<span class="required-asterisk">*</span></th>
+              <th>No. Of Defects<span class="required-asterisk">*</span></th>
+              <th>Re-work Effort(In Hours)</th>
+              <th>Status<span class="required-asterisk">*</span></th>
+              <th>Remarks</th>
+              <th>Expected Completion Month<span class="required-asterisk">*</span></th>
+              <th>Task to be completed this month<span class="required-asterisk">*</span></th>
+              <th>Action</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" pTemplate="body" let-control let-idx="rowIndex">
+            <ng-container [formGroupName]="idx">
+              <tr>
+                <td>
+                  <input type="text" class="form-control" pInputText formControlName="taskName"
+                    placeholder="Enter Ticket Number" [title]="control.get('taskName')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('taskName')?.touched,
+                      'ng-invalid': control.get('taskName')?.invalid
+                    }" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" pInputText formControlName="crNumber"
+                    [title]="control.get('crNumber')?.value || ''" placeholder="Enter CR number" />
+                </td>
+                <td>
+                  <p-dropdown [options]="filteredPriority | sort:'value'" optionValue="value" optionLabel="label"
+                    appendTo="body" formControlName="priority" placeholder="Select Priority"></p-dropdown>
+                </td>
+                <td>
+                  <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" [showIcon]="true"
+                    dateFormat="dd/mm/yy" [readonlyInput]="true" [minDate]="developmentForm.get('weekStartDate')?.value"
+                    [maxDate]="developmentForm.get('weekEndDate')?.value" formControlName="plannedStartDate"
+                    (onSelect)="enablePlannedEndDate(idx)" [ngClass]="{
+                      'ng-dirty': control.get('plannedStartDate')?.touched,
+                      'ng-invalid': control.get('plannedStartDate')?.invalid
+                    }"></p-calendar>
+                </td>
+                <!-- [minDate]="control.get('plannedStartDate')?.value" -->
+                <td>
+                  <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" [showIcon]="true"
+                    dateFormat="dd/mm/yy" [minDate]="developmentForm.get('weekStartDate')?.value"
+                    [maxDate]="developmentForm.get('weekEndDate')?.value" [readonlyInput]="true"
+                    formControlName="plannedEndDate" (onSelect)="plannedDatesCalc($event, idx)" [ngClass]="{
+                      'ng-dirty': control.get('plannedEndDate')?.touched,
+                      'ng-invalid': control.get('plannedEndDate')?.invalid
+                    }"></p-calendar>
+                </td>
+                <td>
+                  <input type="number" pInputText class="disabled-input" readonly placeholder="Enter Planned Duration"
+                    formControlName="plannedDuration" />
+                </td>
+                <td>
+                  <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'"
+                    [minDate]="developmentForm.get('weekStartDate')?.value"
+                    [maxDate]="developmentForm.get('weekEndDate')?.value" dateFormat="dd/mm/yy" [showIcon]="true"
+                    (onSelect)="enableActualEndDate(idx)" [readonlyInput]="true" formControlName="actualStartDate"
+                    [ngClass]="{
+                      'ng-dirty': control.get('actualStartDate')?.touched,
+                      'ng-invalid': control.get('actualStartDate')?.invalid
+                    }"></p-calendar>
+                </td>
+                <!-- [minDate]="control.get('actualStartDate')?.value" -->
+                <td>
+                  <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                    [showIcon]="true" formControlName="actualEndDate"
+                    [minDate]="developmentForm.get('weekStartDate')?.value"
+                    [maxDate]="developmentForm.get('weekEndDate')?.value" [readonlyInput]="true"
+                    (onSelect)="actualDateCalc($event, idx)" [ngClass]="{
+                      'ng-dirty': control.get('actualEndDate')?.touched,
+                      'ng-invalid': control.get('actualEndDate')?.invalid
+                    }"></p-calendar>
+                </td>
+                <td>
+                  <input type="number" pInputText readonly formControlName="actualDuration"
+                    [title]="control.get('actualDuration')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('actualDuration')?.touched,
+                      'ng-invalid': control.get('actualDuration')?.invalid
+                    }" />
+                </td>
+                <td>
+                  <!-- <p-dropdown
+                    appendTo="body"
+                    [options]="onTime"
+                    [optionValue]=""
+                    optionLabel="lable"
+                    optionValue="value"
+                    formControlName="onTimeDelivery"
+                    placeholder="Select"
+                  ></p-dropdown> -->
+                  <input type="text" pInputText readonly class="disabled-input" formControlName="onTimeDelivery"
+                    [title]="control.get('onTimeDelivery')?.value ||''" />
+                </td>
+                <td>
+                  <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                    placeholder="Enter in hours(9.00)" formControlName="plannedEffort"
+                    [title]="control.get('plannedEffort')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('plannedEffort')?.touched,
+                      'ng-invalid': control.get('plannedEffort')?.invalid,
+                    }" />
+                </td>
+                <td>
+                  <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                    placeholder="Enter in hours(9.00)" formControlName="actualEffort"
+                    [title]="control.get('actualEffort')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('actualEffort')?.touched,
+                      'ng-invalid': control.get('actualEffort')?.invalid,
+                    }" />
+                </td>
+                <td>
+                  <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                    placeholder="Enter in hours(9.00)" formControlName="numberOfDefects"
+                    [title]="control.get('numberOfDefects')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('numberOfDefects')?.touched,
+                      'ng-invalid': control.get('numberOfDefects')?.invalid,
+                    }" />
+                </td>
+                <td>
+                  <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                    placeholder="Enter in hours(9.00)" formControlName="reworkEffort"
+                    [title]="control.get('reworkEffort')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('reworkEffort')?.touched,
+                      'ng-invalid': control.get('reworkEffort')?.invalid,
+                    }" />
+                </td>
+                <td>
+                  <p-dropdown appendTo="body" [options]="taskStatus" formControlName="status"
+                    placeholder="Select status" (onChange)="onTimeDeliveryCalc($event, idx)"
+                    [title]="control.get('status')?.value ||''" [ngClass]="{
+                    'ng-dirty': control.get('status')?.touched,
+                    'ng-invalid': control.get('status')?.invalid,
+                  }"></p-dropdown>
+                </td>
+                <td>
+                  <input type="text" pInputText formControlName="remarks" [title]="control.get('remarks')?.value ||''"
+                    [ngClass]="{
+                      'ng-dirty': control.get('remarks')?.touched,
+                      'ng-invalid': control.get('remarks')?.invalid,
+                    }" />
+                </td>
+                <td>
+                  <input type="number" pInputText readonly class="disabled-input"
+                    formControlName="expectedCompletionMonth"
+                    [title]="control.get('expectedCompletionMonth')?.value ||''" [ngClass]="{
+                      'ng-dirty': control.get('expectedCompletionMonth')?.touched,
+                      'ng-invalid': control.get('expectedCompletionMonth')?.invalid,
+                    }" />
+                </td>
+                <td>
+                  <input type="text" formControlName="taskToBeCompletedThisMonth" class="disabled-input"
+                    placeholder="Task completed" pInputText readonly />
+                </td>
+                <td>
+                  <p-button icon="pi pi-minus" class="minus-button" [text]="true" [raised]="true" severity="danger"
+                    (onClick)="removeDevRow(idx)"></p-button>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-template>
+          <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+              <p-button icon="pi pi-plus" class="add-button mr-2" [text]="true" [raised]="true"
+                (onClick)="addDevRow()"></p-button>
+            </div>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </form>
+  <!-- Edit Support Form -->
+
+  <form [formGroup]="editSpptFrm" (ngSubmit)="onUpdate(editSpptFrm.value)">
+    <div class="card" *ngIf="editMetrics">
+      <p-toolbar>
+        <ng-template pTemplate="left">
+          <div>
+            <span class="flex">
+              <p-button (onClick)="backToMetricsGrid()" class="back-button">
+                <span class="material-symbols-outlined" style="font-weight: 900">
+                  arrow_back_ios
+                </span>
+              </p-button>
+              <div class="header-text" style="font-size: 18px; font-weight: 600">
+                Edit Support Metrics
+              </div>
+            </span>
+
+            <div class="dropdowns mt-3  mb-3">
+              <div class="cust-text">
+                <p-dropdown class="project-dropdown" [options]="taskData | sort :'customerName'"
+                  formControlName="client" optionLabel="customerName" (onChange)="onClientSelected($event.value)"
+                  (ngModelChange)="onCustomerChange()" placeholder="Customer" appendTo="body"></p-dropdown>
+              </div>
+              <div class="cust-text mt-2">Project <span class="required-asterisk">*</span></div>
+              <div>
+                <p-dropdown class="project-dropdown" [options]="filteredProjects | sort :'projectName'"
+                  optionLabel="projectName" placeholder="Project" formControlName="project"
+                  (onChange)="onProjectSelected($event.value)" appendTo="body"></p-dropdown>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-toolbar>
+    </div>
+
+    <!-- <div class="mt-4"> -->
+
+    <div class="table-container mt-4" *ngIf="editMetrics && projectType === 'Support'">
+      <div>
+        <!-- <div class="ticket-status">
+        Ticket Status Report - {{ selectedProject }}
+      </div> -->
+        <div>
+          <label for="month/year" class="text-date" style="font-size: 14px">Month/Year <span
+              class="required-asterisk">*</span>
+          </label>
+          <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar ml-1"
+            formControlName="monthYear" (ngModelChange)="updateWeekCalendars($event)" [minDate]="startDate"
+            [maxDate]="endDate" view="month" [readonlyInput]="true" dateFormat="mm/yy" [showIcon]="true"
+            placeholder="MM/YYYY"></p-calendar>
+        </div>
+        <div class="gap-2">
+          <label for="month/year" class="text-date ml-2" style="font-size: 14px">Week Start Date<span
+              class="required-asterisk">*</span></label>
+          <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" [minDate]="startDate"
+            [maxDate]="endDate" class="month-calendar gap-2 ml-2" formControlName="weekStartDate" #weekStartDateCalendar
+            [readonlyInput]="true" dateFormat="dd/mm/yy" [showIcon]="true" placeholder="From Date"></p-calendar>
+        </div>
+        <div class="gap-2">
+          <label for="month/year" class="text-date ml-3" style="font-size: 14px">Week End Date<span
+              class="required-asterisk">*</span></label>
+          <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar ml-2"
+            [minDate]="startDate" [maxDate]="endDate" formControlName="weekEndDate"
+            (onSelect)="onEndDateSelected($event)" #weekEndDateCalendar [readonlyInput]="true" dateFormat="dd/mm/yy"
+            [showIcon]="true" placeholder="To Date"></p-calendar>
+        </div>
+        <div class="submit-button">
+          <p-button pRipple [disabled]="!editSpptFrm.valid" label="Update" (onClick)="onUpdate(editSpptFrm)"
+            class="button-add"></p-button>
+        </div>
+      </div>
+      <form [formGroup]="editSpptFrm">
+        <div formArrayName="ticketDetails">
+          <p-table *ngIf="!metricsExist" [scrollHeight]="'550px'" [value]="editTickets.controls" [rowHover]="true"
+            [rows]="5">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Ticket No <span class="required-asterisk">*</span></th>
+                <th>Ticket Description</th>
+                <th>Create Date & Time<span class="required-asterisk">*</span></th>
+                <th>Created By</th>
+                <th>Assigned To</th>
+                <th>Assigned Date & Time<span class="required-asterisk">*</span></th>
+                <th>Assigned By</th>
+                <th>Priority<span class="required-asterisk">*</span></th>
+                <th>Complexity</th>
+                <th>Expected Closure Date & Time</th>
+                <th>Expected Closure Effort (Hrs)</th>
+                <th>Actual Resolved Date & Time<span class="required-asterisk">*</span></th>
+                <th>Actual Resolution Effort (hrs)<span class="required-asterisk">*</span></th>
+                <th>Worked By<span class="required-asterisk">*</span></th>
+                <th>Closed By<span class="required-asterisk">*</span></th>
+                <th>Reopened (Yes / No)<span class="required-asterisk">*</span></th>
+                <th>Reopened Date & Time</th>
+                <th>Ticket Status<span class="required-asterisk">*</span></th>
+                <th>SLA Met (Yes / No)<span class="required-asterisk">*</span></th>
+                <th>Action</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-control let-idx="rowIndex">
+              <ng-container [formGroupName]="idx">
+                <tr>
+                  <td>
+                    <input type="text" pInputText formControlName="ticketNo"
+                      [title]="control.get('ticketNo')?.value ||''" placeholder="Enter Ticket Number" [ngClass]="{
+                      'ng-dirty': control.get('ticketNo')?.touched,
+                      'ng-invalid': control.get('ticketNo')?.invalid
+                    }" />
+                  </td>
+                  <td>
+                    <input type="text" pInputText formControlName="ticketDesc" placeholder="Enter Ticket Description"
+                      [title]="control.get('ticketDesc')?.value ||''" />
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" [showIcon]="true"
+                      dateFormat="dd/mm/yy" hourFormat="hh:mm:ss" [readonlyInput]="true" formControlName="createDate"
+                      [showTime]="true" [showSeconds]="true"
+                      [title]="control.get('createDate')?.value ||''"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" pInputText (keypress)="AlpahabetOnly($event)"
+                      placeholder="Enter Creater Name" formControlName="createdBy"
+                      [title]="control.get('createdBy')?.value ||''" />
+                  </td>
+                  <td>
+                    <div>
+                      <p-multiSelect appendTo="body" class="test" formControlName="ticketAssignedTo" [options]="users"
+                        placeholder="Select Assignee" optionLabel="userName" optionValue="userName"></p-multiSelect>
+
+                    </div>
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [showIcon]="true" [readonlyInput]="true" formControlName="assignedDate"
+                      [minDate]="editSpptFrm.get('createDate')?.value" [showTime]="true"
+                      [showSeconds]="true"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="text" pInputText (keypress)="AlpahabetOnly($event)" placeholder="Enter Assigner Name"
+                      formControlName="assignedBy" />
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="filteredPriority | sort :'value'" optionValue="value"
+                      optionLabel="label" formControlName="priority" placeholder="Select Priority"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="filteredComplexity | sort :'value'" optionValue="value"
+                      optionLabel="label" formControlName="complexity" placeholder="Select Complexity"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [readonlyInput]="true" [showIcon]="true" formControlName="expectedClosureDate"
+                      [minDate]="editSpptFrm.get('assignedDate')?.value" [showTime]="true"
+                      [showSeconds]="true"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="number" pInputText (keypress)="NumericOnly($event)" min="0" max="100"
+                      placeholder="Enter in hours(9.00)" formControlName="expectedClosureEffort" />
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [readonlyInput]="true" [showIcon]="true" formControlName="actualResolvedDate"
+                      [minDate]="editSpptFrm.get('assignedDate')?.value" [showTime]="true"
+                      [showSeconds]="true"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="number" pInputText (keypress)="NumericOnly($event)" [minlength]="1" [maxlength]="100"
+                      placeholder="Enter in hours(9.00)" formControlName="actualResolutionEffort" />
+                  </td>
+                  <td>
+                    <div>
+                      <p-multiSelect appendTo="body" class="test" formControlName="workedBy" [options]="users"
+                        placeholder="Select Worked By" [ngClass]="{
+                        'ng-dirty': editSpptFrm.get('workedBy')?.touched,
+                        'ng-invalid': editSpptFrm.get('workedBy')?.invalid
+                      }" optionValue="userName" optionLabel="userName"></p-multiSelect>
+                      <small class="p-error" *ngIf="
+                        editSpptFrm.get('workedBy')?.touched &&
+                        editSpptFrm.get('workedBy')?.invalid
+                      ">
+                        &nbsp; &#9888; Please select at least one Worked by.
+                      </small>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <p-multiSelect appendTo="body" class="test" formControlName="closedBy" [options]="users"
+                        placeholder="Select closed By" [ngClass]="{
+                        'ng-dirty': editSpptFrm.get('closedBy')?.touched,
+                        'ng-invalid': editSpptFrm.get('closedBy')?.invalid
+                      }" optionLabel="userName" optionValue="userName"></p-multiSelect>
+                      <small id="assigned-to-help" class="p-error" *ngIf="
+                        editSpptFrm.get('closedBy')?.touched &&
+                        editSpptFrm.get('closedBy')?.invalid
+                      ">
+                        &nbsp; &#9888; Please select at least one Closed by.
+                      </small>
+                    </div>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="options | sort :'value'"
+                      (onChange)="editReopenedMetrics($event, idx)" formControlName="reopened"
+                      placeholder="Select"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [minDate]="editSpptFrm.get('assignedDate')?.value" [showIcon]="true"
+                      formControlName="reopenedDate" [showTime]="true" [showSeconds]="true"></p-calendar>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="ticketOptions" formControlName="ticketStatus"
+                      placeholder="Select Ticket Status"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="options" formControlName="slaMet"
+                      placeholder="Select"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-button icon="pi pi-minus" class="minus-button" [text]="true" [raised]="true" severity="danger"
+                      (onClick)="removeEditRow(idx)"></p-button>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-template>
+            <ng-template pTemplate="summary">
+              <div class="flex align-items-center justify-content-between">
+                <p-button icon="pi pi-plus" class="add-button mr-2" [text]="true" [raised]="true"
+                  (onClick)="addEditRow()"></p-button>
+              </div>
+            </ng-template>
+          </p-table>
+        </div>
+      </form>
+    </div>
+  </form>
+  <!-- Edit Development Form -->
+  <form [formGroup]="editdevelopmentForm" (ngSubmit)="onUpdateDev(editdevelopmentForm.value)">
+    <div class="card" *ngIf="editDevMetrics">
+      <p-toolbar>
+        <ng-template pTemplate="left">
+          <div>
+            <span class="flex">
+              <div class="head-text">
+                <p-button (onClick)="backToMetricsGrid()" class="back-button">
+                  <span class="material-symbols-outlined" style="font-weight: 900">
+                    arrow_back_ios
+                  </span>
+                </p-button>
+                <div class="header-text" style="font-size: 18px; font-weight: 600">
+                  Edit Development & Maintenance
+                </div>
+              </div>
+            </span>
+
+            <div class="cust-text mt-2">
+              Customer <span class="required-asterisk">*</span>
+            </div>
+            <div>
+              <p-dropdown class="project-dropdown" [options]="taskData | sort :'customerName'" formControlName="client"
+                optionLabel="customerName" (onChange)="onClientSelected($event.value)"
+                (ngModelChange)="onCustomerChange()" placeholder="Customer" appendTo="body"></p-dropdown>
+            </div>
+            <div class="cust-text mt-2">
+              Project <span class="required-asterisk">*</span>
+              <p-dropdown class="project-dropdown" [options]="filteredProjects | sort :'projectName'"
+                optionLabel="projectName" placeholder="Project" formControlName="project"
+                (onChange)="onProjectSelected($event.value)" appendTo="body"></p-dropdown>
+            </div>
+            <div>
+
+            </div>
+          </div>
+        </ng-template>
+      </p-toolbar>
+    </div>
+
+    <div class="table-container mt-4" *ngIf="editDevMetrics && projectType === 'Development'">
+      <div>
+        <!-- <div class="ticket-status">
+        Development Tasks Report - {{ selectedProject }}
+      </div> -->
+        <div>
+          <label for="month/year" class="text-date" style="font-size: 14px">Month/Year
+          </label>
+          <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar ml-1"
+            formControlName="monthYear" (ngModelChange)="updateDevWeekCalendars()" (onFocus)="onStartDateDevClick()"
+            [minDate]="startDate" [maxDate]="endDate" view="month" [readonlyInput]="true" dateFormat="MM/yy"
+            [showIcon]="true" placeholder="MM/YYYY"></p-calendar>
+        </div>
+        <div class="gap-2">
+          <label for="weekStartDate" class="text-date ml-2" style="font-size: 14px">Week Start Date <span
+              class="required-asterisk">*</span></label>
+          <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar gap-2 ml-2"
+            formControlName="weekStartDate" (onFocus)="onselectDevEndDate()" [minDate]="startDate" [maxDate]="endDate"
+            #weekStartDateCalendar [readonlyInput]="true" dateFormat="dd/mm/yy" [showIcon]="true"
+            placeholder="From Date"></p-calendar>
+        </div>
+        <div class="gap-2">
+          <label for="weekEndDate" class="text-date ml-3" style="font-size: 14px">Week End Date <span
+              class="required-asterisk">*</span></label>
+          <p-calendar appendTo="body" [iconDisplay]="'input'" [showOnFocus]="true" class="month-calendar ml-2"
+            formControlName="weekEndDate" (onSelect)="onEndDateDevSelected($event)" #weekEndDateCalendar
+            [minDate]="startDate" [maxDate]="endDate" [readonlyInput]="true" dateFormat="dd/mm/yy" [showIcon]="true"
+            placeholder="To Date"></p-calendar>
+        </div>
+        <div class="submit-button">
+          <p-button pRipple label="Development Update" (onClick)="onUpdateDev(editdevelopmentForm)"
+            class="button-add"></p-button>
+        </div>
+
+      </div>
+
+      <form [formGroup]="editdevelopmentForm">
+        <div formArrayName="editDevelopmentTasks">
+          <p-table *ngIf="!metricsExist" [scrollHeight]="'550px'" [value]="editDevelopmentTickets.controls"
+            [rowHover]="true" [rows]="5">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Task Name <span class="required-asterisk">*</span></th>
+                <th>CR Number <span class="required-asterisk">*</span></th>
+                <th>Priority</th>
+                <th>Planned Start Date<span class="required-asterisk">*</span></th>
+                <th>Planned End Date<span class="required-asterisk">*</span></th>
+                <th>Planned Duration</th>
+                <th>Actual Start Date<span class="required-asterisk">*</span></th>
+                <th>Actual End Date<span class="required-asterisk">*</span></th>
+                <th>Actual Duration</th>
+                <th>On Time Delivery</th>
+                <th>Planned Effort<span class="required-asterisk">*</span></th>
+                <th>Actual Effort<span class="required-asterisk">*</span></th>
+                <th>Number of Defects<span class="required-asterisk">*</span></th>
+                <th>Rework Effort</th>
+                <th>Status<span class="required-asterisk">*</span></th>
+                <th>Remarks</th>
+                <th>Expected Completion Month<span class="required-asterisk">*</span></th>
+                <th>Task To Be Completed This Month<span class="required-asterisk">*</span></th>
+                <th>Action</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-control let-idx="rowIndex">
+              <ng-container [formGroupName]="idx">
+                <tr>
+                  <td>
+                    <input type="text" pInputText formControlName="taskName" placeholder="Enter Task Name"
+                      [title]="control.get('taskName')?.value ||''" [title]="control.get('taskName')?.value || ''"
+                      [ngClass]="{
+                      'ng-dirty': control.get('taskName')?.touched,
+                      'ng-invalid': control.get('taskName')?.invalid
+                    }" />
+                  </td>
+                  <td>
+                    <input type="text" pInputText formControlName="crNumber" placeholder="Enter CR Number"
+                      [title]="control.get('crNumber')?.value || ''" />
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="filteredPriority | sort :'value'" optionValue="value"
+                      optionLabel="label" formControlName="priority" placeholder="Select Priority"></p-dropdown>
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [readonlyInput]="true" formControlName="plannedStartDate" [ngClass]="{
+                      'ng-dirty': control.get('plannedStartDate')?.touched,
+                      'ng-invalid': control.get('plannedStartDate')?.invalid
+                    }"></p-calendar>
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" [showIcon]="true"
+                      dateFormat="dd/mm/yy" [readonlyInput]="true" formControlName="plannedEndDate"
+                      [minDate]="control.get('plannedStartDate')?.value" (onSelect)="editPlannedDatesCalc($event, idx)"
+                      [ngClass]="{
+                    'ng-dirty': control.get('plannedEndDate')?.touched,
+                    'ng-invalid': control.get('plannedEndDate')?.invalid
+                  }"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="number" pInputText class="disabled-input" readonly placeholder="Enter Planned Duration"
+                      formControlName="plannedDuration" />
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [readonlyInput]="true" formControlName="actualStartDate" [ngClass]="{
+                      'ng-dirty': control.get('actualStartDate')?.touched,
+                      'ng-invalid': control.get('actualStartDate')?.invalid
+                    }"></p-calendar>
+                  </td>
+                  <td>
+                    <p-calendar appendTo="body" placeholder="DD/MM/YYYY" [iconDisplay]="'input'" dateFormat="dd/mm/yy"
+                      [showIcon]="true" formControlName="actualEndDate"
+                      [minDate]="control.get('actualStartDate')?.value" (onSelect)="editActualDateCalc($event, idx)"
+                      [ngClass]="{
+                      'ng-dirty': control.get('actualEndDate')?.touched,
+                      'ng-invalid': control.get('actualEndDate')?.invalid
+                    }"></p-calendar>
+                  </td>
+                  <td>
+                    <input type="number" class="disabled-input" pInputText readonly placeholder="Enter in hours(9.00)"
+                      formControlName="actualDuration" />
+                  </td>
+                  <td>
+                    <input type="text" pInputText class="disabled-input" readonly formControlName="onTimeDelivery"
+                      [title]="control.get('onTimeDelivery')?.value ||''" />
+                  </td>
+                  <td>
+                    <input type="number" pInputText placeholder="Enter Planned Effort" formControlName="plannedEffort"
+                      (keypress)="NumericOnly($event)" [ngClass]="{
+                      'ng-dirty': control.get('plannedEffort')?.touched,
+                      'ng-invalid': control.get('plannedEffort')?.invalid
+                    }" />
+                  </td>
+                  <td>
+                    <input type="number" pInputText placeholder="Enter Actual Effort" formControlName="actualEffort"
+                      (keypress)="NumericOnly($event)" [ngClass]="{
+                      'ng-dirty': control.get('actualEffort')?.touched,
+                      'ng-invalid': control.get('actualEffort')?.invalid
+                    }" />
+                  </td>
+                  <td>
+                    <input type="number" pInputText placeholder="Enter Number of Defects"
+                      formControlName="numberOfDefects" (keypress)="NumericOnly($event)" [ngClass]="{
+                      'ng-dirty': control.get('numberOfDefects')?.touched,
+                      'ng-invalid': control.get('numberOfDefects')?.invalid
+                    }" />
+                  </td>
+                  <td>
+                    <input type="number" pInputText (keypress)="NumericOnly($event)" min="1" max="1000"
+                      placeholder="Enter in hours(9.00)" formControlName="reworkEffort"
+                      [title]="control.get('reworkEffort')?.value ||''" [ngClass]="{
+                    'ng-dirty': control.get('reworkEffort')?.touched,
+                    'ng-invalid': control.get('reworkEffort')?.invalid,
+                  }" />
+                  </td>
+                  <td>
+                    <p-dropdown appendTo="body" [options]="taskStatus" formControlName="status"
+                      placeholder="Select status" (onChange)="editOnTimeDeliveryCalc($event, idx)"
+                      [title]="control.get('status')?.value ||''" [ngClass]="{
+                    'ng-dirty': control.get('status')?.touched,
+                    'ng-invalid': control.get('status')?.invalid,
+                  }"></p-dropdown>
+                  </td>
+                  <td>
+                    <input type="text" pInputText formControlName="remarks"
+                      [title]="control.get('remarks')?.value ||''" />
+                  </td>
+                  <td>
+                    <input type="number" pInputText class="disabled-input" readonly
+                      formControlName="expectedCompletionMonth"
+                      [title]="control.get('expectedCompletionMonth')?.value ||''" />
+                  </td>
+                  <td>
+                    <input type="text" formControlName="taskToBeCompletedThisMonth" placeholder="Task Completed"
+                      pInputText class="disabled-input" readonly [ngClass]="{
+                    'ng-dirty': control.get('taskToBeCompletedThisMonth')?.touched,
+                    'ng-invalid': control.get('taskToBeCompletedThisMonth')?.invalid
+                  }" />
+                  </td>
+                  <td>
+                    <p-button icon="pi pi-minus" class="minus-button" [text]="true" [raised]="true" severity="danger"
+                      (onClick)="removeDevEditRow(idx)"></p-button>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-template>
+            <ng-template pTemplate="summary">
+              <div class="flex align-items-center justify-content-between">
+                <p-button icon="pi pi-plus" class="add-button mr-2" [text]="true" [raised]="true"
+                  (onClick)="addDevEditRow()"></p-button>
+              </div>
+            </ng-template>
+          </p-table>
+        </div>
+      </form>
+    </div>
+  </form>
+</div>

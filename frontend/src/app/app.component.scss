@@ -1,0 +1,65 @@
+:host ::ng-deep {
+  .table-container {
+    th {
+      border-top: 1px solid #dee2e6;
+    }
+  }
+    .dropdown-asset-list {
+        width: 200px !important;
+    }
+
+    // common style code for masters
+    .required-asterisk {
+        color: red;
+        font-weight: bold;
+    }
+
+    .p-dropdown {
+        width: 100%;
+    }
+
+    .p-calendar {
+        width: 100%;
+    }
+
+    
+      
+
+    th {
+        background: #fff;
+        border-top: 1px solid gainsboro;
+      }
+   
+
+    .p-datatable-hoverable-rows .p-selectable-row {
+        cursor: default;
+    }
+
+    .calendar-btn>span>button {
+        background: #30498b;
+        border: none;
+    }
+
+    .page-content {
+         box-shadow: 0 3px 5px rgba(0, 0, 0, .02), 0 0 2px rgba(0, 0, 0, .05), 0 1px 4px rgba(0, 0, 0, .08);
+         border-radius: 10px;
+       }
+       
+    .p-paginator {
+ border-radius: 10px;
+    }
+
+    @media only screen and (max-width: 767px) {
+        .btn-mobile>.p-button {
+            padding: 8px 16px;
+        }
+
+        .btn-mobile button span:nth-child(2) {
+            display: none;
+        }
+
+        .btn-mobile button span:nth-child(1) {
+            margin-right: 0;
+        }
+    }
+}
