@@ -202,9 +202,6 @@
                         <h3>
                             <span class="project-title">{{ project.projectName }} - </span> Activities
                         </h3>
-                        <!-- <button class="add-activities-btn" (click)="toggleActivityInputs(getProjectId(project))">
-                            Add Activities
-                        </button> -->
                     </div>
 
 
@@ -245,16 +242,6 @@
                             <p>No progress data available.</p>
                         </ng-template>
 
-                        <!-- Input to add progress
-                        <div class="input-row">
-                            <input [(ngModel)]="newProgress.task" placeholder="Task" />
-                            <input [(ngModel)]="newProgress.status" placeholder="Status" />
-                            <input [(ngModel)]="newProgress.remarks" placeholder="Remarks" />
-                            <button (click)="addProgressItem(project)">
-                                <span class="check-icon">✓</span>
-                            </button>
-                        </div> -->
-
                         <!-- Section 2: Activities Planned -->
                         <h4>Activities Planned for Next Period:</h4>
                         <div *ngIf="(project.plannedActivities?.length || 0) > 0; else noPlanned">
@@ -287,16 +274,6 @@
                         <ng-template #noPlanned>
                             <p>No planned activities available.</p>
                         </ng-template>
-
-                        <!-- Input to add planned activity -->
-                        <!-- <div class="input-row">
-                            <input [(ngModel)]="newPlanned.task" placeholder="Task" />
-                            <input [(ngModel)]="newPlanned.status" placeholder="Status" />
-                            <input [(ngModel)]="newPlanned.remarks" placeholder="Remarks" />
-                            <button (click)="addPlannedItem(project)">
-                                <span class="check-icon">✓</span>
-                            </button>
-                        </div> -->
                     </div>
                 </div>
             </ng-container>
@@ -570,6 +547,184 @@
             </div>
         </div>
     </div>
+
+    <!-- Progress & Planned Activities Combined -->
+<div class="project-status-container">
+
+ <!-- Progress Table -->
+<div class="project-status-header mt-4">Add Progress</div>
+
+<ng-container *ngIf="!isEditProgress">
+  <div *ngFor="let progress of newProgressList; let i = index" class="p-fluid p-grid mb-3 border p-3 rounded">
+    <!-- Task -->
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Task <span class="required">*</span></label>
+        <input pInputText [(ngModel)]="progress.task" placeholder="Enter Task" name="progressTask{{ i }}" />
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Status <span class="required">*</span></label>
+        <input pInputText [(ngModel)]="progress.status" placeholder="Enter Status" name="progressStatus{{ i }}" />
+      </div>
+    </div>
+
+    <!-- Remarks -->
+    <div class="p-col-12">
+      <div class="status-field">
+        <label>Remarks</label>
+        <textarea pInputTextarea [(ngModel)]="progress.remarks" rows="3" placeholder="Enter Remarks" name="progressRemarks{{ i }}"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-2">
+    <button pButton type="button" label="Add Another Progress" icon="pi pi-plus" (click)="addProgressRow()" class="p-button-sm p-button-outlined"></button>
+  </div>
+</ng-container>
+ <!-- Planned Table -->
+  <div class="project-status-header mt-4">Add Planned Activity</div>
+
+  <ng-container *ngIf="!isEditPlanned">
+    <div *ngFor="let planned of newPlannedList; let i = index" class="p-fluid p-grid mb-3">
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Task <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="planned.task" placeholder="Enter Task" name="plannedTask{{ i }}" />
+        </div>
+      </div>
+      <div class="p-col-12 p-md-6">
+        <div class="status-field">
+          <label>Status <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="planned.status" placeholder="Enter Status" name="plannedStatus{{ i }}" />
+        </div>
+      </div>
+      <div class="p-col-12">
+        <div class="status-field">
+          <label>Remarks</label>
+          <textarea pInputTextarea [(ngModel)]="planned.remarks" placeholder="Enter Remarks" rows="3" name="plannedRemarks{{ i }}"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button pButton type="button" label="Add Another Planned Activity" icon="pi pi-plus" (click)="addPlannedRow()"></button>
+  </ng-container>
+</div>
+
+
+
+<!-- // Key Issues and Risks Section -->
+<div class="project-status-container">
+<!-- 🔹 Key Issues Section -->
+  <div class="project-status-header">Key Issues</div>
+
+  <div *ngFor="let issue of newIssueList; let i = index" class="p-fluid p-grid mb-3">
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Type</label>
+        <input pInputText [(ngModel)]="issue.type" placeholder="Enter Issue Type" name="issueType{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Functional Area</label>
+        <input pInputText [(ngModel)]="issue.functionalArea" placeholder="Enter Functional Area" name="issueFunctionalArea{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Description</label>
+        <input pInputText [(ngModel)]="issue.description" placeholder="Enter Description" name="issueDescription{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Actions</label>
+        <input pInputText [(ngModel)]="issue.ActionRequired" placeholder="Enter Actions" name="issueAction{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Date Raised</label>
+        <p-calendar [(ngModel)]="issue.dateRaised" dateFormat="dd/mm/yy" name="issueDateRaised{{ i }}"></p-calendar>
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Resolve By</label>
+        <p-calendar [(ngModel)]="issue.resolveBy" dateFormat="dd/mm/yy" name="issueResolveBy{{ i }}"></p-calendar>
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Owner</label>
+        <input pInputText [(ngModel)]="issue.IssueOwner" placeholder="Enter Owner" name="issueOwner{{ i }}" />
+      </div>
+    </div>
+  </div>
+
+  <button pButton type="button" label="Add Another Issue" icon="pi pi-plus" (click)="addIssueRow()"></button>
+
+  <!-- 🔹 Key Risks Section -->
+  <div class="project-status-header mt-5">Key Risks</div>
+
+  <div *ngFor="let risk of newRiskList; let i = index" class="p-fluid p-grid mb-3">
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Description</label>
+        <input pInputText [(ngModel)]="risk.RiskDescription" placeholder="Enter Description" name="riskDesc{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Mitigation</label>
+        <input pInputText [(ngModel)]="risk.mitigation" placeholder="Enter Mitigation" name="riskMitigation{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Likelihood</label>
+        <input pInputText [(ngModel)]="risk.likelihood" placeholder="Enter Likelihood" name="riskLikelihood{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Owner</label>
+        <input pInputText [(ngModel)]="risk.RiskOwner" placeholder="Enter Owner" name="riskOwner{{ i }}" />
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Date Raised</label>
+        <p-calendar [(ngModel)]="risk.riskdate" dateFormat="dd/mm/yy" name="riskDateRaised{{ i }}"></p-calendar>
+      </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+      <div class="status-field">
+        <label>Resolve By</label>
+        <p-calendar [(ngModel)]="risk.riskresolvedate" dateFormat="dd/mm/yy" name="riskResolveBy{{ i }}"></p-calendar>
+      </div>
+    </div>
+  </div>
+
+  <button pButton type="button" label="Add Another Risk" icon="pi pi-plus" (click)="addRiskRow()"></button>
+</div>
+
+
 
     <div class="submit-button-container">
         <!-- Submit (Add Mode) -->

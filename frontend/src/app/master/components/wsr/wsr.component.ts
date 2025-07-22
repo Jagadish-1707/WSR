@@ -51,6 +51,8 @@ interface ResourceItem {
 }
 
 interface ProjectData {
+  id: any;
+  wsrReportDto: any;
   projectId?: string;
   projectName: string;
   clientName?: string;
@@ -158,7 +160,11 @@ export class WSRComponent implements OnInit {
   wsrselectedProjects: WSRDropdownItem[] = [];
   progressDataBackup: any[] = [];
   plannedActivitiesBackup: any[] = [];
-
+resourceList: {
+    zohoemp_id: string;
+    resourcename: string;
+    rating: number;
+  }[] = [];
 
 
   // ✅ Zoho Employees and Resources
@@ -241,8 +247,64 @@ export class WSRComponent implements OnInit {
 
 
 
-  newProgress = { task: '', status: '', remarks: '' };
-  newPlanned = { task: '', status: '', remarks: '' };
+  newProgressList: { task: string; status: string; remarks: string }[] = [
+  { task: '', status: '', remarks: '' }
+];
+
+newPlannedList: { task: string; status: string; remarks: string }[] = [
+  { task: '', status: '', remarks: '' }
+];
+newIssueList: {
+  type: string;
+  functionalArea: string;
+  description: string;
+  ActionRequired: string;
+  dateRaised: string;
+  resolveBy: string;
+  IssueOwner: string;
+}[] = [
+  {
+    type: '',
+    functionalArea: '',
+    description: '',
+    ActionRequired: '',
+    dateRaised: '',
+    resolveBy: '',
+    IssueOwner: ''
+  }
+];
+
+newRiskList: {
+  RiskDescription: string;
+  mitigation: string;
+  likelihood: string;
+  RiskOwner: string;
+  riskdate: string;
+  riskresolvedate: string;
+}[] = [
+  {
+    RiskDescription: '',
+    mitigation: '',
+    likelihood: '',
+    RiskOwner: '',
+    riskdate: '',
+    riskresolvedate: ''
+  }
+];
+
+isEditProgress: boolean = false;
+editingProgressItem: any = null;
+
+isEditPlanned: boolean = false;
+isEditKeyIssue: boolean = false;
+isEditKeyRisk: boolean = false;
+
+selectedProjectForEdit: any = null;
+progressItemToEdit: any = null;
+plannedItemToEdit: any = null;
+keyIssueToEdit: any = null;
+keyRiskToEdit: any = null;
+
   showActivityInputs: { [projectId: string]: boolean } = {};
 
   toggleActivityInputs(projectId: string): void {
@@ -253,43 +315,43 @@ export class WSRComponent implements OnInit {
     return project.projectId || project.id || project.name || 'default';
   }
 
-  addProgressItem(project: any): void {
-    if (!this.newProgress.task || !this.newProgress.status) return;
+  // addProgressItem(project: any): void {
+  //   if (!this.newProgress.task || !this.newProgress.status) return;
 
-    if (!project.progressData) project.progressData = [];
+  //   if (!project.progressData) project.progressData = [];
 
-    project.progressData.push({
-      task: this.newProgress.task,
-      status: this.newProgress.status,
-      remarks: this.newProgress.remarks,
-      active: false
-    });
+  //   project.progressData.push({
+  //     task: this.newProgress.task,
+  //     status: this.newProgress.status,
+  //     remarks: this.newProgress.remarks,
+  //     active: false
+  //   });
 
-    project.isProgress = true;
-    project.isPlanned = false;
+  //   project.isProgress = true;
+  //   project.isPlanned = false;
 
-    this.progressDataBackup = [...project.progressData];
-    this.newProgress = { task: '', status: '', remarks: '' };
-  }
+  //   this.progressDataBackup = [...project.progressData];
+  //   this.newProgress = { task: '', status: '', remarks: '' };
+  // }
 
-  addPlannedItem(project: any): void {
-    if (!this.newPlanned.task || !this.newPlanned.status) return;
+  // addPlannedItem(project: any): void {
+  //   if (!this.newPlanned.task || !this.newPlanned.status) return;
 
-    if (!project.plannedActivities) project.plannedActivities = [];
+  //   if (!project.plannedActivities) project.plannedActivities = [];
 
-    project.plannedActivities.push({
-      task: this.newPlanned.task,
-      status: this.newPlanned.status,
-      remarks: this.newPlanned.remarks,
-      active: true
-    });
+  //   project.plannedActivities.push({
+  //     task: this.newPlanned.task,
+  //     status: this.newPlanned.status,
+  //     remarks: this.newPlanned.remarks,
+  //     active: true
+  //   });
 
-    project.isPlanned = true;
-    project.isProgress = false;
+  //   project.isPlanned = true;
+  //   project.isProgress = false;
 
-    this.plannedActivitiesBackup = [...project.plannedActivities];
-    this.newPlanned = { task: '', status: '', remarks: '' };
-  }
+  //   this.plannedActivitiesBackup = [...project.plannedActivities];
+  //   this.newPlanned = { task: '', status: '', remarks: '' };
+  // }
 
   resetProgressTable(project: any): void {
     project.progressData = [...this.progressDataBackup];
@@ -298,6 +360,43 @@ export class WSRComponent implements OnInit {
   resetPlannedTable(project: any): void {
     project.plannedActivities = [...this.plannedActivitiesBackup];
   }
+ editProgressItem(project: any, item: any) {
+  this.isEditProgress = true;
+  this.editingProgressItem = { ...item };
+  this.selectedProject = project;
+}
+
+
+editPlannedItem(project: any, item: any): void {
+  this.isEditPlanned = true;
+  this.selectedProjectForEdit = project;
+  this.plannedItemToEdit = { ...item };
+}
+
+editKeyIssue(project: any, issue: any): void {
+  this.isEditKeyIssue = true;
+  this.selectedProjectForEdit = project;
+  this.keyIssueToEdit = { ...issue };
+}
+
+editKeyRisk(project: any, risk: any): void {
+  this.isEditKeyRisk = true;
+  this.selectedProjectForEdit = project;
+  this.keyRiskToEdit = { ...risk };
+}
+
+onCancelEdit(): void {
+  this.isEditProgress = false;
+  this.isEditPlanned = false;
+  this.isEditKeyIssue = false;
+  this.isEditKeyRisk = false;
+  this.selectedProjectForEdit = null;
+  this.progressItemToEdit = null;
+  this.plannedItemToEdit = null;
+  this.keyIssueToEdit = null;
+  this.keyRiskToEdit = null;
+}
+
 
 
   // Input field model bindings 
@@ -364,6 +463,60 @@ export class WSRComponent implements OnInit {
       resolveBy: ''
     };
   }
+  addProgressItemToForm() {
+  this.newProgressList.forEach((item) => {
+    if (item.task && item.status) {
+      this.formModel.progressData.push({ ...item });
+    }
+  });
+
+  // Reset to a single empty row for further input
+  this.newProgressList = [{ task: '', status: '', remarks: '' }];
+}
+
+addPlannedItemToForm() {
+  this.newPlannedList.forEach((item) => {
+    if (item.task && item.status) {
+      this.formModel.plannedActivities.push({ ...item });
+    }
+  });
+
+  // Reset to a single empty row for further input
+  this.newPlannedList = [{ task: '', status: '', remarks: '' }];
+}
+
+
+addKeyIssueToForm() {
+  this.newIssueList.forEach((item) => {
+    if (item.description && item.type) {
+      this.formModel.keyIssues.push({ ...item });
+    }
+  });
+
+  // Reset for next input
+  this.newIssueList = [
+    {
+      type: '', functionalArea: '', description: '',
+      ActionRequired: '', dateRaised: '', resolveBy: '', IssueOwner: ''
+    }
+  ];
+}
+
+addKeyRiskToForm() {
+  this.newRiskList.forEach((item) => {
+    if (item.RiskDescription && item.mitigation) {
+      this.formModel.keyRisks.push({ ...item });
+    }
+  });
+
+  // Reset for next input
+  this.newRiskList = [
+    {
+      RiskDescription: '', mitigation: '', likelihood: '',
+      RiskOwner: '', riskdate: '', riskresolvedate: ''
+    }
+  ];
+}
 
 
   exportOptions = [
@@ -605,6 +758,37 @@ export class WSRComponent implements OnInit {
     }
   }
 
+  
+addProgressRow() {
+  this.newProgressList.push({ task: '', status: '', remarks: '' });
+}
+
+addPlannedRow() {
+  this.newPlannedList.push({ task: '', status: '', remarks: '' });
+}
+addIssueRow() {
+  this.newIssueList.push({
+    type: '',
+    functionalArea: '',
+    description: '',
+    ActionRequired: '',
+    dateRaised: '',
+    resolveBy: '',
+    IssueOwner: ''
+  });
+}
+
+addRiskRow() {
+  this.newRiskList.push({
+    RiskDescription: '',
+    mitigation: '',
+    likelihood: '',
+    RiskOwner: '',
+    riskdate: '',
+    riskresolvedate: ''
+  });
+}
+
   toggleProjectView(): void {
     this.showProjectView = !this.showProjectView;
   }
@@ -778,188 +962,118 @@ export class WSRComponent implements OnInit {
 
 
 
-  submitForm(): void {
-    if (!this.selectedProject) {
-      console.error('❌ No project selected.');
-      return;
-    }
+ submitForm(): void {
 
-    if (!this.isFormValid()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validation Error',
-        detail: 'Please fill all required fields before submitting.',
-      });
-      return;
-    }
+  if (!this.selectedProject) {
+    console.error('❌ No project selected.');
+    return;
+  }
 
-    // Build payload using service
-    const payload = this.wsrPayloadService.buildPayload(
+  if (!this.isFormValid()) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Validation Error',
+      detail: 'Please fill all required fields before submitting.'
+    });
+    return;
+  }
+
+  // 👉 Only push if values are valid (optional)
+ if (this.newIssueList.length > 0) this.formModel.keyIssues = this.newIssueList;
+if (this.newRiskList.length > 0) this.formModel.keyRisks = this.newRiskList;
+
+   if (this.newProgressList.length > 0) this.formModel.progressData = this.newProgressList;
+  if (this.newPlannedList.length > 0) this.formModel.plannedActivities = this.newPlannedList;
+
+  const payload = {
+    ...this.wsrPayloadService.buildPayload(
       this.formModel,
-      this.selectedResources,
+      this.resourceList,
       this.selectedStatuses,
       this.zohoEmployees
-    );
+    ),
+    projectType: this.formModel.projectType,
+    projectDescription: this.formModel.projectDescription
+  };
 
-    console.log('📦 Submitting payload:', payload);
+  console.log('📦 Submitting payload:', payload);
 
-    this.wsrService.submitWSRReport(payload).subscribe({
-      next: (res) => {
-        console.log('✅ WSR submitted successfully');
+  this.wsrService.submitWSRReport(payload).subscribe({
+    next: (res) => {
+      console.log('✅ WSR submitted successfully');
 
-        const alreadyExists = this.selectedProjects.some(
-          (p) => p.projectName === this.selectedProject?.projectName
-        );
+      const alreadyExists = this.selectedProjects.some(
+        p => p.projectName === this.selectedProject?.projectName
+      );
 
-        if (!alreadyExists && this.selectedProject) {
-          this.selectedProjects.push({
-            projectName: this.selectedProject.projectName,
-            schedule: '',
-            resource: '',
-            financial: '',
-            quality: '',
-            scope: '',
-            overallStatus: '',
-            plannedResource: 0,
-            actualResource: 0,
-            measureTaken: '',
-            remarks: '',
-          });
-        }
+      if (!alreadyExists && this.selectedProject) {
+        this.selectedProjects.push({
+          projectName: this.selectedProject.projectName,
+          schedule: '',
+          resource: '',
+          financial: '',
+          quality: '',
+          scope: '',
+          overallStatus: '',
+          plannedResource: this.formModel.plannedResource,
+          actualResource: this.formModel.actualResource,
+          measureTaken: this.formModel.measuresTaken,
+          remarks: this.formModel.remarks,
+          projectDescription: this.formModel.projectDescription,
+          progressData: this.formModel.progressData,
+          plannedActivities: this.formModel.plannedActivities,
+          keyIssues: this.formModel.keyIssues,
+          keyRisks: this.formModel.keyRisks,
+          id: undefined,
+          wsrReportDto: undefined
+        });
+      }
 
-        // this.resetForm();
-        // this.displayAddFormDialog = false;
-        // this.messageService.add({
-        //   severity: 'success',
-        //   summary: 'Success',
-        //   detail: res?.message || 'Project added successfully!'
-        // });
-        this.loadWSRReports?.();
-      },
-      // error: (err) => {
-      //   console.error('❌ WSR submission failed', err);
-      //   this.messageService.add({
-      //     severity: 'error',
-      //     summary: 'Error',
-      //     detail: 'Failed to add project.'
-      //   });
-      // }
-    });
-  }
+      // ✅ Reset temporary form inputs to clear form
+      this.newProgressList.push({ task: '', status: '', remarks: '' });
+      this.newPlannedList.push({ task: '', status: '', remarks: '' });
+      this.newIssueList = [{
+  type: '',
+  functionalArea: '',
+  description: '',
+  ActionRequired: '',
+  dateRaised: '',
+  resolveBy: '',
+  IssueOwner: ''
+}];
 
+this.newRiskList = [{
+  RiskDescription: '',
+  mitigation: '',
+  likelihood: '',
+  RiskOwner: '',
+  riskdate: '',
+  riskresolvedate: ''
+}];
 
-  // Flags for dialog edit modes
-  isEditProgressItem = false;
-  isEditPlannedItem = false;
-  isEditKeyIssue = false;
-  isEditKeyRisk = false;
-
-  // Models for editing
-  editProgressModel: ProgressItem = { task: '', active: false, taskStatus: '', remarks: '' };
-  editPlannedModel: ProgressItem = { task: '', active: true, taskStatus: '', remarks: '' };
-  editKeyIssueModel: any = {};
-  editKeyRiskModel: any = {};
-
-  // Store reference to the project and item being edited
-  editProjectRef: ProjectData | null = null;
-  editItemIndex: number | null = null;
-
-  // Tab 3: Edit Progress
-  editProgressItem(project: ProjectData, item: ProgressItem) {
-    this.isEditProgressItem = true;
-    this.isEditPlannedItem = false;
-    this.isEditKeyIssue = false;
-    this.isEditKeyRisk = false;
-    this.displayAddFormDialog = true;
-    this.editProjectRef = project;
-    this.editItemIndex = project.progressData?.indexOf(item) ?? null;
-    this.editProgressModel = { ...item };
-  }
-
-  // Tab 3: Edit Planned
-  editPlannedItem(project: ProjectData, item: ProgressItem) {
-    this.isEditProgressItem = false;
-    this.isEditPlannedItem = true;
-    this.isEditKeyIssue = false;
-    this.isEditKeyRisk = false;
-    this.displayAddFormDialog = true;
-    this.editProjectRef = project;
-    this.editItemIndex = project.progressData?.indexOf(item) ?? null;
-    this.editPlannedModel = { ...item };
-  }
-
-  // Tab 4: Edit Key Issue
-  editKeyIssue(project: ProjectData, issue: any) {
-    this.isEditProgressItem = false;
-    this.isEditPlannedItem = false;
-    this.isEditKeyIssue = true;
-    this.isEditKeyRisk = false;
-    this.displayAddFormDialog = true;
-    this.editProjectRef = project;
-    this.editItemIndex = project.keyIssues?.indexOf(issue) ?? null;
-    this.editKeyIssueModel = { ...issue };
-  }
-
-  // Tab 4: Edit Key Risk
-  editKeyRisk(project: ProjectData, risk: any) {
-    this.isEditProgressItem = false;
-    this.isEditPlannedItem = false;
-    this.isEditKeyIssue = false;
-    this.isEditKeyRisk = true;
-    this.displayAddFormDialog = true;
-    this.editProjectRef = project;
-    this.editItemIndex = project.keyRisks?.indexOf(risk) ?? null;
-    this.editKeyRiskModel = { ...risk };
-  }
-
-  // Save edited progress item
-  onEditProgressSave() {
-    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.progressData) {
-      this.editProjectRef.progressData[this.editItemIndex] = { ...this.editProgressModel };
-      this.isEditProgressItem = false;
+      this.resetForm(); // Clear the full form if needed
       this.displayAddFormDialog = false;
-    }
-  }
 
-  // Save edited planned item
-  onEditPlannedSave() {
-    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.progressData) {
-      this.editProjectRef.progressData[this.editItemIndex] = { ...this.editPlannedModel };
-      this.isEditPlannedItem = false;
-      this.displayAddFormDialog = false;
-    }
-  }
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: res?.message || 'Project added successfully!'
+      });
 
-  // Save edited key issue
-  onEditKeyIssueSave() {
-    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.keyIssues) {
-      this.editProjectRef.keyIssues[this.editItemIndex] = { ...this.editKeyIssueModel };
-      this.isEditKeyIssue = false;
-      this.displayAddFormDialog = false;
+      this.loadWSRReports?.();
+    },
+    error: (err) => {
+      console.error('❌ WSR submission failed', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to add project.'
+      });
     }
-  }
+  });
+}
 
-  // Save edited key risk
-  onEditKeyRiskSave() {
-    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.keyRisks) {
-      this.editProjectRef.keyRisks[this.editItemIndex] = { ...this.editKeyRiskModel };
-      this.isEditKeyRisk = false;
-      this.displayAddFormDialog = false;
-    }
-  }
 
-  // Cancel edit (already present, just ensure it resets all edit flags)
-  onCancelEdit(): void {
-    this.isEditProjectDetails = false;
-    this.isEditProjectStatus = false;
-    this.isEditProgressItem = false;
-    this.isEditPlannedItem = false;
-    this.isEditKeyIssue = false;
-    this.isEditKeyRisk = false;
-    this.displayAddFormDialog = false;
-    this.editProjectRef = null;
-    this.editItemIndex = null;
-  }
 
 
 

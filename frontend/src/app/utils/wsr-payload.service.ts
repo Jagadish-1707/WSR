@@ -14,31 +14,31 @@ import {
   providedIn: 'root'
 })
 export class WsrPayloadService {
-  constructor() {}
+  constructor() { }
 
   buildPayload(
-  formModel: any,
-  resourceList: {
-    zohoemp_id: string;
-    resourcename: string;
-    rating: number;
-  }[],
-  selectedStatuses: { [key: string]: string | { value: string } },
-  zohoEmployees: { userName: string; zohoEmp_Id: number }[]
-): WSRSubmissionPayload {
-  const now = new Date().toISOString(); // Declare once at the top
-  const createdBy = 'system';
-  const [reportStartDate, reportEndDate] = formModel.reportDates || [];
+    formModel: any,
+    resourceList: {
+      zohoemp_id: string;
+      resourcename: string;
+      rating: number;
+    }[],
+    selectedStatuses: { [key: string]: string | { value: string } },
+    zohoEmployees: { userName: string; zohoEmp_Id: number }[]
+  ): WSRSubmissionPayload {
+    const now = new Date().toISOString(); // Declare once at the top
+    const createdBy = 'system';
+    const [reportStartDate, reportEndDate] = formModel.reportDates || [];
 
-  const getValue = (status: string | { value: string }): string =>
-    typeof status === 'string' ? status : status?.value || '';
+    const getValue = (status: string | { value: string }): string =>
+      typeof status === 'string' ? status : status?.value || '';
 
-  const resources: WSRResourceDto[] = resourceList.map((user) => ({
-    zohoEmp_Id: Number(user.zohoemp_id),
-    emp_Name: user.resourcename,
-    rating: Math.round(user.rating),
-    active: 1
-  }));
+    const resources: WSRResourceDto[] = resourceList.map((user) => ({
+      zohoEmp_Id: Number(user.zohoemp_id),
+      emp_Name: user.resourcename,
+      rating: Math.round(user.rating),
+      active: 1
+    }));
 
     const wsrReportDto: WSRReportDto = {
       id: '0',
@@ -91,74 +91,68 @@ export class WsrPayloadService {
       updatedBy: createdBy
     };
 
-    // const wsrTaskDto: WSRTaskDto[] = [
-    //   ...(formModel.progressData || []).map((item: any) => ({
-    //     task: item.task || '',
-    //     taskStatus: item.status || '',
-    //     remarks: item.remarks || '',
-    //     createdBy,
-    //     createdOn: now,
-    //     active: false
-    //   })),
-    //   ...(formModel.plannedActivities || []).map((item: any) => ({
-    //     task: item.task || '',
-    //     taskStatus: item.status || '',
-    //     remarks: item.remarks || '',
-    //     createdBy,
-    //     createdOn: now,
-    //     active: true
-    //   }))
-    // ];
- 
     const wsrTaskList: WSRTaskDto[] = [];
-    if(formModel.progressData.length > 0) {
+    if (formModel.progressData.length > 0) {
       console.log('progressData', formModel.progressData);
       formModel.progressData.forEach((item: any) => {
         // if (item.task) {
-          wsrTaskList.push({
-            task: item.task,
-            taskStatus: item.status,
-            remarks: item.remarks,
-            createdBy,
-            createdOn: now,
-            active: false
-          });
+        wsrTaskList.push({
+          task: item.task,
+          taskStatus: item.status,
+          remarks: item.remarks,
+          createdBy,
+          createdOn: now,
+          active: false
+        });
         // }
       });
     }
 
-    if(formModel.plannedActivities.length > 0) {
+    if (formModel.plannedActivities.length > 0) {
       formModel.plannedActivities.forEach((item: any) => {
         // if (item.task) {
-          wsrTaskList.push({
-            task: item.task,
-            taskStatus: item.status,
-            remarks: item.remarks,
-            createdBy,
-            createdOn: now,
-            active: true
-          });
+        wsrTaskList.push({
+          task: item.task,
+          taskStatus: item.status,
+          remarks: item.remarks,
+          createdBy,
+          createdOn: now,
+          active: true
+        });
         // }
       });
     }
 
     formModel.wsrTaskDto = wsrTaskList;
 
-    const wsrIssueDto: WSRIssueDto[] = (formModel.keyIssues || []).map((item: any) => ({
-    type: item.type || '',
-    functionalArea: item.functionalArea || '',
-    description: item.description || '',
-    ActionRequired: item.ActionRequired || '',
-    dateReported: item.dateRaised ? new Date(item.dateRaised).toISOString() : now,
-    resolveByDate: item.resolveBy ? new Date(item.resolveBy).toISOString() : now,
-    IssueOwner: item.IssueOwner || '',
-    createdBy,
-    createdOn: now
-  }));
 
 
-    const wsrKeyRisksDto: WSRKeyRiskDto[] = (formModel.keyRisks || []).map((item: any) => ({
-      RiskDescription: item.RiskDescription || '',
+    const newIssueList: WSRIssueDto[] = [];
+    if (formModel.keyIssues.length > 0) {
+      console.log('keyIssues', formModel.keyIssues);
+      formModel.keyIssues.forEach((item: any) => {
+
+        newIssueList.push({
+          type: item.type || '',
+          functionalArea: item.functionalArea || '',
+          description: item.description || '',
+          ActionRequired: item.ActionRequired || '',
+          dateReported: item.dateRaised ? new Date(item.dateRaised).toISOString() : now,
+          resolveByDate: item.resolveBy ? new Date(item.resolveBy).toISOString() : now,
+          IssueOwner: item.IssueOwner || '',
+          createdBy,
+          createdOn: now
+        });
+      });
+    }
+
+     const newRiskList: WSRKeyRiskDto[] = [];
+    if (formModel.keyRisks.length > 0) {
+      console.log('keyRisks', formModel.keyRisks);
+      formModel.keyRisks.forEach((item: any) => {
+
+        newRiskList.push({
+         RiskDescription: item.RiskDescription || '',
       mitigation: item.mitigation || '',
       likelihood: item.likelihood || '',
       RiskOwner: item.RiskOwner || '',
@@ -166,15 +160,46 @@ export class WsrPayloadService {
       ResolveByDate: item.ResolveByDate ? new Date(item.ResolveByDate).toISOString() : now,
       createdBy,
       createdOn: now
-    }));
+        });
+      });
+    }
+
+
+
+
+
+
+    //   const wsrIssueDto: WSRIssueDto[] = (formModel.keyIssues || []).map((item: any) => ({
+    //   type: item.type || '',
+    //   functionalArea: item.functionalArea || '',
+    //   description: item.description || '',
+    //   ActionRequired: item.ActionRequired || '',
+    //   dateReported: item.dateRaised ? new Date(item.dateRaised).toISOString() : now,
+    //   resolveByDate: item.resolveBy ? new Date(item.resolveBy).toISOString() : now,
+    //   IssueOwner: item.IssueOwner || '',
+    //   createdBy,
+    //   createdOn: now
+    // }));
+
+
+    // const wsrKeyRisksDto: WSRKeyRiskDto[] = (formModel.keyRisks || []).map((item: any) => ({
+    //   RiskDescription: item.RiskDescription || '',
+    //   mitigation: item.mitigation || '',
+    //   likelihood: item.likelihood || '',
+    //   RiskOwner: item.RiskOwner || '',
+    //   dateRaised: item.dateRaised ? new Date(item.dateRaised).toISOString() : now,
+    //   ResolveByDate: item.ResolveByDate ? new Date(item.ResolveByDate).toISOString() : now,
+    //   createdBy,
+    //   createdOn: now
+    // }));
 
     return {
       WSRReportDto: wsrReportDto,
       WSRProjectStatusDto: wsrProjectStatusDto,
       WSRProjectDetailsDto: wsrProjectDetailsDto,
-      wsrTaskDto : wsrTaskList,
-      wsrIssueDto: wsrIssueDto,
-      wsrKeyRisksDto : wsrKeyRisksDto
+      wsrTaskDto: wsrTaskList,
+      wsrIssueDto: newIssueList,
+      wsrKeyRisksDto: newRiskList
     };
   }
 }

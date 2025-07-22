@@ -78,12 +78,12 @@ export interface WSRIssueDto {
 
 
 export interface WSRKeyRiskDto {
-  description: string;
+  RiskDescription: string;
   mitigation: string;
   likelihood: string;
-  owner: string;
+  RiskOwner: string;
   dateRaised: string;
-  resolveBy: string;
+  ResolveByDate: string;
   createdBy: string;
   createdOn: string;
 }

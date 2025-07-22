@@ -190,8 +190,44 @@ export class WSRDetailsComponent implements OnInit {
 newPlannedList: { task: string; status: string; remarks: string }[] = [
   { task: '', status: '', remarks: '' }
 ];
-newIssue = { type: '', functionalArea: '', description: '', ActionRequired: '', dateRaised: '', resolveBy: '', IssueOwner: '' };
-newRisk = { RiskDescription: '', mitigation: '', likelihood: '', RiskOwner: '', riskdate: '', riskresolvedate: '' };
+newIssueList: {
+  type: string;
+  functionalArea: string;
+  description: string;
+  ActionRequired: string;
+  dateRaised: string;
+  resolveBy: string;
+  IssueOwner: string;
+}[] = [
+  {
+    type: '',
+    functionalArea: '',
+    description: '',
+    ActionRequired: '',
+    dateRaised: '',
+    resolveBy: '',
+    IssueOwner: ''
+  }
+];
+
+newRiskList: {
+  RiskDescription: string;
+  mitigation: string;
+  likelihood: string;
+  RiskOwner: string;
+  riskdate: string;
+  riskresolvedate: string;
+}[] = [
+  {
+    RiskDescription: '',
+    mitigation: '',
+    likelihood: '',
+    RiskOwner: '',
+    riskdate: '',
+    riskresolvedate: ''
+  }
+];
+
 
 // formModel = {
 //   progressData: [],
@@ -224,18 +260,37 @@ addPlannedItemToForm() {
 
 
 addKeyIssueToForm() {
-  if (this.newIssue.description && this.newIssue.type) {
-    this.formModel.keyIssues.push({ ...this.newIssue });
-    this.newIssue = { type: '', functionalArea: '', description: '', ActionRequired: '', dateRaised: '', resolveBy: '', IssueOwner: '' };
-  }
+  this.newIssueList.forEach((item) => {
+    if (item.description && item.type) {
+      this.formModel.keyIssues.push({ ...item });
+    }
+  });
+
+  // Reset for next input
+  this.newIssueList = [
+    {
+      type: '', functionalArea: '', description: '',
+      ActionRequired: '', dateRaised: '', resolveBy: '', IssueOwner: ''
+    }
+  ];
 }
 
 addKeyRiskToForm() {
-  if (this.newRisk.RiskDescription && this.newRisk.mitigation) {
-    this.formModel.keyRisks.push({ ...this.newRisk });
-    this.newRisk = { RiskDescription: '', mitigation: '', likelihood: '', RiskOwner: '', riskdate: '', riskresolvedate: '' };
-  }
+  this.newRiskList.forEach((item) => {
+    if (item.RiskDescription && item.mitigation) {
+      this.formModel.keyRisks.push({ ...item });
+    }
+  });
+
+  // Reset for next input
+  this.newRiskList = [
+    {
+      RiskDescription: '', mitigation: '', likelihood: '',
+      RiskOwner: '', riskdate: '', riskresolvedate: ''
+    }
+  ];
 }
+
 
 
 
@@ -618,6 +673,30 @@ addProgressRow() {
 addPlannedRow() {
   this.newPlannedList.push({ task: '', status: '', remarks: '' });
 }
+addIssueRow() {
+  this.newIssueList.push({
+    type: '',
+    functionalArea: '',
+    description: '',
+    ActionRequired: '',
+    dateRaised: '',
+    resolveBy: '',
+    IssueOwner: ''
+  });
+}
+
+addRiskRow() {
+  this.newRiskList.push({
+    RiskDescription: '',
+    mitigation: '',
+    likelihood: '',
+    RiskOwner: '',
+    riskdate: '',
+    riskresolvedate: ''
+  });
+}
+
+
 
 
 
@@ -691,8 +770,9 @@ submitForm(): void {
   }
 
   // 👉 Only push if values are valid (optional)
-  if (this.newIssue?.description) this.formModel.keyIssues.push(this.newIssue);
-  if (this.newRisk?.RiskDescription) this.formModel.keyRisks.push(this.newRisk);
+ if (this.newIssueList.length > 0) this.formModel.keyIssues = this.newIssueList;
+if (this.newRiskList.length > 0) this.formModel.keyRisks = this.newRiskList;
+
    if (this.newProgressList.length > 0) this.formModel.progressData = this.newProgressList;
   if (this.newPlannedList.length > 0) this.formModel.plannedActivities = this.newPlannedList;
 
@@ -743,14 +823,24 @@ submitForm(): void {
       // ✅ Reset temporary form inputs to clear form
       this.newProgressList.push({ task: '', status: '', remarks: '' });
       this.newPlannedList.push({ task: '', status: '', remarks: '' });
-      this.newIssue = {
-        type: '', functionalArea: '', description: '', ActionRequired: '',
-        dateRaised: '', resolveBy: '', IssueOwner: ''
-      };
-      this.newRisk = {
-        RiskDescription: '', mitigation: '', likelihood: '',
-        RiskOwner: '', riskdate: '', riskresolvedate: ''
-      };
+      this.newIssueList = [{
+  type: '',
+  functionalArea: '',
+  description: '',
+  ActionRequired: '',
+  dateRaised: '',
+  resolveBy: '',
+  IssueOwner: ''
+}];
+
+this.newRiskList = [{
+  RiskDescription: '',
+  mitigation: '',
+  likelihood: '',
+  RiskOwner: '',
+  riskdate: '',
+  riskresolvedate: ''
+}];
 
       this.resetForm(); // Clear the full form if needed
       this.displayAddFormDialog = false;
@@ -815,14 +905,24 @@ submitForm(): void {
 
   this.newProgressList.push({ task: '', status: '', remarks: '' });
   this.newProgressList.push({ task: '', status: '', remarks: '' });
-  this.newIssue = {
-    type: '', functionalArea: '', description: '', ActionRequired: '',
-    dateRaised: '', resolveBy: '', IssueOwner: ''
-  };
-  this.newRisk = {
-    RiskDescription: '', mitigation: '', likelihood: '',
-    RiskOwner: '', riskdate: '', riskresolvedate: ''
-  };
+  this.newIssueList = [{
+  type: '',
+  functionalArea: '',
+  description: '',
+  ActionRequired: '',
+  dateRaised: '',
+  resolveBy: '',
+  IssueOwner: ''
+}];
+
+this.newRiskList = [{
+  RiskDescription: '',
+  mitigation: '',
+  likelihood: '',
+  RiskOwner: '',
+  riskdate: '',
+  riskresolvedate: ''
+}];
 }
 
 
