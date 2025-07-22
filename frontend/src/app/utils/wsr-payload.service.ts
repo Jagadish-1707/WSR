@@ -91,24 +91,60 @@ export class WsrPayloadService {
       updatedBy: createdBy
     };
 
-    const wsrTaskDto: WSRTaskDto[] = [
-      ...(formModel.progressData || []).map((item: any) => ({
-        task: item.task || '',
-        taskStatus: item.status || '',
-        remarks: item.remarks || '',
-        createdBy,
-        createdOn: now
-      })),
-      ...(formModel.plannedActivities || []).map((item: any) => ({
-        task: item.task || '',
-        taskStatus: item.status || '',
-        remarks: item.remarks || '',
-        createdBy,
-        createdOn: now
-      }))
-    ];
+    // const wsrTaskDto: WSRTaskDto[] = [
+    //   ...(formModel.progressData || []).map((item: any) => ({
+    //     task: item.task || '',
+    //     taskStatus: item.status || '',
+    //     remarks: item.remarks || '',
+    //     createdBy,
+    //     createdOn: now,
+    //     active: false
+    //   })),
+    //   ...(formModel.plannedActivities || []).map((item: any) => ({
+    //     task: item.task || '',
+    //     taskStatus: item.status || '',
+    //     remarks: item.remarks || '',
+    //     createdBy,
+    //     createdOn: now,
+    //     active: true
+    //   }))
+    // ];
+ 
+    const wsrTaskList: WSRTaskDto[] = [];
+    if(formModel.progressData.length > 0) {
+      console.log('progressData', formModel.progressData);
+      formModel.progressData.forEach((item: any) => {
+        // if (item.task) {
+          wsrTaskList.push({
+            task: item.task,
+            taskStatus: item.status,
+            remarks: item.remarks,
+            createdBy,
+            createdOn: now,
+            active: false
+          });
+        // }
+      });
+    }
 
-     const wsrIssueDto: WSRIssueDto[] = (formModel.keyIssues || []).map((item: any) => ({
+    if(formModel.plannedActivities.length > 0) {
+      formModel.plannedActivities.forEach((item: any) => {
+        // if (item.task) {
+          wsrTaskList.push({
+            task: item.task,
+            taskStatus: item.status,
+            remarks: item.remarks,
+            createdBy,
+            createdOn: now,
+            active: true
+          });
+        // }
+      });
+    }
+
+    formModel.wsrTaskDto = wsrTaskList;
+
+    const wsrIssueDto: WSRIssueDto[] = (formModel.keyIssues || []).map((item: any) => ({
     type: item.type || '',
     functionalArea: item.functionalArea || '',
     description: item.description || '',
@@ -136,7 +172,7 @@ export class WsrPayloadService {
       WSRReportDto: wsrReportDto,
       WSRProjectStatusDto: wsrProjectStatusDto,
       WSRProjectDetailsDto: wsrProjectDetailsDto,
-      wsrTaskDto :wsrTaskDto,
+      wsrTaskDto : wsrTaskList,
       wsrIssueDto: wsrIssueDto,
       wsrKeyRisksDto : wsrKeyRisksDto
     };

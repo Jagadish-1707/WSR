@@ -183,8 +183,13 @@ export class WSRDetailsComponent implements OnInit {
     { label: 'Red', value: 'Red' }
   ];
   selectedStatuses: { [key: string]: string } = {};
-  newProgress = { task: '', status: '', remarks: '' };
-newPlanned = { task: '', status: '', remarks: '' };
+ newProgressList: { task: string; status: string; remarks: string }[] = [
+  { task: '', status: '', remarks: '' }
+];
+
+newPlannedList: { task: string; status: string; remarks: string }[] = [
+  { task: '', status: '', remarks: '' }
+];
 newIssue = { type: '', functionalArea: '', description: '', ActionRequired: '', dateRaised: '', resolveBy: '', IssueOwner: '' };
 newRisk = { RiskDescription: '', mitigation: '', likelihood: '', RiskOwner: '', riskdate: '', riskresolvedate: '' };
 
@@ -195,20 +200,28 @@ newRisk = { RiskDescription: '', mitigation: '', likelihood: '', RiskOwner: '', 
 //   keyRisks: [],
 //   // ... your other fields
 // };
-
 addProgressItemToForm() {
-  if (this.newProgress.task && this.newProgress.status) {
-    this.formModel.progressData.push({ ...this.newProgress });
-    this.newProgress = { task: '', status: '', remarks: '' };
-  }
+  this.newProgressList.forEach((item) => {
+    if (item.task && item.status) {
+      this.formModel.progressData.push({ ...item });
+    }
+  });
+
+  // Reset to a single empty row for further input
+  this.newProgressList = [{ task: '', status: '', remarks: '' }];
 }
 
 addPlannedItemToForm() {
-  if (this.newPlanned.task && this.newPlanned.status) {
-    this.formModel.plannedActivities.push({ ...this.newPlanned });
-    this.newPlanned = { task: '', status: '', remarks: '' };
-  }
+  this.newPlannedList.forEach((item) => {
+    if (item.task && item.status) {
+      this.formModel.plannedActivities.push({ ...item });
+    }
+  });
+
+  // Reset to a single empty row for further input
+  this.newPlannedList = [{ task: '', status: '', remarks: '' }];
 }
+
 
 addKeyIssueToForm() {
   if (this.newIssue.description && this.newIssue.type) {
@@ -598,6 +611,13 @@ onProjectSelected(selectedProject: any): void {
   }
 }
 
+addProgressRow() {
+  this.newProgressList.push({ task: '', status: '', remarks: '' });
+}
+
+addPlannedRow() {
+  this.newPlannedList.push({ task: '', status: '', remarks: '' });
+}
 
 
 
@@ -655,7 +675,6 @@ onProjectSelected(selectedProject: any): void {
   }
   
 submitForm(): void {
-  console.log('newPlanned', this.newPlanned);
 
   if (!this.selectedProject) {
     console.error('❌ No project selected.');
@@ -672,10 +691,10 @@ submitForm(): void {
   }
 
   // 👉 Only push if values are valid (optional)
-  if (this.newProgress?.task) this.formModel.progressData.push(this.newProgress);
-  if (this.newPlanned?.task) this.formModel.plannedActivities.push(this.newPlanned);
   if (this.newIssue?.description) this.formModel.keyIssues.push(this.newIssue);
   if (this.newRisk?.RiskDescription) this.formModel.keyRisks.push(this.newRisk);
+   if (this.newProgressList.length > 0) this.formModel.progressData = this.newProgressList;
+  if (this.newPlannedList.length > 0) this.formModel.plannedActivities = this.newPlannedList;
 
   const payload = {
     ...this.wsrPayloadService.buildPayload(
@@ -722,8 +741,8 @@ submitForm(): void {
       }
 
       // ✅ Reset temporary form inputs to clear form
-      this.newProgress = { task: '', status: '', remarks: '' };
-      this.newPlanned = { task: '', status: '', remarks: '' };
+      this.newProgressList.push({ task: '', status: '', remarks: '' });
+      this.newPlannedList.push({ task: '', status: '', remarks: '' });
       this.newIssue = {
         type: '', functionalArea: '', description: '', ActionRequired: '',
         dateRaised: '', resolveBy: '', IssueOwner: ''
@@ -794,8 +813,8 @@ submitForm(): void {
     keyRisks: []
   };
 
-  this.newProgress = { task: '', status: '', remarks: '' };
-  this.newPlanned = { task: '', status: '', remarks: '' };
+  this.newProgressList.push({ task: '', status: '', remarks: '' });
+  this.newProgressList.push({ task: '', status: '', remarks: '' });
   this.newIssue = {
     type: '', functionalArea: '', description: '', ActionRequired: '',
     dateRaised: '', resolveBy: '', IssueOwner: ''

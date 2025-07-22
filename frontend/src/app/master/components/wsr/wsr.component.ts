@@ -53,7 +53,7 @@ interface ResourceItem {
 interface ProjectData {
   projectId?: string;
   projectName: string;
-  clientName?: string; 
+  clientName?: string;
   schedule: string;
   resource: string;
   financial: string;
@@ -110,14 +110,14 @@ interface ProjectData {
 }
 
 interface keyIssues {
-    type?: string;
-    functionalArea?: string;
-    description?: string;
-    actions?: string;
-    dateRaised?: string;
-    resolveBy?: string;
-    owner?: string;
-  }
+  type?: string;
+  functionalArea?: string;
+  description?: string;
+  actions?: string;
+  dateRaised?: string;
+  resolveBy?: string;
+  owner?: string;
+}
 
 @Component({
   selector: 'app-wsr',
@@ -262,7 +262,7 @@ export class WSRComponent implements OnInit {
       task: this.newProgress.task,
       status: this.newProgress.status,
       remarks: this.newProgress.remarks,
-      planned: false
+      active: false
     });
 
     project.isProgress = true;
@@ -281,7 +281,7 @@ export class WSRComponent implements OnInit {
       task: this.newPlanned.task,
       status: this.newPlanned.status,
       remarks: this.newPlanned.remarks,
-      planned: true
+      active: true
     });
 
     project.isPlanned = true;
@@ -448,40 +448,40 @@ export class WSRComponent implements OnInit {
 
   // ✅ Normalize API response for tab rendering
   private mapWSRDataToProject(data: any): ProjectData {
-  const report = data.wsrReportDto || {};
-  const status = data.wsrProjectStatusDto || {};
-  const details = data.wsrProjectDetailsDto || {};
+    const report = data.wsrReportDto || {};
+    const status = data.wsrProjectStatusDto || {};
+    const details = data.wsrProjectDetailsDto || {};
 
-  // Optional: Normalize date fields (for p-calendar compatibility)
-  const keyIssues = (data.wsrIssueDto || []).map((issue: any) => ({
-    ...issue,
-    dateRaised: issue.dateReported ? new Date(issue.dateReported) : null,
-    resolveBy: issue.resolveByDate ? new Date(issue.resolveByDate) : null,
-  }));
+    // Optional: Normalize date fields (for p-calendar compatibility)
+    const keyIssues = (data.wsrIssueDto || []).map((issue: any) => ({
+      ...issue,
+      dateRaised: issue.dateReported ? new Date(issue.dateReported) : null,
+      resolveBy: issue.resolveByDate ? new Date(issue.resolveByDate) : null,
+    }));
 
-  const keyRisks = (data.wsrKeyRisksDto || []).map((risk: any) => ({
-    ...risk,
-    dateRaised: risk.dateRaised ? new Date(risk.dateRaised) : null,
-    resolveBy: risk.resolveByDate ? new Date(risk.resolveByDate) : null,
-  }));
+    const keyRisks = (data.wsrKeyRisksDto || []).map((risk: any) => ({
+      ...risk,
+      dateRaised: risk.dateRaised ? new Date(risk.dateRaised) : null,
+      resolveBy: risk.resolveByDate ? new Date(risk.resolveByDate) : null,
+    }));
 
-  return {
-    ...report,
-    ...status,
-    ...details,
+    return {
+      ...report,
+      ...status,
+      ...details,
 
-    resourceData: details.resourceData || [],
-    progressData: data.wsrTaskDto || [],
-    plannedActivities: data.wsrTaskDto || [],
-    keyIssues,
-    keyRisks,
-    resources: details.resources || [],
+      resourceData: details.resourceData || [],
+      progressData: data.wsrTaskDto || [],
+      plannedActivities: data.wsrTaskDto || [],
+      keyIssues,
+      keyRisks,
+      resources: details.resources || [],
 
-    // Optional: ensure projectName and projectId exist
-    projectName: report.projectName || status.projectName || 'Unnamed Project',
-    projectId: report.projectId || status.projectId || details.projectId || '',
-  };
-}
+      // Optional: ensure projectName and projectId exist
+      projectName: report.projectName || status.projectName || 'Unnamed Project',
+      projectId: report.projectId || status.projectId || details.projectId || '',
+    };
+  }
 
 
 
@@ -776,6 +776,8 @@ export class WSRComponent implements OnInit {
 
 
 
+
+
   submitForm(): void {
     if (!this.selectedProject) {
       console.error('❌ No project selected.');
@@ -846,10 +848,117 @@ export class WSRComponent implements OnInit {
   }
 
 
+  // Flags for dialog edit modes
+  isEditProgressItem = false;
+  isEditPlannedItem = false;
+  isEditKeyIssue = false;
+  isEditKeyRisk = false;
+
+  // Models for editing
+  editProgressModel: ProgressItem = { task: '', active: false, taskStatus: '', remarks: '' };
+  editPlannedModel: ProgressItem = { task: '', active: true, taskStatus: '', remarks: '' };
+  editKeyIssueModel: any = {};
+  editKeyRiskModel: any = {};
+
+  // Store reference to the project and item being edited
+  editProjectRef: ProjectData | null = null;
+  editItemIndex: number | null = null;
+
+  // Tab 3: Edit Progress
+  editProgressItem(project: ProjectData, item: ProgressItem) {
+    this.isEditProgressItem = true;
+    this.isEditPlannedItem = false;
+    this.isEditKeyIssue = false;
+    this.isEditKeyRisk = false;
+    this.displayAddFormDialog = true;
+    this.editProjectRef = project;
+    this.editItemIndex = project.progressData?.indexOf(item) ?? null;
+    this.editProgressModel = { ...item };
+  }
+
+  // Tab 3: Edit Planned
+  editPlannedItem(project: ProjectData, item: ProgressItem) {
+    this.isEditProgressItem = false;
+    this.isEditPlannedItem = true;
+    this.isEditKeyIssue = false;
+    this.isEditKeyRisk = false;
+    this.displayAddFormDialog = true;
+    this.editProjectRef = project;
+    this.editItemIndex = project.progressData?.indexOf(item) ?? null;
+    this.editPlannedModel = { ...item };
+  }
+
+  // Tab 4: Edit Key Issue
+  editKeyIssue(project: ProjectData, issue: any) {
+    this.isEditProgressItem = false;
+    this.isEditPlannedItem = false;
+    this.isEditKeyIssue = true;
+    this.isEditKeyRisk = false;
+    this.displayAddFormDialog = true;
+    this.editProjectRef = project;
+    this.editItemIndex = project.keyIssues?.indexOf(issue) ?? null;
+    this.editKeyIssueModel = { ...issue };
+  }
+
+  // Tab 4: Edit Key Risk
+  editKeyRisk(project: ProjectData, risk: any) {
+    this.isEditProgressItem = false;
+    this.isEditPlannedItem = false;
+    this.isEditKeyIssue = false;
+    this.isEditKeyRisk = true;
+    this.displayAddFormDialog = true;
+    this.editProjectRef = project;
+    this.editItemIndex = project.keyRisks?.indexOf(risk) ?? null;
+    this.editKeyRiskModel = { ...risk };
+  }
+
+  // Save edited progress item
+  onEditProgressSave() {
+    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.progressData) {
+      this.editProjectRef.progressData[this.editItemIndex] = { ...this.editProgressModel };
+      this.isEditProgressItem = false;
+      this.displayAddFormDialog = false;
+    }
+  }
+
+  // Save edited planned item
+  onEditPlannedSave() {
+    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.progressData) {
+      this.editProjectRef.progressData[this.editItemIndex] = { ...this.editPlannedModel };
+      this.isEditPlannedItem = false;
+      this.displayAddFormDialog = false;
+    }
+  }
+
+  // Save edited key issue
+  onEditKeyIssueSave() {
+    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.keyIssues) {
+      this.editProjectRef.keyIssues[this.editItemIndex] = { ...this.editKeyIssueModel };
+      this.isEditKeyIssue = false;
+      this.displayAddFormDialog = false;
+    }
+  }
+
+  // Save edited key risk
+  onEditKeyRiskSave() {
+    if (this.editProjectRef && this.editItemIndex !== null && this.editProjectRef.keyRisks) {
+      this.editProjectRef.keyRisks[this.editItemIndex] = { ...this.editKeyRiskModel };
+      this.isEditKeyRisk = false;
+      this.displayAddFormDialog = false;
+    }
+  }
+
+  // Cancel edit (already present, just ensure it resets all edit flags)
   onCancelEdit(): void {
     this.isEditProjectDetails = false;
     this.isEditProjectStatus = false;
+    this.isEditProgressItem = false;
+    this.isEditPlannedItem = false;
+    this.isEditKeyIssue = false;
+    this.isEditKeyRisk = false;
     this.displayAddFormDialog = false;
+    this.editProjectRef = null;
+    this.editItemIndex = null;
   }
 
 
@@ -881,6 +990,16 @@ export class WSRComponent implements OnInit {
     this.selectedProject = null;
   }
 
+
+  formatDateCustom(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   async downloadPPT(): Promise<void> {
     const pptx = new PptxGenJS();
 
@@ -892,7 +1011,8 @@ export class WSRComponent implements OnInit {
         {
           text: {
             text: 'Page <#> of <#slideCount>',
-            options: {
+            options:
+            {
               x: 4.5, y: 6.8, fontSize: 9, align: 'center'
             }
           }
@@ -1212,11 +1332,11 @@ export class WSRComponent implements OnInit {
       if (project.progressData?.length) {
         const progressTable = [
           ['Sl No', 'Task', 'Status', 'Remarks'],
-          ...project.progressData.map((item, index) => [
+          ...project.progressData.filter(x => !x.active).map((item, index) => [
             (item.sno || index + 1).toString(),
             item.task || '',
             item.taskStatus || '',
-            item.remarks || ''
+            item.remarks || '',
           ])
         ];
         progressSlide.addText('Progress since last report & Key Achievements:', { x: 0.5, y: 1, fontSize: 14, bold: true });
@@ -1233,7 +1353,7 @@ export class WSRComponent implements OnInit {
       if (project.plannedActivities?.length) {
         const planTable = [
           ['Sl No', 'Task', 'Status', 'Remarks'],
-          ...project.plannedActivities.map((item, index) => [
+          ...project.plannedActivities.filter(x => x.active).map((item, index) => [
             (item.sno || index + 1).toString(),
             item.task || '',
             item.taskStatus || '',
@@ -1284,8 +1404,8 @@ export class WSRComponent implements OnInit {
             item.functionalArea || '',
             item.description || '',
             item.actionRequired || '',
-            item.dateRaised || '',
-            item.resolveBy || '',
+            this.formatDateCustom(item.dateRaised),
+            this.formatDateCustom(item.resolveBy),
             item.issueOwner || ''
           ])
         ];
@@ -1309,8 +1429,8 @@ export class WSRComponent implements OnInit {
             item.mitigation || '',
             item.likelihood || '',
             item.riskOwner || '',
-            item.dateRaised || '',
-            item.resolveBy || ''
+            this.formatDateCustom(item.dateRaised),
+            this.formatDateCustom(item.resolveBy),
           ])
         ];
         issueSlide.addText('Key Risks:', { x: 0.5, y: 5.8, fontSize: 14, bold: true });
@@ -1495,46 +1615,46 @@ export class WSRComponent implements OnInit {
 
                 // Traffic Light Status Table
 
-               {
-  table: {
-    widths: ['20%', '20%', '20%', '20%', '20%'],
-    body: [
-      // Row 1: Legend Header
-      [
-        { text: 'Traffic Lights', style: 'infoLabel', fillColor: '#e6e6e6', alignment: 'center', margin: [0, 5, 0, 0] },
-        { text: '🔴 RED', style: 'infoLabel', color: 'red', alignment: 'center', margin: [0, 5, 0, 0] },
-        { text: '🟠 AMBER', style: 'infoLabel', color: 'orange', alignment: 'center', margin: [0, 5, 0, 0] },
-        { text: '🟢 GREEN', style: 'infoLabel', color: 'green', alignment: 'center', margin: [0, 5, 0, 0] },
-        { text: '⚪ NA', style: 'infoLabel', alignment: 'center', margin: [0, 5, 0, 0] },
-      ],
+                {
+                  table: {
+                    widths: ['20%', '20%', '20%', '20%', '20%'],
+                    body: [
+                      // Row 1: Legend Header
+                      [
+                        { text: 'Traffic Lights', style: 'infoLabel', fillColor: '#e6e6e6', alignment: 'center', margin: [0, 5, 0, 0] },
+                        { text: '🔴 RED', style: 'infoLabel', color: 'red', alignment: 'center', margin: [0, 5, 0, 0] },
+                        { text: '🟠 AMBER', style: 'infoLabel', color: 'orange', alignment: 'center', margin: [0, 5, 0, 0] },
+                        { text: '🟢 GREEN', style: 'infoLabel', color: 'green', alignment: 'center', margin: [0, 5, 0, 0] },
+                        { text: '⚪ NA', style: 'infoLabel', alignment: 'center', margin: [0, 5, 0, 0] },
+                      ],
 
-      // Row 2: First set of ratings with only colored emojis
-      [
-        { text: 'Overall Project Status ↑', style: 'trafficCell', bold: true, alignment: 'center', border: [true, true, true, false], margin: [0, 7, 0, 0] },
-        { text: '🟢', style: 'trafficCell', alignment: 'center', border: [true, true, false, false], margin: [0, 7, 0, 0] },  // Financial
-        { text: '🟢', style: 'trafficCell', alignment: 'center', border: [false, true, false, false], margin: [0, 7, 0, 0] }, // Schedule
-        { text: '🟠', style: 'trafficCell', alignment: 'center', border: [false, true, false, false], margin: [0, 7, 0, 0] }, // Resource
-        { text: '🔴', style: 'trafficCell', alignment: 'center', border: [false, true, true, false], margin: [0, 7, 0, 0] },  // Quality
-      ],
+                      // Row 2: First set of ratings with only colored emojis
+                      [
+                        { text: 'Overall Project Status ↑', style: 'trafficCell', bold: true, alignment: 'center', border: [true, true, true, false], margin: [0, 7, 0, 0] },
+                        { text: '🟢', style: 'trafficCell', alignment: 'center', border: [true, true, false, false], margin: [0, 7, 0, 0] },  // Financial
+                        { text: '🟢', style: 'trafficCell', alignment: 'center', border: [false, true, false, false], margin: [0, 7, 0, 0] }, // Schedule
+                        { text: '🟠', style: 'trafficCell', alignment: 'center', border: [false, true, false, false], margin: [0, 7, 0, 0] }, // Resource
+                        { text: '🔴', style: 'trafficCell', alignment: 'center', border: [false, true, true, false], margin: [0, 7, 0, 0] },  // Quality
+                      ],
 
-      // Row 3: Continuation with only symbols
-      [
-        { text: '', style: 'trafficCell', border: [true, false, false, true] },
-        { text: '⚪', style: 'trafficCell', alignment: 'center', border: [true, false, false, true], margin: [0, 0, 0, 7] }, // Scope
-        { text: '', style: 'trafficCell', border: [false, false, false, true] },
-        { text: '', style: 'trafficCell', border: [false, false, false, true] },
-        { text: '', style: 'trafficCell', border: [false, false, true, true] }
-      ],
-    ]
-  },
-  layout: {
-    hLineWidth: (): number => 0.5,
-    vLineWidth: (): number => 0.5,
-    hLineColor: (): string => '#aaa',
-    vLineColor: (): string => '#aaa',
-  },
-  margin: [0, 10, 0, 10],
-},
+                      // Row 3: Continuation with only symbols
+                      [
+                        { text: '', style: 'trafficCell', border: [true, false, false, true] },
+                        { text: '⚪', style: 'trafficCell', alignment: 'center', border: [true, false, false, true], margin: [0, 0, 0, 7] }, // Scope
+                        { text: '', style: 'trafficCell', border: [false, false, false, true] },
+                        { text: '', style: 'trafficCell', border: [false, false, false, true] },
+                        { text: '', style: 'trafficCell', border: [false, false, true, true] }
+                      ],
+                    ]
+                  },
+                  layout: {
+                    hLineWidth: (): number => 0.5,
+                    vLineWidth: (): number => 0.5,
+                    hLineColor: (): string => '#aaa',
+                    vLineColor: (): string => '#aaa',
+                  },
+                  margin: [0, 10, 0, 10],
+                },
 
 
               ],
@@ -1687,7 +1807,7 @@ export class WSRComponent implements OnInit {
                         { text: 'Status', style: 'progressTableHeader' },
                         { text: 'Remarks', style: 'progressTableHeader' },
                       ],
-                      ...progressData.map((item, index) => [
+                      ...progressData.filter(x =>!x.active).map((item, index) => [
                         {
                           text: (item.sno || index + 1).toString(),
                           alignment: 'center',
@@ -1743,7 +1863,7 @@ export class WSRComponent implements OnInit {
                         { text: 'Status', style: 'progressTableHeader' },
                         { text: 'Remarks', style: 'progressTableHeader' },
                       ],
-                      ...plannedActivities.map((item, index) => [
+                      ...plannedActivities.filter(x => x.active).map((item, index) => [
                         {
                           text: (item.sno || index + 1).toString(),
                           alignment: 'center',
@@ -1873,13 +1993,14 @@ export class WSRComponent implements OnInit {
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.dateRaised || '',
+                          text: this.formatDateCustom(item.dateRaised),
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.resolveBy || '',
+                          text: this.formatDateCustom(item.resolveBy),
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
+
                         {
                           text: item.issueOwner || '',
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
@@ -1898,7 +2019,7 @@ export class WSRComponent implements OnInit {
                     paddingBottom: (): number => 6,
                   },
                   margin: [0, 0, 0, 20],
-                },
+                               },
               ]
               : []),
 
@@ -1957,13 +2078,14 @@ export class WSRComponent implements OnInit {
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.dateRaised || '',
+                          text: this.formatDateCustom(item.dateRaised),
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
                         {
-                          text: item.resolveBy || '',
+                          text: this.formatDateCustom(item.resolveBy),
                           fillColor: index % 2 ? '#e6f3ff' : 'white',
                         },
+
                       ]),
                     ],
                   },

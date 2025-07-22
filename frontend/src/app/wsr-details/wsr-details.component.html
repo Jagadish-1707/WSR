@@ -281,97 +281,63 @@
   </div>
 
   <!-- Progress & Planned Activities Combined -->
-  <div class="project-status-container">
-    <div *ngIf="formModel.progressData?.length > 0">
-      <table class="individual-project-details">
-        <thead>
-          <tr>
-            <th>Sl No</th>
-            <th>Task</th>
-            <th>Status</th>
-            <th>Remarks</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of formModel.progressData; let i = index" [class.even-row]="i % 2 !== 0">
-            <td class="text-center">{{ i + 1 }}</td>
-            <td>{{ item.task }}</td>
-            <td class="text-center">{{ item.TaskStatus }}</td>
-            <td>{{ item.remarks }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="project-status-container">
 
-    <div class="project-status-header mt-4">Add Progress</div>
-    <div class="p-fluid p-grid">
-      <div class="p-col-12 p-md-6">
-        <div class="status-field">
-          <label>Task <span class="required">*</span></label>
-          <input pInputText [(ngModel)]="newProgress.task" placeholder="Enter Task" />
-        </div>
-      </div>
+  <!-- Progress Table -->
+ <div class="project-status-header mt-4">Add Progress</div>
 
-      <div class="p-col-12 p-md-6">
-        <div class="status-field">
-          <label>Status <span class="required">*</span></label>
-          <input pInputText [(ngModel)]="newProgress.status" placeholder="Enter Status" />
-        </div>
-      </div>
-
-      <div class="p-col-12">
-        <div class="status-field">
-          <label>Remarks</label>
-          <textarea pInputTextarea rows="3" [(ngModel)]="newProgress.remarks" placeholder="Enter Remarks"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="formModel.plannedActivities?.length > 0">
-      <table class="individual-project-details">
-        <thead>
-          <tr>
-            <th>Sl No</th>
-            <th>Task</th>
-            <th>Status</th>
-            <th>Remarks</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of formModel.plannedActivities; let i = index" [class.even-row]="i % 2 !== 0">
-            <td class="text-center">{{ i + 1 }}</td>
-            <td>{{ item.task }}</td>
-            <td class="text-center">{{ item.TaskStatus }}</td>
-            <td>{{ item.remarks }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="project-status-header mt-4">Add Planned Activity</div>
-    <div class="p-fluid p-grid">
-      <div class="p-col-12 p-md-6">
-        <div class="status-field">
-          <label>Task <span class="required">*</span></label>
-          <input pInputText [(ngModel)]="newPlanned.task" placeholder="Enter Task" />
-        </div>
-      </div>
-
-      <div class="p-col-12 p-md-6">
-        <div class="status-field">
-          <label>Status <span class="required">*</span></label>
-          <input pInputText [(ngModel)]="newPlanned.status" placeholder="Enter Status" />
-        </div>
-      </div>
-
-      <div class="p-col-12">
-        <div class="status-field">
-          <label>Remarks</label>
-          <textarea pInputTextarea rows="3" [(ngModel)]="newPlanned.remarks" placeholder="Enter Remarks"></textarea>
-        </div>
-      </div>
+<div *ngFor="let progress of newProgressList; let i = index" class="p-fluid p-grid mb-3">
+  <div class="p-col-12 p-md-6">
+    <div class="status-field">
+      <label>Task <span class="required">*</span></label>
+      <input pInputText [(ngModel)]="progress.task" placeholder="Enter Task" name="progressTask{{ i }}" />
     </div>
   </div>
+  <div class="p-col-12 p-md-6">
+    <div class="status-field">
+      <label>Status <span class="required">*</span></label>
+      <input pInputText [(ngModel)]="progress.status" placeholder="Enter Status" name="progressStatus{{ i }}" />
+    </div>
+  </div>
+  <div class="p-col-12">
+    <div class="status-field">
+      <label>Remarks</label>
+      <textarea pInputTextarea [(ngModel)]="progress.remarks" placeholder="Enter Remarks" rows="3" name="progressRemarks{{ i }}"></textarea>
+    </div>
+  </div>
+</div>
+
+<button pButton type="button" label="Add Another Progress" icon="pi pi-plus" (click)="addProgressRow()"></button>
+
+
+  <!-- Planned Table --><div class="project-status-header mt-4">Add Planned Activity</div>
+
+<div *ngFor="let planned of newPlannedList; let i = index" class="p-fluid p-grid mb-3">
+  <div class="p-col-12 p-md-6">
+    <div class="status-field">
+      <label>Task <span class="required">*</span></label>
+      <input pInputText [(ngModel)]="planned.task" placeholder="Enter Task" name="plannedTask{{ i }}" />
+    </div>
+  </div>
+  <div class="p-col-12 p-md-6">
+    <div class="status-field">
+      <label>Status <span class="required">*</span></label>
+      <input pInputText [(ngModel)]="planned.status" placeholder="Enter Status" name="plannedStatus{{ i }}" />
+    </div>
+  </div>
+  <div class="p-col-12">
+    <div class="status-field">
+      <label>Remarks</label>
+      <textarea pInputTextarea [(ngModel)]="planned.remarks" placeholder="Enter Remarks" rows="3" name="plannedRemarks{{ i }}"></textarea>
+    </div>
+  </div>
+</div>
+
+<button pButton type="button" label="Add Another Planned Activity" icon="pi pi-plus" (click)="addPlannedRow()"></button>
+</div>
+
+
+
 
 
 

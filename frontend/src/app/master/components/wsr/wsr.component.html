@@ -222,6 +222,7 @@
                                         <th>Task</th>
                                         <th>Status</th>
                                         <th>Remarks</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -231,6 +232,10 @@
                                             <td>{{ item.task }}</td>
                                             <td class="text-center">{{ item.taskStatus }}</td>
                                             <td>{{ item.remarks }}</td>
+                                            <td>
+                                                <button pButton icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-text"
+                                                    (click)="editProgressItem(project, item)" title="Edit Progress"></button>
+                                            </td>
                                         </tr>
                                     </ng-container>
                                 </tbody>
@@ -260,6 +265,7 @@
                                         <th>Task</th>
                                         <th>Status</th>
                                         <th>Remarks</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -269,6 +275,10 @@
                                             <td>{{ item.task }}</td>
                                             <td class="text-center">{{ item.taskStatus }}</td>
                                             <td>{{ item.remarks }}</td>
+                                            <td>
+                                                <button pButton icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-text"
+                                                    (click)="editPlannedItem(project, item)" title="Edit Planned"></button>
+                                            </td>
                                         </tr>
                                     </ng-container>
                                 </tbody>
@@ -321,6 +331,7 @@
                                         <th>Date Raised</th>
                                         <th>Resolve By</th>
                                         <th>Owner</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -333,6 +344,10 @@
                                         <td>{{ issue.dateRaised | date: 'dd/MM/yyyy' }}</td>
                                         <td>{{ issue.resolveBy | date: 'dd/MM/yyyy' }}</td>
                                         <td>{{ issue.issueOwner }}</td>
+                                        <td>
+                                            <button pButton icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-text"
+                                                (click)="editKeyIssue(project, issue)" title="Edit Key Issue"></button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -366,6 +381,7 @@
                                         <th>Owner</th>
                                         <th>Date Raised</th>
                                         <th>Resolve By</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -377,6 +393,10 @@
                                         <td>{{ risk.riskOwner }}</td>
                                         <td>{{ risk.dateRaised | date: 'dd/MM/yyyy' }}</td>
                                         <td>{{ risk.resolveBy | date: 'dd/MM/yyyy' }}</td>
+                                        <td>
+                                            <button pButton icon="pi pi-pencil" class="p-button-sm p-button-rounded p-button-text"
+                                                (click)="editKeyRisk(project, risk)" title="Edit Key Risk"></button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -572,4 +592,5 @@
             class="p-button-secondary">
         </button>
     </div>
+
 </p-dialog>

@@ -61,6 +61,7 @@ export class WSRTaskDto {
   remarks!: string;
   createdBy!: string;
   createdOn!: string;
+  active!: boolean;
 }
 
 export interface WSRIssueDto {
